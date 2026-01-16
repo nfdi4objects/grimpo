@@ -5,9 +5,11 @@ from lib import CollectionRegistry, TerminologyRegistry, MappingRegistry, \
 import argparse
 import os
 from pathlib import Path
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app)
 app.json.compact = False
 
 collections = None

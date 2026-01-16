@@ -8,3 +8,4 @@ SPARQLWrapper
 pyoxigraph==0.5.2
 rdflib
 PyLD
+flask-cors
