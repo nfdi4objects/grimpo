@@ -6,6 +6,6 @@ datahugger
 jsonschema
 SPARQLWrapper
 pyoxigraph==0.5.2
-rdflib
+rdflib>=7.5.0
 PyLD
 flask-cors

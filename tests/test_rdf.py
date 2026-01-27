@@ -1,6 +1,7 @@
-import pytest
-
+# Unit test
 from lib import triple_iterator, RDFFilter, ValidationError
+from lib.rdf import NativeTripleStore
+from rdflib import URIRef, Literal, BNode
 
 
 def parse(source, filter=None, unique=False):
@@ -70,3 +71,18 @@ def test_filter():
     filter = RDFFilter(disallow_subject_ns=("http://www.cidoc-crm.org/cidoc-crm/"))
     triples = parse("tests/filter.ttl", filter, True)
     assert len(triples) == 3
+
+
+def test_store():
+    store = NativeTripleStore()
+
+    store.insert('http://example.org/', '_:b1 dct:title "foo"')
+    assert store.query("SELECT * { ?s ?p ?o }") == [{
+        's': {'type': 'bnode', 'value': 'b1'},
+        'p': {'type': 'uri', 'value': 'http://purl.org/dc/terms/title'},
+        'o': {'type': 'literal', 'value': 'foo'}
+    }]
+
+    store.store_file('http://example.org/1', "tests/filter.ttl")
+    query = "SELECT * { GRAPH <http://example.org/1> { ?s ?b ?o } }"
+    assert len(store.query(query)) == 6

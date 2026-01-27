@@ -164,7 +164,7 @@ Received data in RDF or JSKOS format must be syntactically valid. Additional con
 
 **JSKOS data** (for terminologies and mappings) is not validated yet (see [open issue](https://github.com/nfdi4objects/n4o-graph-importer/issues/50)).
 
-**RDF data** is allowed to contain any absolute IRI references matching the regular expression `` ^[a-z][a-z0-9+.-]*:[^<>"{}|^`\\\x00-\x20]*$ ``. This includes some IRI references invalid in theory but  supported by most RDF software in practice. Additional constraints on RDF data do not result in validation errors but malformed triples are filtered out and result in collected as part of [report] files.
+**RDF data** is allowed to contain any absolute IRI references matching the regular expression `` ^[a-z][a-z0-9+.-]*:[^<>"{}|^`\\\x00-\x20]*$ ``. This includes some IRI references invalid in theory but  supported by most RDF software in practice. Additional constraints on RDF data do not result in validation errors but malformed triples are filtered out (as described in the following) and collected as part of [report] files.
 
 ### Filtering
 
@@ -206,7 +206,7 @@ The web service and its Docker image can be configured via environment variables
 
 - `TITLE`: title of the application. Default: `N4O Graph Importer`
 - `BASE`: base URI of named graphs. Default: `https://graph.nfdi4objects.net/` (this will be changed to `http://example.org/`)
-- `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. Default: <http://localhost:3030/n4o>.
+- `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. An in-memory Triple store is used as fallback if `SPARQL` is not set.
 - `STAGE`: writeable stage directory. Default: `stage`
 - `DATA`: local data directory for file import
 - `FRONTEND`: URL of [n4o-graph-apis] instance. This is included as field `frontend` in [/status.json](#get-statusjson) and shown in the HTML interface for convenience. Default is the value of `BASE`
@@ -381,7 +381,7 @@ Return the list of registered mapping sources.
 
 #### GET /mappings/schema.json
 
-[mappings-schema.json]: lib/mappings-schema.json)
+[mappings-schema.json]: lib/mappings-schema.json
 
 Return the mapping sources schema [mappings-schema.json] used to validate mapping sources.
 

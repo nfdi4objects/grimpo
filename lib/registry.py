@@ -3,7 +3,7 @@ from datetime import datetime
 from shutil import copy, copyfileobj, rmtree
 import urllib
 from .validate import validateJSON
-from .rdf import jsonld2nt, TripleStore
+from .rdf import jsonld2nt, result_to_ttl
 from .rdffilter import RDFFilter
 from .log import Log
 from .errors import ApiError, NotFound, ValidationError
@@ -18,7 +18,7 @@ class Registry:
 
     def __init__(self, kind, **config):
         self.base = config["base"]
-        self.sparql = TripleStore(config["sparql"])
+        self.sparql = config["store"]
         self.kind = kind
         # named graphs
         self.graph = f"{self.base}{kind}/"
@@ -91,7 +91,7 @@ class Registry:
 
     def update_metadata(self):
         query = f"SELECT * {{ GRAPH <{self.graph}> {{ VALUES (?p) {{(dct:issued)}} ?s ?p ?o }} }}"
-        issued = self.sparql.query_ttl(query)
+        issued = result_to_ttl(self.sparql.query(query))
         metadata = jsonld2nt(self.list(), self.context)
         file = self.stage / f"{self.kind}.ttl"
         with open(file, "w") as f:
@@ -125,10 +125,11 @@ class Registry:
         download = f"{self.graph}{id}/stage/{self.kind}-{id}.nt"
 
         self.sparql.delete(self.graph, f"<{uri}> dct:issued ?issued")
-        self.sparql.update((
-            "DELETE { <%s> dcat:distribution ?s. ?s ?p ?o }"
-            "WHERE { <%s> dcat:distribution ?s . ?s dcat:downloadURL <%s> }"
-        ) % (uri, uri, download))
+
+        # TODO: this requires further investigation: which graph to query?!
+        self.sparql.delete_where(
+            "<%s> dcat:distribution ?s. ?s ?p ?o" % (uri),
+            "<%s> dcat:distribution ?s . ?s dcat:downloadURL <%s>" % (uri, download))
 
         if published:
             log.append("Update issued timestamp and distribution")
@@ -152,7 +153,7 @@ class Registry:
     def remove(self, id):
         uri = self.get(id)["uri"]
         rmtree(self.stage / str(id), ignore_errors=True)
-        self.sparql.update(f"DROP GRAPH <{uri}>")
+        self.sparql.drop_graph(uri)
         self.update_distribution(id, Log("/dev/null"), False)
 
     def receive_log(self, id):

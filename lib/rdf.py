@@ -1,4 +1,5 @@
-from rdflib import URIRef, Literal, BNode
+from abc import ABC, abstractmethod
+from rdflib import URIRef, Literal, BNode, Dataset, Graph
 from SPARQLWrapper import SPARQLWrapper
 import requests
 from pyld import jsonld
@@ -19,36 +20,63 @@ def jsonld2nt(doc, context):
     return jsonld.to_rdf(expanded, options={'format': 'application/n-quads'})
 
 
-class TripleStore:
+PREFIXES = ("PREFIX dcat: <http://www.w3.org/ns/dcat#>\n"
+            "PREFIX dct: <http://purl.org/dc/terms/>\n"
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n")
+
+
+class AbstractTripleStore(ABC):
+    @abstractmethod
+    def query(self, query):
+        pass
+
+    @abstractmethod
+    def update(self, query):
+        pass
+
+    def insert(self, graph, triples):
+        query = "INSERT DATA { GRAPH <%s> { %s } }" % (graph, triples)
+        return self.update(query)
+
+    def remove(self, graph, triples):
+        query = "DELETE DATA { GRAPH <%s> { %s } }" % (graph, triples)
+        return self.update(query)
+
+    def delete(self, graph, triples):
+        query = "DELETE WHERE { GRAPH <%s> { %s } }" % (graph, triples)
+        return self.update(query)
+
+    # TODO: this is a hack and requires further investigation
+    def delete_where(self, delete, where):
+        query = "DELETE { %s } WHERE { %s }" % (delete, where)
+        return self.update(query)
+
+    def drop_graph(self, graph):
+        return self.update(f"DROP GRAPH <{graph}>")
+
+    @abstractmethod
+    def store_file(self, graph, file):
+        pass
+
+
+class TripleStore(AbstractTripleStore):
     def __init__(self, api):
         self.api = api
-        self.prefixes = {
-            "dcat": "http://www.w3.org/ns/dcat#",
-            "dct": "http://purl.org/dc/terms/",
-            "xsd": "http://www.w3.org/2001/XMLSchema#"
-        }
 
-    def client(self, query):
+    def __client(self, query):
         client = SPARQLWrapper(self.api, returnFormat='json')
-        prefixes = "".join([f"PREFIX {p}: <{self.prefixes[p]}>\n" for p in self.prefixes])
-        client.setQuery(prefixes + query)
+        client.setQuery(PREFIXES + query)
         return client
 
     def query(self, query):
-        client = self.client(query)
+        client = self.__client(query)
         try:
             return client.queryAndConvert()["results"]["bindings"]
         except Exception as e:
             raise ServerError(f"SPARQL Query failed: {e}")
 
-    def query_ttl(self, query):
-        data = self.query(query)
-        rows = [dict([(key, sparql_to_rdf(val).n3())
-                     for key, val in row.items()]) for row in data]
-        return "\n".join([f"{row['s']} {row['p']} {row['o']} ." for row in rows])
-
     def update(self, query):
-        client = self.client(query)
+        client = self.__client(query)
         client.method = 'POST'
         try:
             res = client.query()
@@ -57,20 +85,58 @@ class TripleStore:
         except Exception as e:
             raise ServerError(f"SPARQL UPDATE failed: {e}")
 
-    def insert(self, graph, triples):
-        query = "INSERT DATA { GRAPH <%s> { %s } }" % (graph, triples)
-        return self.update(query)
-
-    def delete(self, graph, triples):
-        query = "DELETE WHERE { GRAPH <%s> { %s } }" % (graph, triples)
-        return self.update(query)
-
     def store_file(self, graph, file):
         headers = {"content-type": "text/turtle"}
         res = requests.put(f"{self.api}?graph={graph}",
                            data=open(file, 'rb'), headers=headers)
         return res.status_code == 200
         # TODO: detect error?
+
+
+class NativeTripleStore(AbstractTripleStore):
+    def __init__(self):
+        self.ds = Dataset(default_union=True)
+
+    def query(self, query):
+        def term(t):
+            if isinstance(t, URIRef):
+                return {"type": "uri", "value": str(t)}
+            if isinstance(t, BNode):
+                return {"type": "bnode", "value": str(t)}
+            literal = {"type": "literal", "value": str(t)}
+            if t.language:
+                literal["xml:lang"] = t.language
+            if t.datatype:
+                literal["datatype"] = str(t.datatype)
+            return literal
+
+        def map_row(row):
+            return {str(k): term(v) for k, v in row.items()}
+
+        query = PREFIXES + query
+        return [map_row(row) for row in self.ds.query(query).bindings]
+
+    def update(self, query):
+        self.ds.update(PREFIXES + query)
+
+    def drop_graph(self, graph):
+        self.ds.remove_graph(graph)
+
+    def store_file(self, graph, file):
+        graph = self.ds.graph(graph)
+        data = Graph()
+        data.parse(file)
+        # TODO with self.ds.transaction():
+        for triple in data:
+            graph.add(triple)
+        return True
+
+
+def createTripleStore(api):
+    if (api):
+        return TripleStore(api)
+    else:
+        return NativeTripleStore()
 
 
 def sparql_to_rdf(binding):
@@ -85,6 +151,12 @@ def sparql_to_rdf(binding):
             return Literal(binding['value'], lang=binding['xml:lang'])
         else:
             return Literal(binding['value'])
+
+
+def result_to_ttl(data):
+    rows = [dict([(key, sparql_to_rdf(val).n3())
+                 for key, val in row.items()]) for row in data]
+    return "\n".join([f"{row['s']} {row['p']} {row['o']} ." for row in rows])
 
 
 class NullLog:

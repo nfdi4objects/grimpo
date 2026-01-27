@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template, send_from_directory, send_file, Response
 from waitress import serve
 from lib import CollectionRegistry, TerminologyRegistry, MappingRegistry, \
-    ApiError, NotFound, ValidationError, TripleStore
+    ApiError, NotFound, ValidationError, createTripleStore
 import argparse
 import os
 from pathlib import Path
@@ -33,10 +33,11 @@ def init(**config):
         'BASE', 'https://graph.nfdi4objects.net/'))
     app.config['frontend'] = config.get('frontend', os.getenv(
         'FRONTEND', app.config['base']))
-    app.config['sparql'] = config.get(
-        'sparql', os.getenv('SPARQL', 'http://localhost:3030/n4o'))
+    app.config['sparql'] = config.get('sparql', os.getenv('SPARQL'))
     app.config['stage'] = config.get('stage', os.getenv('STAGE', 'stage'))
     app.config['data'] = config.get('data', os.getenv('DATA', 'data'))
+
+    app.config['store'] = createTripleStore(config.get("sparql"))
 
     terminologies = TerminologyRegistry(**app.config)
     collections = CollectionRegistry(**app.config, terminologies=terminologies)
@@ -70,8 +71,9 @@ route('GET', '/', lambda: render_template('index.html', **app.config))
 def status():
     values = {key: str(val) for key, val in app.config.items() if key.islower()}
     try:
-        sparql = TripleStore(app.config['sparql'])
-        sparql.insert(f"{app.config['base']}collection/", '')
+        # TODO: add back check
+        # sparql = createTripleStore(app.config.get('sparql'))
+        # sparql.insert(f"{app.config['base']}collection/", '')
         values['connected'] = True
     except Exception:
         values['connected'] = False

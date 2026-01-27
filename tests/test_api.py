@@ -1,3 +1,4 @@
+# Integration test
 from unittest.mock import patch
 import tempfile
 import os
@@ -6,13 +7,12 @@ from shutil import copy
 from pathlib import Path
 import pytest
 
-from lib import TripleStore, read_json
+from lib import read_json
 from app import app, init
 
 cwd = Path().cwd()
 
-sparqlApi = os.getenv('SPARQL', 'http://localhost:3033/n4o')
-sparql = TripleStore(sparqlApi)
+sparqlApi = os.getenv('SPARQL')
 
 base = "https://graph.nfdi4objects.net/collection/"
 terminology_graph = "https://graph.nfdi4objects.net/terminology/"
@@ -36,14 +36,6 @@ collection_3_full = {
 }
 
 
-def count_graphs():
-    query = "SELECT ?g (count(*) as ?t) { GRAPH ?g {?s ?p ?o} } GROUP BY ?g"
-    graphs = {}
-    for row in sparql.query(query):
-        graphs[row['g']['value']] = int(row['t']['value'])
-    return graphs
-
-
 @pytest.fixture
 def stage():
     with tempfile.TemporaryDirectory() as tempdir:
@@ -62,6 +54,14 @@ def expect_error(client, method, path, json=None, error=None, code=400):
             assert res.get(key, None) == error[key]
 
 
+def count_graphs(sparql):
+    query = "SELECT ?g (count(*) as ?t) { GRAPH ?g {?s ?p ?o} } GROUP BY ?g"
+    graphs = {}
+    for row in sparql.query(query):
+        graphs[row['g']['value']] = int(row['t']['value'])
+    return graphs
+
+
 @pytest.fixture
 def client(stage):
     app.testing = True
@@ -70,10 +70,12 @@ def client(stage):
     init(title="N4O Graph Import API TEST",
          stage=stage, sparql=sparqlApi, data=data)
 
+    sparql = app.config["store"]
+
     with app.test_client() as client:
         def fail(*args, **kwargs):
             return expect_error(client, *args, **kwargs)
-        yield client, fail, stage
+        yield client, fail, stage, sparql
 
 
 def mock_urlopen(url):
@@ -88,7 +90,7 @@ def mock_requests_get(url):
 
 
 def test_validation(client):
-    client, fail, _ = client
+    client, fail, _a, _b = client
 
     # malformed payload
     fail("PUT", "/collection/1", [], "expected JSON object")
@@ -109,7 +111,7 @@ def test_validation(client):
 
 
 def test_terminology(client):
-    client, fail, stage = client
+    client, fail, stage, sparql = client
 
     # Additional endpoints
     client.get('/data/').status_code == 200
@@ -193,13 +195,13 @@ def test_terminology(client):
     assert client.get("/terminology/skosmos.ttl").data.decode("utf-8") == skosmos
 
     # check size of terminology graphs
-    assert count_graphs() == {
+    assert count_graphs(sparql) == {
         'https://graph.nfdi4objects.net/terminology/': 37,
         'http://bartoc.org/en/node/18274': 377,
         'http://bartoc.org/en/node/20533': 679
     }
     assert client.post("/terminology/20533/remove").status_code == 200
-    assert count_graphs() == {
+    assert count_graphs(sparql) == {
         'https://graph.nfdi4objects.net/terminology/': 36,
         'http://bartoc.org/en/node/18274': 377
     }
@@ -212,18 +214,18 @@ def test_terminology(client):
 
     # delete terminology
     assert client.delete('/terminology/18274').status_code == 200
-    assert count_graphs() == {
+    assert count_graphs(sparql) == {
         # TODO: this seems wrong if terminology is unregistered
         'https://graph.nfdi4objects.net/terminology/': 35,
     }
 
     # TODO: this cleanup should not be required!
     graph = "https://graph.nfdi4objects.net/terminology/"
-    sparql.update(f"DROP GRAPH <{graph}>")
+    sparql.drop_graph(graph)
 
 
 def test_api(client):
-    client, fail, stage = client
+    client, fail, stage, sparql = client
 
     # start without collections
     resp = client.get('/')
@@ -256,7 +258,7 @@ def test_api(client):
 
     assert client.get("/collection/1/stage/").status_code == 200
 
-    assert count_graphs() == {'https://graph.nfdi4objects.net/collection/': 4}
+    assert count_graphs(sparql) == {'https://graph.nfdi4objects.net/collection/': 4}
 
     # delete collection
     assert client.delete('/collection/1').status_code == 200
@@ -357,7 +359,7 @@ def test_api(client):
 
 
 def test_mappings(client):
-    client, fail, stage = client
+    client, fail, stage, sparql = client
 
     assert client.post('/mappings/', json={}).status_code == 200
     assert client.get('/mappings/1').status_code == 200
