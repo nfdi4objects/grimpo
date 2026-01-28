@@ -3,7 +3,7 @@ from datetime import datetime
 from shutil import copy, copyfileobj, rmtree
 import urllib
 from .validate import validateJSON
-from .rdf import jsonld2nt, result_to_ttl
+from .rdf import jsonld2nt
 from .rdffilter import RDFFilter
 from .log import Log
 from .errors import ApiError, NotFound, ValidationError
@@ -91,7 +91,7 @@ class Registry:
 
     def update_metadata(self):
         query = f"SELECT * {{ GRAPH <{self.graph}> {{ VALUES (?p) {{(dct:issued)}} ?s ?p ?o }} }}"
-        issued = result_to_ttl(self.sparql.query(query))
+        issued = self.sparql.query(query, "nq")
         metadata = jsonld2nt(self.list(), self.context)
         file = self.stage / f"{self.kind}.ttl"
         with open(file, "w") as f:

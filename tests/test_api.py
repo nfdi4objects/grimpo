@@ -57,8 +57,10 @@ def expect_error(client, method, path, json=None, error=None, code=400):
 def count_graphs(sparql):
     query = "SELECT ?g (count(*) as ?t) { GRAPH ?g {?s ?p ?o} } GROUP BY ?g"
     graphs = {}
+
     for row in sparql.query(query):
-        graphs[row['g']['value']] = int(row['t']['value'])
+        if "g" in row:  # <https://github.com/RDFLib/rdflib/issues/3382>
+            graphs[row['g']['value']] = int(row['t']['value'])
     return graphs
 
 
@@ -124,14 +126,15 @@ def test_terminology(client):
     fail("GET", "/terminology/18274", code=404)
     fail("GET", "/terminology/18274/stage/", code=404)
 
+    # register terminology from BARTOC
+    assert count_graphs(sparql) == {}
     with patch('requests.get', new=mock_requests_get):
-
-        # register terminology, get afterwards
         assert client.put("/terminology/18274").status_code == 200
         assert client.get("/terminology/18274").status_code == 200
 
         # try to register non-existing terminology
         fail("PUT", "/terminology/0", code=404)
+    assert count_graphs(sparql) == {'https://graph.nfdi4objects.net/terminology/': 12}
 
     assert client.get("/terminology/18274/stage/").status_code == 200
     fail("GET", "/terminology/18274/stage/terminology-18274.nt", code=404)
@@ -168,6 +171,10 @@ def test_terminology(client):
         '/terminology/18274/receive?from=skos.rdf').status_code == 200
     assert client.get('/terminology/18274/receive').status_code == 200
     assert client.get("/terminology/18274/stage/terminology-18274.nt").status_code == 200
+
+    # FIXME: Here we get too many bnodes in InternalTripleStore
+    # print(sparql.query("SELECT * { GRAPH ?g { ?s ?p ?o } }", "ttl"))
+    # assert count_graphs(sparql) == { 'https://graph.nfdi4objects.net/terminology/': 99 } # 12
 
     # load terminology data and check log
     fail("GET", '/terminology/18274/load', code=404)

@@ -1,8 +1,7 @@
 # Unit test
 import pytest
 import tempfile
-from lib import CollectionRegistry
-from lib.rdf import createTripleStore
+from lib import CollectionRegistry, createTripleStore
 
 
 @pytest.fixture

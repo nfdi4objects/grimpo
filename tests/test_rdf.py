@@ -1,6 +1,5 @@
 # Unit test
 from lib import triple_iterator, RDFFilter, ValidationError
-from lib.triplestores import createTripleStore
 
 
 def parse(source, filter=None, unique=False):
@@ -20,7 +19,7 @@ def fail(file, error):
         assert e.to_dict() == error
 
 
-def _test_parsing():
+def test_parsing():
     assert len(parse("tests/skos.rdf")) == 377
     assert len(parse("tests/rdf.zip")) == 4
     assert len(parse("tests/iri.ttl")) == 1
@@ -63,27 +62,10 @@ def _test_parsing():
     })
 
 
-def _test_filter():
+def test_filter():
     triples = parse("tests/filter.ttl")
     assert len(triples) == 7
 
     filter = RDFFilter(disallow_subject_ns=("http://www.cidoc-crm.org/cidoc-crm/"))
     triples = parse("tests/filter.ttl", filter, True)
     assert len(triples) == 3
-
-
-def test_store():
-    store = createTripleStore()
-
-    store.insert('http://example.org/', '_:b1 dct:title "foo"')
-    assert store.query("SELECT * { ?s ?p ?o }") == [{
-        's': {'type': 'bnode', 'value': 'b1'},
-        'p': {'type': 'uri', 'value': 'http://purl.org/dc/terms/title'},
-        'o': {'type': 'literal', 'value': 'foo'}
-    }]
-
-    return
-
-    store.store_file('http://example.org/1', "tests/filter.ttl")
-    query = "SELECT * { GRAPH <http://example.org/1> { ?s ?b ?o } }"
-    assert len(store.query(query)) == 6

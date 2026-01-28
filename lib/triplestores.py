@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from rdflib import URIRef, BNode, Dataset, Graph
+from rdflib import URIRef, Literal, BNode, Dataset, Graph
 from SPARQLWrapper import SPARQLWrapper
 import requests
 import warnings
@@ -26,7 +26,7 @@ class AbstractTripleStore(ABC):
 
     """Must implement SPARQL Query"""
     @abstractmethod
-    def query(self, query):
+    def query(self, query, format):
         pass
 
     """Import"""
@@ -67,10 +67,11 @@ class ExternalTripleStore(AbstractTripleStore):
         client.setQuery(self.prefixes + query)
         return client
 
-    def query(self, query):
+    def query(self, query, format='sparql'):
         client = self.__client(query)
         try:
-            return client.queryAndConvert()["results"]["bindings"]
+            result = client.queryAndConvert()["results"]["bindings"]
+            return convert_query_result(result, convert_sparql_term, format)
         except Exception as e:
             raise ServerError(f"SPARQL Query failed: {e}")
 
@@ -97,28 +98,17 @@ class InternalTripleStore(AbstractTripleStore):
     def __init__(self):
         self.ds = Dataset(default_union=True)
 
-    def query(self, query):
-        def term(t):
-            if isinstance(t, URIRef):
-                return {"type": "uri", "value": str(t)}
-            if isinstance(t, BNode):
-                return {"type": "bnode", "value": str(t)}
-            literal = {"type": "literal", "value": str(t)}
-            if t.language:
-                literal["xml:lang"] = t.language
-            if t.datatype:
-                literal["datatype"] = str(t.datatype)
-            return literal
-
+    def query(self, query, format='sparql'):
         def map_row(row):
-            return {str(k): term(v) for k, v in row.items()}
+            return {str(k): convert_rdflib_term(v, format) for k, v in row.items()}
 
         query = self.prefixes + query
 
         # RDFLib raises warning, see <https://github.com/RDFLib/rdflib/issues/3361>
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
-            return [map_row(row) for row in self.ds.query(query).bindings]
+            result = self.ds.query(query).bindings
+            return convert_query_result(result, convert_rdflib_term, format)
 
     def _update(self, query):
         self.ds.update(self.prefixes + query)
@@ -133,3 +123,50 @@ class InternalTripleStore(AbstractTripleStore):
         for triple in data:
             graph.add(triple)
         return True
+
+
+def convert_query_result(result, mapper, target):
+    """Convert a SPARQL Query result to target form (sparql, rdflib, n3, nq, ttl)."""
+
+    if target == "nq" or target == "ttl":
+        result = convert_query_result(result, mapper, "n3")
+        return "\n".join([
+            " ".join([row.get(f) for f in ['g', 's', 'p', 'o'] if f in row]) + " ."
+            for row in result])
+
+    return [{str(k): mapper(v, target) for k, v in row.items()} for row in result]
+
+
+def convert_sparql_term(term, format):
+    if format == "rdflib" or format == "n3":
+        if term['type'] == 'uri':
+            term = URIRef(term['value'])
+        elif term['type'] == 'bnode':
+            term = BNode(term['value'])
+        elif term['type'] == 'literal':
+            if 'datatype' in term:
+                term = Literal(term['value'], datatype=URIRef(term['datatype']))
+            elif 'xml:lang' in term:
+                term = Literal(term['value'], lang=term['xml:lang'])
+            else:
+                term = Literal(term['value'])
+        if format == "n3":
+            return term.n3()
+    return term
+
+
+def convert_rdflib_term(term, format):
+    if format == "rdflib":
+        return term
+    if format == "n3":
+        return term.n3()
+    if isinstance(term, URIRef):
+        return {"type": "uri", "value": str(term)}
+    if isinstance(term, BNode):
+        return {"type": "bnode", "value": str(term)}
+    literal = {"type": "literal", "value": str(term)}
+    if term.language:
+        literal["xml:lang"] = term.language
+    if term.datatype:
+        literal["datatype"] = str(term.datatype)
+    return literal

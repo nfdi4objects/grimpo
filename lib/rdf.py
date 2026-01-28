@@ -1,6 +1,4 @@
-from .triplestores import createTripleStore
 from pyld import jsonld
-from rdflib import URIRef, Literal, BNode
 from .errors import ValidationError
 from .walk import walk
 from .validate import invalidIRI
@@ -16,26 +14,6 @@ def jsonld2nt(doc, context):
         doc["@context"] = context
     expanded = jsonld.expand(doc)
     return jsonld.to_rdf(expanded, options={'format': 'application/n-quads'})
-
-
-def sparql_to_rdf(binding):
-    if binding['type'] == 'uri':
-        return URIRef(binding['value'])
-    elif binding['type'] == 'bnode':
-        return BNode(binding['value'])
-    elif binding['type'] == 'literal':
-        if 'datatype' in binding:
-            return Literal(binding['value'], datatype=URIRef(binding['datatype']))
-        elif 'xml:lang' in binding:
-            return Literal(binding['value'], lang=binding['xml:lang'])
-        else:
-            return Literal(binding['value'])
-
-
-def result_to_ttl(data):
-    rows = [dict([(key, sparql_to_rdf(val).n3())
-                 for key, val in row.items()]) for row in data]
-    return "\n".join([f"{row['s']} {row['p']} {row['o']} ." for row in rows])
 
 
 class NullLog:

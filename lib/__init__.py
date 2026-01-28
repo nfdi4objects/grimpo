@@ -3,7 +3,8 @@ from .terminologies import TerminologyRegistry
 from .mappings import MappingRegistry
 from .errors import ApiError, NotFound, NotAllowed, ServerError
 from .utils import read_json, write_json
-from .rdf import createTripleStore, triple_iterator
+from .rdf import triple_iterator
+from .triplestores import createTripleStore
 from .rdffilter import RDFFilter
 from .validate import validateJSON, ValidationError
 
