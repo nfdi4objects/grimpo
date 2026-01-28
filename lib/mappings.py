@@ -73,4 +73,4 @@ class MappingRegistry(Registry):
     def detach(self, id, data):
         graph = self.get(id)["uri"]
         triples = "".join(*jskos_mapping_triples(json.loads(data)))
-        self.sparql.remove(graph, triples)
+        self.sparql.delete(graph, triples)

@@ -6,6 +6,7 @@ datahugger
 jsonschema
 SPARQLWrapper
 pyoxigraph==0.5.2
+pyparsing==3.2.5    # because >=3.3.0 emits warnings with RDFLib 7.5.0 
 rdflib>=7.5.0
 PyLD
 flask-cors

@@ -1,9 +1,7 @@
-from abc import ABC, abstractmethod
-from rdflib import URIRef, Literal, BNode, Dataset, Graph
-from SPARQLWrapper import SPARQLWrapper
-import requests
+from .triplestores import createTripleStore
 from pyld import jsonld
-from .errors import ServerError, ValidationError
+from rdflib import URIRef, Literal, BNode
+from .errors import ValidationError
 from .walk import walk
 from .validate import invalidIRI
 from pyoxigraph import parse, RdfFormat
@@ -18,125 +16,6 @@ def jsonld2nt(doc, context):
         doc["@context"] = context
     expanded = jsonld.expand(doc)
     return jsonld.to_rdf(expanded, options={'format': 'application/n-quads'})
-
-
-PREFIXES = ("PREFIX dcat: <http://www.w3.org/ns/dcat#>\n"
-            "PREFIX dct: <http://purl.org/dc/terms/>\n"
-            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n")
-
-
-class AbstractTripleStore(ABC):
-    @abstractmethod
-    def query(self, query):
-        pass
-
-    @abstractmethod
-    def update(self, query):
-        pass
-
-    def insert(self, graph, triples):
-        query = "INSERT DATA { GRAPH <%s> { %s } }" % (graph, triples)
-        return self.update(query)
-
-    def remove(self, graph, triples):
-        query = "DELETE DATA { GRAPH <%s> { %s } }" % (graph, triples)
-        return self.update(query)
-
-    def delete(self, graph, triples):
-        query = "DELETE WHERE { GRAPH <%s> { %s } }" % (graph, triples)
-        return self.update(query)
-
-    # TODO: this is a hack and requires further investigation
-    def delete_where(self, delete, where):
-        query = "DELETE { %s } WHERE { %s }" % (delete, where)
-        return self.update(query)
-
-    def drop_graph(self, graph):
-        return self.update(f"DROP GRAPH <{graph}>")
-
-    @abstractmethod
-    def store_file(self, graph, file):
-        pass
-
-
-class TripleStore(AbstractTripleStore):
-    def __init__(self, api):
-        self.api = api
-
-    def __client(self, query):
-        client = SPARQLWrapper(self.api, returnFormat='json')
-        client.setQuery(PREFIXES + query)
-        return client
-
-    def query(self, query):
-        client = self.__client(query)
-        try:
-            return client.queryAndConvert()["results"]["bindings"]
-        except Exception as e:
-            raise ServerError(f"SPARQL Query failed: {e}")
-
-    def update(self, query):
-        client = self.__client(query)
-        client.method = 'POST'
-        try:
-            res = client.query()
-            if res.response.code != 200:
-                raise ServerError(f"HTTP Status code {res.response.code}")
-        except Exception as e:
-            raise ServerError(f"SPARQL UPDATE failed: {e}")
-
-    def store_file(self, graph, file):
-        headers = {"content-type": "text/turtle"}
-        res = requests.put(f"{self.api}?graph={graph}",
-                           data=open(file, 'rb'), headers=headers)
-        return res.status_code == 200
-        # TODO: detect error?
-
-
-class NativeTripleStore(AbstractTripleStore):
-    def __init__(self):
-        self.ds = Dataset(default_union=True)
-
-    def query(self, query):
-        def term(t):
-            if isinstance(t, URIRef):
-                return {"type": "uri", "value": str(t)}
-            if isinstance(t, BNode):
-                return {"type": "bnode", "value": str(t)}
-            literal = {"type": "literal", "value": str(t)}
-            if t.language:
-                literal["xml:lang"] = t.language
-            if t.datatype:
-                literal["datatype"] = str(t.datatype)
-            return literal
-
-        def map_row(row):
-            return {str(k): term(v) for k, v in row.items()}
-
-        query = PREFIXES + query
-        return [map_row(row) for row in self.ds.query(query).bindings]
-
-    def update(self, query):
-        self.ds.update(PREFIXES + query)
-
-    def drop_graph(self, graph):
-        self.ds.remove_graph(graph)
-
-    def store_file(self, graph, file):
-        graph = self.ds.graph(graph)
-        data = Graph()
-        data.parse(file)
-        # TODO with self.ds.transaction():
-        for triple in data:
-            graph.add(triple)
-        return True
-
-
-def createTripleStore(api):
-    if (api):
-        return TripleStore(api)
-    else:
-        return NativeTripleStore()
 
 
 def sparql_to_rdf(binding):
