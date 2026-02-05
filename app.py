@@ -37,7 +37,7 @@ def init(**config):
     app.config['stage'] = config.get('stage', os.getenv('STAGE', 'stage'))
     app.config['data'] = config.get('data', os.getenv('DATA', 'data'))
 
-    app.config['store'] = createTripleStore(config.get("sparql"))
+    app.config['store'] = createTripleStore(app.config.get("sparql"))
 
     terminologies = TerminologyRegistry(**app.config)
     collections = CollectionRegistry(**app.config, terminologies=terminologies)
