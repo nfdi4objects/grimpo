@@ -108,7 +108,8 @@ class Registry:
         for id in [t["id"] for t in self.list()]:
             self.delete(id)
 
-    def load(self, id):
+    def load(self, id, **kw):
+        mode = kw.get('mode','replace')
         stage = self.stage / str(id)
         file = stage / f"{self.kind}-{id}.nt"
         uri = self.get(id)["uri"]
@@ -116,7 +117,10 @@ class Registry:
             raise NotFound(f"{self.kind} data has not been received!")
         log = Log(stage / "load.json",
                   f"Loading {self.kind} {uri} from {file}")
-        self.sparql.store_file(uri, file)
+        if mode=='add':
+            self.sparql.add_file(uri, file)
+        else:
+            self.sparql.store_file(uri, file)
         self.update_distribution(id, log)
         return log.done()
 
