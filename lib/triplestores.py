@@ -99,7 +99,8 @@ class ExternalTripleStore(AbstractTripleStore):
     def add_file(self, graph, file):
         tmp_graph = 'https://graph.nfdi4objects.net/collection/tmp'
         if self.store_file(graph=tmp_graph,file=file):
-            self._update( "INSERT { GRAPH <%s>  { ?s ?p ?o } } WHERE { GRAPH <%s> { ?s ?p ?o } }" % (graph, tmp_graph))
+            self._update( "INSERT { GRAPH <%s>  { ?s ?p ?o } } WHERE { GRAPH <%s> { ?s ?p ?o } }" % (graph, tmp_graph)) #
+            #self._update( "ADD GRAPH <%s> TO GRAPH <%s>" % (tmp_graph,graph)) 
             self._update( "CLEAR GRAPH <%s>" %(tmp_graph))
             return True
         return False
