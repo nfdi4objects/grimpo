@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pyld import jsonld
 from .errors import ValidationError
 from .walk import walk
@@ -5,14 +6,39 @@ from .validate import invalidIRI
 from pyoxigraph import parse, RdfFormat
 
 
-def jsonld2nt(doc, context):
+def _offline_document_loader(documents):
+    """Load allowlisted JSON-LD contexts from local documents only."""
+    def load(url, options=None):
+        if url not in documents:
+            raise ValidationError(f"Unsupported remote JSON-LD context: {url}")
+        return {
+            "contentType": "application/ld+json",
+            "contextUrl": None,
+            "document": deepcopy(documents[url]),
+            "documentUrl": url,
+        }
+    return load
+
+
+def jsonld2nt(doc, context, remote_contexts=None):
+    """Convert JSON-LD to N-Quads without fetching remote contexts."""
+    doc = deepcopy(doc)
+    remote_contexts = remote_contexts or {}
     if type(doc) is list:
-        for e in doc:
-            e.pop("@context", None)
         doc = {"@context": context, "@graph": doc}
-    else:
+    elif "@context" not in doc:
         doc["@context"] = context
-    expanded = jsonld.expand(doc)
+    try:
+        expanded = jsonld.expand(doc, options={
+            "documentLoader": _offline_document_loader(remote_contexts)
+        })
+    except jsonld.JsonLdError as error:
+        # PyLD wraps exceptions raised by document loaders.
+        url = error.details.get("url")
+        if error.code == "loading remote context failed" and url not in remote_contexts:
+            raise ValidationError(
+                f"Unsupported remote JSON-LD context: {url}")
+        raise
     return jsonld.to_rdf(expanded, options={'format': 'application/n-quads'})
 
 
