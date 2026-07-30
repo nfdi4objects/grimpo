@@ -22,12 +22,9 @@ def context_loader(documents):
 def jsonld2nt(doc, context, remote_contexts=None):
     """Convert JSON-LD to N-Quads without fetching remote contexts."""
     remote_contexts = remote_contexts or {}
-    if type(doc) is list:
-        doc = {"@context": context, "@graph": doc}
-    elif "@context" not in doc:
-        doc["@context"] = context
     try:
         expanded = jsonld.expand(doc, options={
+            "expandContext": context,
             "documentLoader": context_loader(remote_contexts)
         })
     except jsonld.JsonLdError as error:
