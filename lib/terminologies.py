@@ -6,9 +6,12 @@ from .errors import NotFound
 from .rdf import jsonld2nt
 from .registry import Registry
 
+JSKOS_CONTEXT_URL = "https://gbv.github.io/jskos/context.json"
+
 
 class TerminologyRegistry(Registry):
     context = read_json(Path(__file__).parent / 'jskos-context.json')
+    remote_contexts = {JSKOS_CONTEXT_URL: context}
     skosmos_context = read_json(Path(__file__).parent / 'skosmos-context.json')
     auto_ids = False
 
@@ -31,8 +34,9 @@ class TerminologyRegistry(Registry):
 
         return ttl
 
-    def register(self, item):
-        id = str(int(item.get("id")))
+    def _resolve(self, item):
+        item = self.validate(item)
+        id = str(int(item["id"]))
         uri = f"{self.prefix}{id}"
 
         bartoc = Path(self.data) / 'bartoc.json'
@@ -44,7 +48,24 @@ class TerminologyRegistry(Registry):
         if not len(voc):
             raise NotFound(f"Terminology not found: {uri}")
 
-        return super().register(voc[0], id)
+        data = self.validate(voc[0], id)
+        jsonld2nt(data, self.context, self.remote_contexts)
+        return data
+
+    def register(self, item):
+        data = self._resolve(item)
+        return super().register(data, data["id"])
+
+    def replace(self, items):
+        if type(items) is not list:
+            return super().replace(items)
+
+        records = [self._resolve(item) for item in items]
+
+        self.purge()
+        for record in records:
+            Registry.register(self, record, record["id"])
+        return self.list()
 
     def update_distribution(self, id, log, published=True):
         super().update_distribution(id, log, published)
@@ -64,8 +85,10 @@ class TerminologyRegistry(Registry):
 
         voc["a"] = ["skosmos:Vocabulary", "void:Dataset"]
         voc["id"] = f"{self.graph}{id}/stage/skosmos.ttl#{id}"
+        if "@context" in voc:
+            voc["@context"] = [voc["@context"], self.skosmos_context]
         with open(skosmos, "w") as f:
-            ttl = jsonld2nt(voc, self.skosmos_context)
+            ttl = jsonld2nt(voc, self.skosmos_context, self.remote_contexts)
             ttl = "\n".join(sorted(ttl.rstrip().split("\n")))
             f.write(ttl)
 
@@ -74,7 +97,7 @@ class TerminologyRegistry(Registry):
             log.append("Converting JSKOS to RDF")
             with open(original) as file:
                 jskos = [json.loads(line) for line in file]
-            rdf = jsonld2nt(jskos, self.context)
+            rdf = jsonld2nt(jskos, self.context, self.remote_contexts)
             original = self.stage / str(id) / "original.ttl"
             with open(original, "w") as f:
                 f.write(rdf)

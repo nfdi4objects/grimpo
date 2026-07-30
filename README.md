@@ -164,6 +164,11 @@ Received data in RDF or JSKOS format must be syntactically valid. Additional con
 
 **JSKOS data** (for terminologies and mappings) is not validated yet (see [open issue](https://github.com/nfdi4objects/n4o-graph-importer/issues/50)).
 
+JSON-LD context declarations are preserved but never retrieved from the
+network. The canonical JSKOS context at
+<https://gbv.github.io/jskos/context.json> is read from the bundled copy; any
+other remote context URL is rejected.
+
 **RDF data** is allowed to contain any absolute IRI references matching the regular expression `` ^[a-z][a-z0-9+.-]*:[^<>"{}|^`\\\x00-\x20]*$ ``. This includes some IRI references invalid in theory but  supported by most RDF software in practice. Additional constraints on RDF data do not result in validation errors but malformed triples are filtered out (as described in the following) and collected as part of [report] files.
 
 ### Filtering

@@ -5,14 +5,35 @@ from .validate import invalidIRI
 from pyoxigraph import parse, RdfFormat
 
 
-def jsonld2nt(doc, context):
-    if type(doc) is list:
-        for e in doc:
-            e.pop("@context", None)
-        doc = {"@context": context, "@graph": doc}
-    else:
-        doc["@context"] = context
-    expanded = jsonld.expand(doc)
+def context_loader(documents):
+    """Load allowlisted JSON-LD contexts from local documents only."""
+    def load(url, options=None):
+        if url not in documents:
+            raise ValidationError(f"Unsupported remote JSON-LD context: {url}")
+        return {
+            "contentType": "application/ld+json",
+            "contextUrl": None,
+            "document": documents[url],
+            "documentUrl": url,
+        }
+    return load
+
+
+def jsonld2nt(doc, context, remote_contexts=None):
+    """Convert JSON-LD to N-Quads without fetching remote contexts."""
+    remote_contexts = remote_contexts or {}
+    try:
+        expanded = jsonld.expand(doc, options={
+            "expandContext": context,
+            "documentLoader": context_loader(remote_contexts)
+        })
+    except jsonld.JsonLdError as error:
+        # PyLD wraps exceptions raised by document loaders.
+        url = error.details.get("url")
+        if error.code == "loading remote context failed" and url not in remote_contexts:
+            raise ValidationError(
+                f"Unsupported remote JSON-LD context: {url}")
+        raise
     return jsonld.to_rdf(expanded, options={'format': 'application/n-quads'})
 
 

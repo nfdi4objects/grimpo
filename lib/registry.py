@@ -13,6 +13,7 @@ import re
 
 class Registry:
     context = None
+    remote_contexts = {}
     schema = None
     auto_ids = True
 
@@ -92,7 +93,7 @@ class Registry:
     def update_metadata(self):
         query = f"SELECT * {{ GRAPH <{self.graph}> {{ VALUES (?p) {{(dct:issued)}} ?s ?p ?o }} }}"
         issued = self.sparql.query(query, "nq")
-        metadata = jsonld2nt(self.list(), self.context)
+        metadata = jsonld2nt(self.list(), self.context, self.remote_contexts)
         file = self.stage / f"{self.kind}.ttl"
         with open(file, "w") as f:
             f.write(metadata)

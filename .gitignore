@@ -7,3 +7,4 @@ stage/
 *.tmp
 tmp/
 .vscode/settings.json
+.idea/
