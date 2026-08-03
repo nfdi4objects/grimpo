@@ -80,11 +80,6 @@ def client(stage):
         yield client, fail, stage, sparql
 
 
-def mock_urlopen(url):
-    urls = {"http://example.org/20533.concepts.ndjson": "tests/20533.concepts.ndjson"}
-    return open(urls[url], "rb")
-
-
 def mock_requests_get(url):
     uri = parse_qs(urlparse(url).query)['uri'][0]
     json = next(([item] for item in bartoc if item["uri"] == uri), [])
@@ -275,7 +270,7 @@ def test_api(client):
     fail("POST", '/collection/1/receive', code=404)
     fail("POST", '/collection/1/load', code=404)
     fail("POST", '/collection/1/add', code=404)
- 
+
     # add again
     resp = client.put('/collection/1', json=collection_1)
     assert resp.status_code == 200  # TODO: should be 201 Created

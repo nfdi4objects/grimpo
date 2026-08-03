@@ -69,11 +69,9 @@ route('GET', '/', lambda: render_template('index.html', **app.config))
 
 
 def status():
-    values = {key: str(val) for key, val in app.config.items() if key.islower()}
+    values = {key: val for key, val in app.config.items() if key.islower() and type(val) in [str, bool]}
     try:
-        # TODO: add back check
-        # sparql = createTripleStore(app.config.get('sparql'))
-        # sparql.insert(f"{app.config['base']}collection/", '')
+        app.config['store'].query("SELECT * { ?s ?p ?o } LIMIT 1")
         values['connected'] = True
     except Exception:
         values['connected'] = False
@@ -109,7 +107,7 @@ api('DELETE', '/collection/<int:id>', lambda id: collections.delete(id))
 api('POST', '/collection/<int:id>/receive', lambda id: collections.receive(id, request.args.get("from", None)))
 api('GET', '/collection/<int:id>/receive', lambda id: collections.receive_log(id))
 api('POST', '/collection/<int:id>/load', lambda id: collections.load(id))
-api('POST', '/collection/<int:id>/add', lambda id: collections.load(id,mode='add'))
+api('POST', '/collection/<int:id>/add', lambda id: collections.load(id, mode='add'))
 api('GET', '/collection/<int:id>/load', lambda id: collections.load_log(id))
 api('POST', '/collection/<int:id>/remove', lambda id: collections.remove(id))
 
