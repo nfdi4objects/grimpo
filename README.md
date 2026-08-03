@@ -273,7 +273,7 @@ List and get files of the stage directory of a terminology.
 
 #### POST /terminology/{id}/receive
 
-Receive terminology data. The location of the data is going to be extracted from terminology metadata from BARTOC but this has not been implemented yet. For now pass query parameter `from` instead to locate an URL or the name of a file in the data directory. File format can be:
+Receive terminology data. The location of the data is going to be extracted from terminology metadata from BARTOC but this [has not been implemented yet](https://github.com/nfdi4objects/n4o-graph-importer/issues/58). For now pass query parameter `from` instead to locate an URL or the name of a file in the data directory. File format can be:
 
 - RDF/Turtle for file extension `.ttl` or `.nt`
 - RDF/XML for file extension `.rdf` or `.xml`
@@ -354,7 +354,9 @@ List and get files of the stage directory of a collection.
 
 #### POST /collection/{id}/receive
 
-Receive and process collection data. The location of the data is taken from collection metadata field `access` if existing. The location can be overridden with optional query parameter `from` with an URL or a file name from local data directory. File format can be:
+Receive and process collection data. The location of the data is taken from collection metadata field `distributions` if existing. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with landing page URL) is used. Subfield `format` can be added to specificy the data format. *[This feature has not fully been implemented yet](https://github.com/nfdi4objects/n4o-graph-importer/issues/59)*
+
+The location can be overridden with optional query parameter `from` with an URL or a file name from local data directory. File format can be:
 
 - RDF/Turtle for file extension `.ttl` or `.nt`
 - RDF/XML for file extension `.rdf` or `.xml`
