@@ -275,7 +275,7 @@ def test_api(client):
     fail("POST", '/collection/1/receive', code=404)
     fail("POST", '/collection/1/load', code=404)
     fail("POST", '/collection/1/add', code=404)
- 
+
     # add again
     resp = client.put('/collection/1', json=collection_1)
     assert resp.status_code == 200  # TODO: should be 201 Created

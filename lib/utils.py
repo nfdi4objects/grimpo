@@ -1,5 +1,6 @@
 import json
 import datahugger
+from pathlib import Path
 from .errors import NotFound
 
 
@@ -14,6 +15,10 @@ def read_json(file):
 def write_json(file, data):
     with open(file, "w") as f:
         f.write(json.dumps(data, indent=4))
+
+
+def read_context(file):
+    return read_json(Path(__file__).parent / "context" / file)
 
 
 # TODO: limit to known formats

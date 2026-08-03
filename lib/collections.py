@@ -1,11 +1,11 @@
 from pathlib import Path
 from .registry import Registry
-from .utils import read_json
+from .utils import read_json, read_context
 
 
 class CollectionRegistry(Registry):
     schema = read_json(Path(__file__).parent / 'collection-schema.json')
-    context = read_json(Path(__file__).parent / 'collection-context.json')
+    context = read_context("collection.json")
 
     def __init__(self, **config):
         super().__init__("collection", **config)

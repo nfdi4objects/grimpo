@@ -1,0 +1,17 @@
+{
+  "@context": {
+    "iiif_prezi": "http://iiif.io/api/presentation/3#",
+    "dc": "http://purl.org/dc/elements/1.1/",
+
+    "id": "@id",
+    "type": "@type",
+    "thumbnail": {
+      "@type": "@id",
+      "@id": "iiif_prezi:thumbnail",
+      "@container": "@set"
+    },
+    "format": {
+      "@id": "dc:format"
+    }
+  }
+}

@@ -95,13 +95,12 @@ class ExternalTripleStore(AbstractTripleStore):
         res = requests.put(f"{self.api}?graph={graph}",
                            data=open(file, 'rb'), headers=headers)
         return res.status_code == 200 or res.status_code == 201
-    
+
     def add_file(self, graph, file):
         headers = {"content-type": "text/turtle"}
         res = requests.post(f"{self.api}?graph={graph}",
-                           data=open(file, 'rb'), headers=headers)
+                            data=open(file, 'rb'), headers=headers)
         return res.status_code == 200 or res.status_code == 201
-
 
 
 class InternalTripleStore(AbstractTripleStore):
@@ -135,10 +134,10 @@ class InternalTripleStore(AbstractTripleStore):
         for triple in data:
             graph.add(triple)
         return True
-    
+
     def add_file(self, graph, file):
-        return self.store_file(graph,file)
- 
+        return self.store_file(graph, file)
+
 
 def convert_query_result(result, mapper, target):
     """Convert a SPARQL Query result to target form (sparql, rdflib, n3, nq, ttl)."""

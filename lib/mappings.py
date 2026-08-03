@@ -1,6 +1,6 @@
 from pathlib import Path
 import json
-from .utils import read_json
+from .utils import read_json, read_context
 from .rdffilter import RDFFilter
 from .registry import Registry
 from .errors import ValidationError
@@ -37,7 +37,7 @@ def jskos_mapping_triples(mappings) -> list:
 
 class MappingRegistry(Registry):
     schema = read_json(Path(__file__).parent / 'mappings-schema.json')
-    context = read_json(Path(__file__).parent / 'collection-context.json')
+    context = read_context("collection.json")
 
     def __init__(self, **config):
         super().__init__("mappings", **config)
