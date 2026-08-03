@@ -2,5 +2,5 @@
   "id": "1",
   "name": "test collection",
   "url": "https://example.org/",
-  "uri": "https://graph.nfdi4objects.net/collection/1"
+  "uri": "http://example.org/collection/1"
 }

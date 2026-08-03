@@ -119,7 +119,7 @@ The application does not include any methods of authentification. It is meant to
 
 [graph]: #graphs
 
-The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix base can be changed by [configuration](#configuration) and it is currently set to `https://graph.nfdi4objects.net/` by default.
+The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix base should be changed by [configuration](#configuration) first.
 
 - metadata about all terminologies is in graph of URI `http://example.org/terminology/`
 
@@ -209,8 +209,8 @@ Receiving data generates two additional files in the stage directory (replace `{
 
 The web service and its Docker image can be configured via environment variables:
 
-- `TITLE`: title of the application. Default: `N4O Graph Importer`
-- `BASE`: base URI of named graphs. Default: `https://graph.nfdi4objects.net/` (this will be changed to `http://example.org/`)
+- `TITLE`: title of the application. Default: `Knowledge Graph Importer`
+- `BASE`: base URI of named graphs. Default: `http://example.org/`
 - `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. An in-memory Triple store is used as fallback if `SPARQL` is not set.
 - `STAGE`: writeable stage directory. Default: `stage`
 - `DATA`: local data directory for file import
