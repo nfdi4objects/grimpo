@@ -28,7 +28,6 @@ def test_store():
     query = "SELECT * { GRAPH <http://example.org/1> { ?s ?b ?o } }"
     assert len(store.query(query)) == 6
 
-
     store.store_file('http://example.org/2', "tests/ex1.ttl")
     query = "SELECT * { GRAPH <http://example.org/2> { ?s ?b ?o } }"
     assert len(store.query(query)) == 3

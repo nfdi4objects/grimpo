@@ -96,9 +96,8 @@ class ExternalTripleStore(AbstractTripleStore):
     def add_file(self, graph, file):
         headers = {"content-type": "text/turtle"}
         res = requests.post(f"{self.api}?graph={graph}",
-                           data=open(file, 'rb'), headers=headers)
+                            data=open(file, 'rb'), headers=headers)
         return res.status_code == 200 or res.status_code == 201
-
 
 
 class InternalTripleStore(AbstractTripleStore):
@@ -134,7 +133,7 @@ class InternalTripleStore(AbstractTripleStore):
         return True
 
     def add_file(self, graph, file):
-        return self.store_file(graph,file)
+        return self.store_file(graph, file)
 
 
 def convert_query_result(result, mapper, target):
