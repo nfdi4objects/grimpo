@@ -64,7 +64,8 @@ class TerminologyRegistry(Registry):
 
         self.purge()
         for record in records:
-            Registry.register(self, record, record["id"])
+            self._save_record(record, record["id"])
+        self.update_metadata()
         return self.list()
 
     def update_distribution(self, id, log, published=True):

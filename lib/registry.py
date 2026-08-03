@@ -73,11 +73,15 @@ class Registry:
     def get(self, id):
         return read_json(self.stage / f"{int(id)}.json")
 
-    def register(self, data, id=None):
+    def _save_record(self, data, id=None):
         data = self.validate(data, id)
         id = data["id"]
         write_json(self.stage / f"{id}.json", data)
         (self.stage / str(id)).mkdir(exist_ok=True)
+        return data
+
+    def register(self, data, id=None):
+        data = self._save_record(data, id)
         self.update_metadata()
         return data
 
