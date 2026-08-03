@@ -12,7 +12,7 @@
 <p>
   Controlled <b>write access</b> to Triple store at <a id="backend" href="{{ sparql }}">{{ sparql }}</a>.
   This is a backend service <b>without authentication</b>: all data can be modified!
-  Please use SPARQL endpoint or <a id="frontend" href="#">frontend</a> for read access.
+  Please use SPARQL endpoint or <a href="{{ frontend }}">frontend</a> for read access.
 </p>
 <h2>General Endpoints</h2>
 <ul>
@@ -325,6 +325,5 @@ window.onload = () => {
     if (!s.connected) {
       document.getElementById('backend').className = 'error'
     }
-    document.getElementById('frontend').href = s.frontend
   })
 }</script>
