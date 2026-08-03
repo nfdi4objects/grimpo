@@ -24,25 +24,22 @@ class AbstractTripleStore(ABC):
                 "PREFIX dct: <http://purl.org/dc/terms/>\n"
                 "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n")
 
-    """Must implement SPARQL Query"""
     @abstractmethod
     def query(self, query, format):
-        pass
+        """...exectue a SPARQL Query..."""
 
-    """Import"""
     @abstractmethod
     def store_file(self, graph, file):
-        pass
+        """...import RDF from a file into an existing..."""
 
     """Import add"""
     @abstractmethod
     def add_file(self, graph, file):
-        pass
+        """...import RDF from a file into a new graph..."""
 
-    """Must implement SPARQL Update. Not to be called directly."""
     @abstractmethod
     def _update(self, query):
-        pass
+        """...execute SPARQL Update. Not to be called directly..."""
 
     def insert(self, graph, triples):
         query = "INSERT DATA { GRAPH <%s> { %s } }" % (graph, triples)
@@ -95,7 +92,7 @@ class ExternalTripleStore(AbstractTripleStore):
         res = requests.put(f"{self.api}?graph={graph}",
                            data=open(file, 'rb'), headers=headers)
         return res.status_code == 200 or res.status_code == 201
-    
+
     def add_file(self, graph, file):
         headers = {"content-type": "text/turtle"}
         res = requests.post(f"{self.api}?graph={graph}",
@@ -135,10 +132,10 @@ class InternalTripleStore(AbstractTripleStore):
         for triple in data:
             graph.add(triple)
         return True
-    
+
     def add_file(self, graph, file):
         return self.store_file(graph,file)
- 
+
 
 def convert_query_result(result, mapper, target):
     """Convert a SPARQL Query result to target form (sparql, rdflib, n3, nq, ttl)."""
