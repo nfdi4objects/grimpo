@@ -34,16 +34,19 @@ class TerminologyRegistry(Registry):
 
         return ttl
 
-    def _resolve(self, item):
+    def _resolve(self, item, catalog=None):
         item = self.validate(item)
         id = str(int(item["id"]))
         uri = f"{self.prefix}{id}"
 
-        bartoc = Path(self.data) / 'bartoc.json'
-        if bartoc.is_file():
-            voc = [v for v in read_json(bartoc) if v["uri"] == uri]
+        if catalog is not None:
+            voc = [catalog[uri]] if uri in catalog else []
         else:
-            voc = requests.get(f"https://bartoc.org/api/data?uri={uri}").json()
+            bartoc = Path(self.data) / 'bartoc.json'
+            if bartoc.is_file():
+                voc = [v for v in read_json(bartoc) if v["uri"] == uri]
+            else:
+                voc = requests.get(f"https://bartoc.org/api/data?uri={uri}").json()
 
         if not len(voc):
             raise NotFound(f"Terminology not found: {uri}")
@@ -60,7 +63,9 @@ class TerminologyRegistry(Registry):
         if type(items) is not list:
             return super().replace(items)
 
-        records = [self._resolve(item) for item in items]
+        bartoc = Path(self.data) / 'bartoc.json'
+        catalog = {v["uri"]: v for v in read_json(bartoc)} if bartoc.is_file() else None
+        records = [self._resolve(item, catalog) for item in items]
 
         self.purge()
         for record in records:
