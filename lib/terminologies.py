@@ -1,18 +1,19 @@
 from pathlib import Path
 import requests
 import json
-from .utils import read_json
+from .utils import read_json, read_context
 from .errors import NotFound
 from .rdf import jsonld2nt
 from .registry import Registry
 
-JSKOS_CONTEXT_URL = "https://gbv.github.io/jskos/context.json"
-
 
 class TerminologyRegistry(Registry):
-    context = read_json(Path(__file__).parent / 'jskos-context.json')
-    remote_contexts = {JSKOS_CONTEXT_URL: context}
-    skosmos_context = read_json(Path(__file__).parent / 'skosmos-context.json')
+    remote_contexts = {
+        "https://gbv.github.io/jskos/context.json": read_context("jskos.json"),
+        "http://iiif.io/api/presentation/3/context.json": read_context("iiif.json"),
+    }
+    context = remote_contexts["https://gbv.github.io/jskos/context.json"]
+    skosmos_context = read_context('skosmos.json')
     auto_ids = False
 
     def __init__(self, **config):

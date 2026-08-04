@@ -103,6 +103,10 @@
       "@type": "@id",
       "@container": "@set"
     },
+    "media": {
+      "@id": "http://xmlns.com/foaf/0.1/depiction",
+      "@context": "http://iiif.io/api/presentation/3/context.json"
+    },
     "place": {
       "@id": "http://schema.org/location",
       "@container": "@set"
@@ -203,6 +207,10 @@
       "@id": "http://www.w3.org/ns/dcat#distribution",
       "@container": "@set"
     },
+    "services": {
+      "@id": "http://www.w3.org/ns/dcat#accessService",
+      "@container": "@set"
+    },
     "download": "http://www.w3.org/ns/dcat#downloadURL",
     "accessURL": "http://www.w3.org/ns/dcat#accessURL",
     "checksum": "http://spdx.org/rdf/terms#checksum",
@@ -224,6 +232,18 @@
         "language": "@language"
       }
     },
-    "rank": "http://wikiba.se/ontology#rank"
+    "rank": "http://wikiba.se/ontology#rank",
+    "version": "http://www.w3.org/2002/07/owl#versionInfo",
+    "justification": {
+      "@id": "https://w3id.org/sssom/mapping_justification",
+      "@type": "@id"
+    },
+    "tool": "https://w3id.org/sssom/mapping_tool",
+    "issue": "http://www.w3.org/2005/01/wf/flow#task",
+    "issueTracker": "http://schema.org/discussionUrl",
+    "guidelines": "http://purl.org/dc/terms/conformsTo",
+    "api": "http://purl.org/dc/terms/conformsTo",
+    "endpoint": "http://www.w3.org/ns/dcat#endpointURL",
+    "serves": "http://www.w3.org/ns/dcat#servesDataset"
   }
 }

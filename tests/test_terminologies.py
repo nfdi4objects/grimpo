@@ -21,6 +21,15 @@ def terminology(terminology_id, nested_context=JSKOS_CONTEXT_URL):
             "uri": "http://dewey.info/class/3/e23/",
             "notation": ["3"],
         }],
+        "media": [{
+            "type": "Manifest",
+            "items": [],
+            "thumbnail": [{
+                "type": "Image",
+                "id": "http://example.org/1/thumbnail.jpg",
+                "format": "image/jpeg"
+            }]
+        }]
     }
 
 
@@ -63,14 +72,15 @@ def test_nested_contexts(tmp_path, monkeypatch):
     )
     assert len(store.query(query)) == 1
 
-    # Remember the graph size before attempting an invalid replacement.
+    # Expected number of triples
     query = f"SELECT * {{ GRAPH <{graph}> {{ ?s ?p ?o }} }}"
-    triple_count = len(store.query(query))
+    assert len(store.query(query)) == 6
 
+    # Try to add a terminology with unsupported JSKOS context URL
     write_json(dump, [terminology(1579, "https://example.org/context.json")])
     with pytest.raises(ValidationError, match="Unsupported remote"):
         registry.replace([{"uri": "http://bartoc.org/en/node/1579"}])
 
-    # An unknown context must leave the registry and graph unchanged.
+    # leaves the registry and graph unchanged
     assert [item["id"] for item in registry.list()] == ["1578"]
-    assert len(store.query(query)) == triple_count
+    assert len(store.query(query)) == 6
