@@ -98,10 +98,17 @@ class Registry:
         query = f"SELECT * {{ GRAPH <{self.graph}> {{ VALUES (?p) {{(dct:issued)}} ?s ?p ?o }} }}"
         issued = self.sparql.query(query, "nq")
         metadata = jsonld2nt(self.list(), self.context, self.remote_contexts)
+        modified = datetime.now().replace(microsecond=0).isoformat()
         file = self.stage / f"{self.kind}.ttl"
         with open(file, "w") as f:
             f.write(metadata)
             f.write(issued)
+            f.write(
+                f'\n<{self.graph}> '
+                '<http://purl.org/dc/terms/modified> '
+                f'"{modified}"^^'
+                '<http://www.w3.org/2001/XMLSchema#dateTime> .'
+            )
         self.sparql.store_file(self.graph, file)
 
     def delete(self, id):
