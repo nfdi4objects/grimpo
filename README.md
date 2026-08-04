@@ -84,7 +84,7 @@ Importing is controlled via [an HTTP API](#api) in three steps:
 
 1. **register**: metadata is retrieved, collected in a **registry** and written to the triple store
 2. **receive**: data is retrieved into a **stage** directory where it is [validated](#validation), [filtered](#filtering), and a [report] is generated
-2. **load**: processed data is loaded into the triple store
+2. **load**: processed data is loaded into the **triple store**
 
 Register can be undone by additional step **delete**. Load and receive can be undone by step **remove**. Mappings can also be injested and withdraw directly into/from the triple store via **append/detach** to support non-durable live-updates.
 
@@ -93,9 +93,9 @@ flowchart LR
   END[ ]:::hidden
   START[ ]:::hidden
   C[ ]:::hidden
-  R["**register**"]
-  S("**stage**"):::data
-  T("**triple store**"):::data
+  R["<b>registry</b>"]
+  S("<b>stage</b>"):::data
+  T("<b>triple store</b>"):::data
 
   START -- register --> R
   R -- receive --> S
