@@ -1,10 +1,10 @@
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/description> "Classification of materials used in KENOM portal."@en .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/subject> <http://dewey.info/class/7/e23/> .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/subject> <http://dewey.info/class/737/e23/> .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/title> "KENOM Material"@en .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/net/skosmos#language> "de" .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/net/skosmos#language> "en" .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/net/skosmos#sparqlGraph> <http://bartoc.org/en/node/20533> .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://rdfs.org/ns/void#uriSpace> "http://uri.gbv.de/terminology/kenom_material/" .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/net/skosmos#Vocabulary> .
-<https://graph.nfdi4objects.net/terminology/20533/stage/skosmos.ttl#20533> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdfs.org/ns/void#Dataset> .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/description> "Classification of materials used in KENOM portal."@en .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/subject> <http://dewey.info/class/7/e23/> .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/subject> <http://dewey.info/class/737/e23/> .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/dc/terms/title> "KENOM Material"@en .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/net/skosmos#language> "de" .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/net/skosmos#language> "en" .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://purl.org/net/skosmos#sparqlGraph> <http://bartoc.org/en/node/20533> .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://rdfs.org/ns/void#uriSpace> "http://uri.gbv.de/terminology/kenom_material/" .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/net/skosmos#Vocabulary> .
+<http://example.org/terminology/20533/stage/skosmos.ttl#20533> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdfs.org/ns/void#Dataset> .

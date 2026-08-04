@@ -22,15 +22,14 @@ def init(**config):
     global terminologies
     global mappings
 
-    title = config.get('title', os.getenv('TITLE', 'N4O Graph Importer'))
+    title = config.get('title', os.getenv('TITLE', 'Knowledge Graph Importer'))
 
     if config.get("debug", False):
         app.debug = True
         title = f"{title} (debugging mode)"
 
     app.config['title'] = title
-    app.config['base'] = config.get('base', os.getenv(
-        'BASE', 'https://graph.nfdi4objects.net/'))
+    app.config['base'] = config.get('base', os.getenv('BASE', 'http://example.org/'))
     app.config['frontend'] = config.get('frontend', os.getenv(
         'FRONTEND', app.config['base']))
     app.config['sparql'] = config.get('sparql', os.getenv('SPARQL'))

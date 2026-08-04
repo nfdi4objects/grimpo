@@ -11,8 +11,8 @@
 
 <p>
   Controlled <b>write access</b> to Triple store at <a id="backend" href="{{ sparql }}">{{ sparql }}</a>.
-  Please use SPARQL endpoint or <a id="frontend" href="https://github.com/nfdi4objects/n4o-graph-apis?tab=readme-ov-file#n4o-graph-api">N4O Graph APIs</a> for read access.
-  There is <b>no authentication</b> and all data can be modified!
+  This is a backend service <b>without authentication</b>: all data can be modified!
+  Please use SPARQL endpoint or <a href="{{ frontend }}">frontend</a> for read access.
 </p>
 <h2>General Endpoints</h2>
 <ul>
@@ -325,6 +325,5 @@ window.onload = () => {
     if (!s.connected) {
       document.getElementById('backend').className = 'error'
     }
-    document.getElementById('frontend').href = s.frontend
   })
 }</script>

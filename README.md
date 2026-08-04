@@ -1,12 +1,13 @@
-# n4o-graph-importer
+# grimpo
 
 [![Docker image](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/docker.yml/badge.svg)](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer)
 [![Test](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/test.yml/badge.svg)](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/test.yml)
 
 > Import RDF data into a Knowledge Graph
 
-This [web service](#api) implements a controlled workflow to import RDF data into the triple store of a knowledge graph.
-The service is provided [as Docker image](https://github.com/nfdi4objects/n4o-graph-importer) but it can also be run from sources for [development and testing](#development).
+This knowledge graph importer named **grimpo** provides a [web service](#api) for controlled import of RDF data into the triple store of a knowledge graph. The knowledge graph is [split into](#graph) indivual data collections, terminologies, and mappings.
+
+Grimpo is provided [as Docker image](https://github.com/nfdi4objects/n4o-graph-importer) but it can also be run from sources for [development and testing](#development).
 
 Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.net/) to build the [NFDI4Objects Knowledge Graph](https://graph.nfdi4objects.net/). 
 
@@ -119,7 +120,7 @@ The application does not include any methods of authentification. It is meant to
 
 [graph]: #graphs
 
-The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix base can be changed by [configuration](#configuration) and it is currently set to `https://graph.nfdi4objects.net/` by default.
+The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix base should be changed by [configuration](#configuration) first.
 
 - metadata about all terminologies is in graph of URI `http://example.org/terminology/`
 
@@ -209,8 +210,8 @@ Receiving data generates two additional files in the stage directory (replace `{
 
 The web service and its Docker image can be configured via environment variables:
 
-- `TITLE`: title of the application. Default: `N4O Graph Importer`
-- `BASE`: base URI of named graphs. Default: `https://graph.nfdi4objects.net/` (this will be changed to `http://example.org/`)
+- `TITLE`: title of the application. Default: `Knowledge Graph Importer`
+- `BASE`: base URI of named graphs. Default: `http://example.org/`
 - `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. An in-memory Triple store is used as fallback if `SPARQL` is not set.
 - `STAGE`: writeable stage directory. Default: `stage`
 - `DATA`: local data directory for file import
@@ -475,7 +476,7 @@ To also inspect the content of the triple store, use [n4o-graph-apis].
 
 *TODO: add description how to run this both*
 
-The Docker image of n4o-graph-importer is automatically build on GitHub. To locally build and run the image for testing:
+The Docker image of grimpo is automatically build on GitHub. To locally build and run the image for testing:
 
 ~~~sh
 docker image build -t grimpo .

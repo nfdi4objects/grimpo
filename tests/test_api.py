@@ -14,8 +14,8 @@ cwd = Path().cwd()
 
 sparqlApi = os.getenv('SPARQL')
 
-base = "https://graph.nfdi4objects.net/collection/"
-terminology_graph = "https://graph.nfdi4objects.net/terminology/"
+base = "http://example.org/collection/"
+terminology_graph = "http://example.org/terminology/"
 
 bartoc = read_json("tests/bartoc-subset.json")
 
@@ -69,7 +69,7 @@ def client(stage):
     app.testing = True
 
     data = Path(__file__).parent
-    init(title="N4O Graph Import API TEST",
+    init(title="Graph Import API TEST",
          stage=stage, sparql=sparqlApi, data=data)
 
     sparql = app.config["store"]
@@ -91,19 +91,19 @@ def test_validation(client):
 
     # malformed payload
     fail("PUT", "/collection/1", [], "expected JSON object")
-    fail("PUT", "/collection/1", {"uri": "https://graph.nfdi4objects.net/collection/2"},
-         "URI https://graph.nfdi4objects.net/collection/2 and id 1 don't match")
+    fail("PUT", "/collection/1", {"uri": "http://example.org/collection/2"},
+         "URI http://example.org/collection/2 and id 1 don't match")
     fail("PUT", "/collection/1", {"url": "http:/example.org/"}, {
         'message': "'http:/example.org/' does not match '^https?://'",
         'position': {'jsonpointer': '/url'}})
     fail("PUT", "/collection/1", {"id": "2"}, "ids 1 and 2 don't match")
 
     fail("PUT", "/collection/", {}, "expected list of collection")
-    fail("PUT", "/collection/", [{"id": "1", "uri": "https://graph.nfdi4objects.net/collection/2"}],
-         "URI https://graph.nfdi4objects.net/collection/2 and id 1 don't match")
+    fail("PUT", "/collection/", [{"id": "1", "uri": "http://example.org/collection/2"}],
+         "URI http://example.org/collection/2 and id 1 don't match")
     fail("POST", "/collection/",
-         {"id": "1", "uri": "https://graph.nfdi4objects.net/collection/2", "name": "x"},
-         "URI https://graph.nfdi4objects.net/collection/2 and id 1 don't match")
+         {"id": "1", "uri": "http://example.org/collection/2", "name": "x"},
+         "URI http://example.org/collection/2 and id 1 don't match")
     fail("POST", "/collection/", {})
 
 
@@ -115,7 +115,7 @@ def test_terminology(client):
     client.get('/data/skos.rdf').status_code == 200
     client.get('/status.json').status_code == 200
     client.get(
-        '/status.json').get_json()["title"] == "N4O Graph Import API TEST"
+        '/status.json').get_json()["title"] == "Graph Import API TEST"
 
     # get unregisterd terminology
     fail("GET", "/terminology/18274", code=404)
@@ -129,7 +129,7 @@ def test_terminology(client):
 
         # try to register non-existing terminology
         fail("PUT", "/terminology/0", code=404)
-    assert count_graphs(sparql) == {'https://graph.nfdi4objects.net/terminology/': 12}
+    assert count_graphs(sparql) == {'http://example.org/terminology/': 12}
 
     assert client.get("/terminology/18274/stage/").status_code == 200
     fail("GET", "/terminology/18274/stage/terminology-18274.nt", code=404)
@@ -169,7 +169,7 @@ def test_terminology(client):
 
     # FIXME: Here we get too many bnodes in InternalTripleStore
     # print(sparql.query("SELECT * { GRAPH ?g { ?s ?p ?o } }", "ttl"))
-    # assert count_graphs(sparql) == { 'https://graph.nfdi4objects.net/terminology/': 99 } # 12
+    # assert count_graphs(sparql) == { 'http://example.org/terminology/': 99 } # 12
 
     # load terminology data and check log
     fail("GET", '/terminology/18274/load', code=404)
@@ -198,13 +198,13 @@ def test_terminology(client):
 
     # check size of terminology graphs
     assert count_graphs(sparql) == {
-        'https://graph.nfdi4objects.net/terminology/': 37,
+        'http://example.org/terminology/': 37,
         'http://bartoc.org/en/node/18274': 377,
         'http://bartoc.org/en/node/20533': 679
     }
     assert client.post("/terminology/20533/remove").status_code == 200
     assert count_graphs(sparql) == {
-        'https://graph.nfdi4objects.net/terminology/': 36,
+        'http://example.org/terminology/': 36,
         'http://bartoc.org/en/node/18274': 377
     }
 
@@ -218,11 +218,11 @@ def test_terminology(client):
     assert client.delete('/terminology/18274').status_code == 200
     assert count_graphs(sparql) == {
         # TODO: this seems wrong if terminology is unregistered
-        'https://graph.nfdi4objects.net/terminology/': 35,
+        'http://example.org/terminology/': 35,
     }
 
     # TODO: this cleanup should not be required!
-    graph = "https://graph.nfdi4objects.net/terminology/"
+    graph = "http://example.org/terminology/"
     sparql.drop_graph(graph)
 
 
@@ -232,7 +232,7 @@ def test_api(client):
     # start without collections
     resp = client.get('/')
     assert resp.status_code == 200
-    assert b"N4O Graph Import API TEST" in resp.data
+    assert b"Graph Import API TEST" in resp.data
 
     assert client.get('/icon.png').status_code == 200
 
@@ -260,7 +260,7 @@ def test_api(client):
 
     assert client.get("/collection/1/stage/").status_code == 200
 
-    assert count_graphs(sparql) == {'https://graph.nfdi4objects.net/collection/': 4}
+    assert count_graphs(sparql) == {'http://example.org/collection/': 4}
 
     # delete collection
     assert client.delete('/collection/1').status_code == 200
