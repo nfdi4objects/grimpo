@@ -14,6 +14,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 ## Table of Contents
 
 - [Usage](#usage)
+  - [Data sources](#data-sources)
   - [Graphs](#graphs)
   - [Validation](#validation)
   - [Filtering](#filtering)
@@ -116,6 +117,14 @@ The application does not include any methods of authentification. It is meant to
 - [n4o-fuseki](https://github.com/nfdi4objects/n4o-fuseki): RDF triple store
 - [n4o-graph-apis](https://github.com/nfdi4objects/n4o-graph-apis): web interface and public SPARQL endpoint
 
+### Data sources
+
+**Terminology metadata** is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminology/{id}](#put-terminologyid) or [PUT /terminology/](#put-terminology)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead. Script `update-terminologies` in this repository can be used to get a subset from BARTOC, including all [terminologies listed in NFDI4Objects](https://bartoc.org/vocabularies?partOf=http://bartoc.org/en/node/18961).
+
+The location of the data is taken from metadata field `distributions` if existing. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with landing page URL) is used. Subfield `format` can be added to specificy the data format. *[This feature has not fully been implemented yet](https://github.com/nfdi4objects/n4o-graph-importer/issues/59)*
+
+The location can be overridden with optional query parameter `from` with an URL or a file name from [local data directory.](#configuration), but this location is not made public. 
+
 ### Graphs
 
 [graph]: #graphs
@@ -217,8 +226,6 @@ The web service and its Docker image can be configured via environment variables
 - `DATA`: local data directory for file import
 - `FRONTEND`: URL of [n4o-graph-apis] instance. This is included as field `frontend` in [/status.json](#get-statusjson) and shown in the HTML interface for convenience. Default is the value of `BASE`
 
-If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead of BARTOC API. Script `update-terminologies` in this repository can be used to get a subset from BARTOC, including all [terminologies listed in NFDI4Objects](https://bartoc.org/vocabularies?partOf=http://bartoc.org/en/node/18961).
-
 ## API
 
 There is a minimal HTML interface at root path (**GET /**) to try out the API. This is more useful than an interface generated automatically, for instance with Swagger. The API is not meant to be publically available (there is no authentification), so there is no need for an [OpenAPI](https://swagger.io/specification/) document anyway.
@@ -274,7 +281,9 @@ List and get files of the stage directory of a terminology.
 
 #### POST /terminology/{id}/receive
 
-Receive terminology data. The location of the data is going to be extracted from terminology metadata from BARTOC but this [has not been implemented yet](https://github.com/nfdi4objects/n4o-graph-importer/issues/58). For now pass query parameter `from` instead to locate an URL or the name of a file in the data directory. File format can be:
+Receive terminology data. Data source is given in terminology metadata field `distributions` or via query parameter `from` (see [data sources](#data-sources)).
+
+File format can be:
 
 - RDF/Turtle for file extension `.ttl` or `.nt`
 - RDF/XML for file extension `.rdf` or `.xml`
@@ -355,9 +364,9 @@ List and get files of the stage directory of a collection.
 
 #### POST /collection/{id}/receive
 
-Receive and process collection data. The location of the data is taken from collection metadata field `distributions` if existing. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with landing page URL) is used. Subfield `format` can be added to specificy the data format. *[This feature has not fully been implemented yet](https://github.com/nfdi4objects/n4o-graph-importer/issues/59)*
+Receive and process collection data. Data source is given in collection metadata field `distributions` or via query parameter `from` (see [data sources](#data-sources)).
 
-The location can be overridden with optional query parameter `from` with an URL or a file name from local data directory. File format can be:
+File format can be:
 
 - RDF/Turtle for file extension `.ttl` or `.nt`
 - RDF/XML for file extension `.rdf` or `.xml`
@@ -431,7 +440,9 @@ List and get files of the stage directory of a mapping source.
 
 #### POST /mappings/{id}/receive
 
-Receive and process mappings from a mapping source. The location of the data is taken from mapping source field `access` if existing. The location can be overridden with optional query parameter `from` with an URL or a file name from local data directory. The file format is derived from file name extension, unless explicitly specified in metadata field `access.format`. Mappings can be given as:
+Receive and process mappings from a mapping source. Data source is given in mapping source metadata field `distributions` or via query parameter `from` (see [data sources](#data-sources)).
+
+Mappings can be given as:
 
 - plain RDF triples in Turtle syntax (extension `.nt` or `.ttl`)
 - plain RDF triples in RDF/XML syntax (extension `.rdf` or `.xml`)
