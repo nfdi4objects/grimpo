@@ -129,7 +129,16 @@ def test_terminology(client):
 
         # try to register non-existing terminology
         fail("PUT", "/terminology/0", code=404)
-    assert count_graphs(sparql) == {'http://example.org/terminology/': 12}
+    assert count_graphs(sparql) == {'http://example.org/terminology/': 13}
+
+    query = (
+        f"SELECT ?modified {{ GRAPH <{terminology_graph}> {{ "
+        f"<{terminology_graph}> <http://purl.org/dc/terms/modified> ?modified "
+        "} }"
+    )
+    modified = sparql.query(query)
+    assert len(modified) == 1
+    assert modified[0]["modified"]["datatype"] == "http://www.w3.org/2001/XMLSchema#dateTime"
 
     assert client.get("/terminology/18274/stage/").status_code == 200
     fail("GET", "/terminology/18274/stage/terminology-18274.nt", code=404)
@@ -198,13 +207,13 @@ def test_terminology(client):
 
     # check size of terminology graphs
     assert count_graphs(sparql) == {
-        'http://example.org/terminology/': 37,
+        'http://example.org/terminology/': 38,
         'http://bartoc.org/en/node/18274': 377,
         'http://bartoc.org/en/node/20533': 679
     }
     assert client.post("/terminology/20533/remove").status_code == 200
     assert count_graphs(sparql) == {
-        'http://example.org/terminology/': 36,
+        'http://example.org/terminology/': 37,
         'http://bartoc.org/en/node/18274': 377
     }
 
@@ -218,7 +227,7 @@ def test_terminology(client):
     assert client.delete('/terminology/18274').status_code == 200
     assert count_graphs(sparql) == {
         # TODO: this seems wrong if terminology is unregistered
-        'http://example.org/terminology/': 35,
+        'http://example.org/terminology/': 36,
     }
 
     # TODO: this cleanup should not be required!
@@ -260,7 +269,7 @@ def test_api(client):
 
     assert client.get("/collection/1/stage/").status_code == 200
 
-    assert count_graphs(sparql) == {'http://example.org/collection/': 4}
+    assert count_graphs(sparql) == {'http://example.org/collection/': 5}
 
     # delete collection
     assert client.delete('/collection/1').status_code == 200

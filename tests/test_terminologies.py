@@ -74,7 +74,7 @@ def test_nested_contexts(tmp_path, monkeypatch):
 
     # Expected number of triples
     query = f"SELECT * {{ GRAPH <{graph}> {{ ?s ?p ?o }} }}"
-    assert len(store.query(query)) == 8
+    assert len(store.query(query)) == 9
 
     # Try to add a terminology with unsupported JSKOS context URL
     write_json(dump, [terminology(1579, "https://example.org/context.json")])
@@ -83,4 +83,4 @@ def test_nested_contexts(tmp_path, monkeypatch):
 
     # leaves the registry and graph unchanged
     assert [item["id"] for item in registry.list()] == ["1578"]
-    assert len(store.query(query)) == 8
+    assert len(store.query(query)) == 9
