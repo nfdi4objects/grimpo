@@ -35,8 +35,9 @@
   "publisher": {
     "@id": "dcterms:publisher"
   },
-  "access": {
+  "distributions": {
     "@id": "dcat:distribution",
+    "@container": "@set",
     "@context": {
       "url": {
         "@id": "dcat:accessURL",
@@ -45,9 +46,7 @@
       "download": {
         "@id": "dcat:downloadURL",
         "@type": "dcat:anyURI"
-      },
-      "protocol": "dcterms:conformsTo",
-      "format": "nfdicore:exportFormat"
+      }
     }
   },
   "partOf": {

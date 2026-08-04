@@ -205,7 +205,17 @@
     "count": "http://rdfs.org/ns/void#entities",
     "distributions": {
       "@id": "http://www.w3.org/ns/dcat#distribution",
-      "@container": "@set"
+      "@container": "@set",
+      "@context": {
+        "url": {
+          "@id": "http://www.w3.org/ns/dcat#accessURL",
+          "@type": "http://www.w3.org/ns/dcat#anyURI"
+        },
+        "download": {
+          "@id": "http://www.w3.org/ns/dcat#downloadURL",
+          "@type": "http://www.w3.org/ns/dcat#anyURI"
+        }
+      }
     },
     "services": {
       "@id": "http://www.w3.org/ns/dcat#accessService",

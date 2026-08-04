@@ -121,6 +121,10 @@ The application does not include any methods of authentification. It is meant to
 
 **Terminology metadata** is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminology/{id}](#put-terminologyid) or [PUT /terminology/](#put-terminology)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead. Script `update-terminologies` in this repository can be used to get a subset from BARTOC, including all [terminologies listed in NFDI4Objects](https://bartoc.org/vocabularies?partOf=http://bartoc.org/en/node/18961).
 
+**Collection metadata** must be provided in a custom JSON format.
+
+**Mapping source metadata** must be provided in a custom JSON format but this will be changed to align with JSKOS concordances and mapping registries.
+
 The location of the data is taken from metadata field `distributions` if existing. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with landing page URL) is used. Subfield `format` can be added to specificy the data format. *[This feature has not fully been implemented yet](https://github.com/nfdi4objects/n4o-graph-importer/issues/59)*
 
 The location can be overridden with optional query parameter `from` with an URL or a file name from [local data directory.](#configuration), but this location is not made public. 
