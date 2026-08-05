@@ -1,6 +1,5 @@
 # Integration test
 from unittest.mock import patch
-import tempfile
 import os
 from urllib.parse import urlparse, parse_qs
 from shutil import copy
@@ -36,12 +35,6 @@ collection_3_full = {
 }
 
 
-@pytest.fixture
-def stage():
-    with tempfile.TemporaryDirectory() as tempdir:
-        yield tempdir
-
-
 def expect_error(client, method, path, json=None, error=None, code=400):
     res = client.open(path, method=method, json=json)
     assert res.status_code == code
@@ -65,19 +58,19 @@ def count_graphs(sparql):
 
 
 @pytest.fixture
-def client(stage):
+def client(tmp_path):
     app.testing = True
 
     data = Path(__file__).parent
     init(title="Graph Import API TEST",
-         stage=stage, sparql=sparqlApi, data=data)
+         stage=tmp_path, sparql=sparqlApi, data=data)
 
     sparql = app.config["store"]
 
     with app.test_client() as client:
         def fail(*args, **kwargs):
             return expect_error(client, *args, **kwargs)
-        yield client, fail, stage, sparql
+        yield client, fail, tmp_path, sparql
 
 
 def mock_requests_get(url):

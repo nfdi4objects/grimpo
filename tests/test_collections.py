@@ -1,21 +1,8 @@
 # Unit test
-import pytest
-import tempfile
-from lib import CollectionRegistry, createTripleStore
-
-
-@pytest.fixture
-def config():
-    with tempfile.TemporaryDirectory() as tempdir:
-        yield {
-            "base": "http://example.org/",
-            "stage": f"{tempdir}/stage",
-            "data": f"{tempdir}/data",
-        }
+from lib import CollectionRegistry
+from .utils import config  # noqa: F401
 
 
 def test_collections(config):
-    # print(config)
-    config["store"] = createTripleStore(False)  # in-memory
     CollectionRegistry(**config)
     # TODO

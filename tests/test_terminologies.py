@@ -1,9 +1,8 @@
 import pytest
-
+from .utils import config  # noqa: F401
 from lib import (
     TerminologyRegistry,
     ValidationError,
-    createTripleStore,
     write_json,
 )
 
@@ -33,7 +32,7 @@ def terminology(terminology_id, nested_context=JSKOS_CONTEXT_URL):
     }
 
 
-def test_nested_contexts(tmp_path, monkeypatch):
+def test_nested_contexts(config, monkeypatch):
     # The conversion must not make HTTP requests.
     def fail_network(*_args, **_kwargs):
         raise AssertionError(
@@ -41,18 +40,11 @@ def test_nested_contexts(tmp_path, monkeypatch):
 
     monkeypatch.setattr("requests.get", fail_network)
 
-    data = tmp_path / "data"
-    data.mkdir()
-    dump = data / "bartoc.json"
-    write_json(dump, [terminology(1578)])
+    bartoc = config["data"] / "bartoc.json"
+    write_json(bartoc, [terminology(1578)])
 
-    store = createTripleStore()
-    registry = TerminologyRegistry(
-        base="http://example.org/",
-        data=data,
-        stage=tmp_path / "stage",
-        store=store,
-    )
+    store = config["store"]
+    registry = TerminologyRegistry(**config)
 
     # A different fallback proves that the declared context is preserved.
     registry.context = {
@@ -77,7 +69,7 @@ def test_nested_contexts(tmp_path, monkeypatch):
     assert len(store.query(query)) == 9
 
     # Try to add a terminology with unsupported JSKOS context URL
-    write_json(dump, [terminology(1579, "https://example.org/context.json")])
+    write_json(bartoc, [terminology(1579, "https://example.org/context.json")])
     with pytest.raises(ValidationError, match="Unsupported remote"):
         registry.replace([{"uri": "http://bartoc.org/en/node/1579"}])
 
