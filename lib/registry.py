@@ -7,7 +7,8 @@ from .rdf import jsonld2nt
 from .rdffilter import RDFFilter
 from .log import Log
 from .errors import ApiError, NotFound, ValidationError
-from .utils import read_json, write_json, access_location
+from .utils import read_json, write_json
+from .formats import guess_format
 import re
 
 
@@ -65,8 +66,6 @@ class Registry:
         return item
 
     def list(self):
-        if not self.stage.is_dir():
-            return []
         files = [f for f in self.stage.iterdir() if f.suffix == ".json" and re.match('^[0-9]+$', f.stem)]
         return [read_json(f) for f in files]
 
@@ -95,9 +94,12 @@ class Registry:
         return self.list()
 
     def update_metadata(self):
+        # query issued statements to keep them
         query = f"SELECT * {{ GRAPH <{self.graph}> {{ VALUES (?p) {{(dct:issued)}} ?s ?p ?o }} }}"
         issued = self.sparql.query(query, "nq")
+        # rebuild metadata from JSON-LD
         metadata = jsonld2nt(self.list(), self.context, self.remote_contexts)
+        # add issued statements and modified timestamp
         modified = datetime.now().replace(microsecond=0).isoformat()
         file = self.stage / f"{self.kind}.ttl"
         with open(file, "w") as f:
@@ -120,8 +122,7 @@ class Registry:
         for id in [t["id"] for t in self.list()]:
             self.delete(id)
 
-    def load(self, id, **kw):
-        mode = kw.get('mode', 'replace')
+    def load(self, id, add=False):
         stage = self.stage / str(id)
         file = stage / f"{self.kind}-{id}.nt"
         uri = self.get(id)["uri"]
@@ -129,7 +130,7 @@ class Registry:
             raise NotFound(f"{self.kind} data has not been received!")
         log = Log(stage / "load.json",
                   f"Loading {self.kind} {uri} from {file}")
-        if mode == 'add':
+        if add:
             self.sparql.add_file(uri, file)
         else:
             self.sparql.store_file(uri, file)
@@ -181,59 +182,37 @@ class Registry:
     def forbidden_namespaces(self, id):
         return {}
 
-    def receive(self, id, file=None):
-        file, fmt = self.identify_source(id, file)
-        original, log = self.fetch_source(id, file, fmt)
-        file = self.preprocess_source(id, original, fmt, log)
-        self.receive_rdf(id, file, log)
-        return log.done()
-
-    def identify_source(self, id, source=None):
+    def receive(self, id, source=None, format=None):
         item = self.get(id)
-        fmt = None
 
         if not source:
-            source, fmt = access_location(item)
+            source, format = self.identify_source(item, format)
         if not source:
             raise NotFound("Missing source to receive data from")
 
-        if fmt:
-            fmt = fmt.removeprefix("https://format.gbv.de/")
-            if fmt == "rdf/turtle":
-                fmt = "ttl"
-            elif fmt == "rdf/xml":
-                fmt = "xml"
-
-        if not fmt:
-            if Path(source).suffix in [".nt", ".ttl"]:
-                fmt = "ttl"
-            elif Path(source).suffix in [".rdf", ".xml"]:
-                fmt = "xml"
-            elif Path(source).suffix in [".ndjson", ".jsonl"]:
-                fmt = "ndjson"
-            elif Path(source).suffix in [".zip", ".ZIP"]:
-                fmt = "zip"
-
-        if not fmt:
+        format = guess_format(source, format=format)
+        if not format:
             raise ApiError("Unknown data format")
 
-        return source, fmt
+        original, log = self.fetch_source(id, source, format)
 
-    def fetch_source(self, id, source, fmt):
+        file = self.preprocess_source(id, original, format, log)
+        self.receive_rdf(id, file, log)
+        return log.done()
+
+    def fetch_source(self, id, source, format):
         stage = self.stage / str(id)
         stage.mkdir(exist_ok=True)
 
-        original = stage / f"original.{fmt}"
+        original = stage / f"original.{format}"
         log = Log(stage / "receive.json", f"Receiving {id} from {source}")
 
         try:
-            if "/" not in source:
+            if "/" not in source:   # file
                 source = self.data / source
                 log.append(f"Retrieving source {source} from data directory")
                 copy(source, original)
-            else:
-                # TODO: source may be a DOI or similar identifier
-                # ./extract-rdf.py $download_dir $stage/triples.nt
+            else:  # URL
                 log.append(f"Retrieving source from {source}")
                 # TODO: caching (download only if modified)
                 with urllib.request.urlopen(source) as fsrc, open(original, 'wb') as fdst:
@@ -244,7 +223,7 @@ class Registry:
 
         return (original, log)
 
-    def preprocess_source(self, id, file, fmt, log):
+    def preprocess_source(self, id, file, format, log):
         """Returned file must be RDF or ZIP (with RDF)."""
         return file
 
@@ -259,3 +238,13 @@ class Registry:
 
         kept, removed, changed = self.rdf_filter(id).process(source, keep, remove, log)
         # TODO: if keptCount is zero, raise an error
+
+    def identify_source(self, data, format):
+        for dist in data.get("distributions", []):
+            format = format or dist.get("format", None)
+            if "download" in dist:
+                return dist["download"], format
+            elif dist.get("url", "").startswith("https://doi.org/10.5281/zenodo."):
+                id = dist["url"][31:]
+                return f"https://zenodo.org/api/records/{id}/files-archive", "zip"
+        return None, None

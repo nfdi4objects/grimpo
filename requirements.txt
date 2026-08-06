@@ -2,7 +2,6 @@ Flask==3.1.0
 flask_autoindex
 waitress==3.0.2
 requests
-datahugger
 jsonschema
 SPARQLWrapper
 pyoxigraph==0.5.2
