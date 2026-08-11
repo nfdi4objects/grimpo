@@ -13,13 +13,14 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 
 ## Table of Contents
 
+- [Installation](#installation)
+- [Configuration](#configuration)
 - [Usage](#usage)
   - [Data sources](#data-sources)
   - [Graphs](#graphs)
   - [Validation](#validation)
   - [Filtering](#filtering)
   - [Reports](#reports)
-- [Configuration](#configuration)
 - [API](#api)
   - [General endpoints](#general-endpoints)
     - [GET /status.json](#get-statusjson)
@@ -72,6 +73,24 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 - [Development](#development)
 - [License](#license)
 
+## Installation
+
+The application does not include any methods of authentification. It is meant to be deployed together with components described in [n4o-graph](https://github.com/nfdi4objects/n4o-graph) repository. In particular:
+
+- [n4o-fuseki](https://github.com/nfdi4objects/n4o-fuseki): RDF triple store
+- [n4o-graph-apis](https://github.com/nfdi4objects/n4o-graph-apis): web interface and public SPARQL endpoint
+
+## Configuration
+
+The web service and its Docker image can be configured via environment variables:
+
+- `TITLE`: title of the application. Default: `Knowledge Graph Importer`
+- `BASE`: base URI of named graphs. Default: `http://example.org/`
+- `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. An in-memory Triple store is used as fallback if `SPARQL` is not set.
+- `STAGE`: writeable stage directory. Default: `stage`
+- `DATA`: local data directory for file import
+- `FRONTEND`: URL of [n4o-graph-apis] instance. This is included as field `frontend` in [/status.json](#get-statusjson) and shown in the HTML interface for convenience. Default is the value of `BASE`
+
 ## Usage
 
 Three kinds of data can be imported seperately:
@@ -88,7 +107,7 @@ Importing is controlled via [an HTTP API](#api) in three steps:
 2. **receive**: data is retrieved into a **stage** directory where it is [validated](#validation), [filtered](#filtering), and a [report] is generated
 2. **load**: processed data is loaded into the **triple store**
 
-Register can be undone by additional step **delete**. Load and receive can be undone by step **remove**. Mappings can also be injested and withdraw directly into/from the triple store via **append/detach** to support non-durable live-updates.
+Register can be undone by additional step **delete**. Load and receive can be undone by step **remove**. Mappings can also be injested and withdraw directly into/from the triple store via **append/detach** to support non-durable live-updates. Register and load also log information into [reports](#reports).
 
 ```mermaid
 flowchart LR
@@ -112,18 +131,37 @@ classDef hidden display: none;
 classDef data stroke:#4d8dd1, fill:#D4E6F9;
 ```
 
-The application does not include any methods of authentification. It is meant to be deployed together with components described in [n4o-graph](https://github.com/nfdi4objects/n4o-graph) repository. In particular:
-
-- [n4o-fuseki](https://github.com/nfdi4objects/n4o-fuseki): RDF triple store
-- [n4o-graph-apis](https://github.com/nfdi4objects/n4o-graph-apis): web interface and public SPARQL endpoint
-
 ### Data sources
 
-**Terminology metadata** is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminology/{id}](#put-terminologyid) or [PUT /terminology/](#put-terminology)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead. Script `update-terminologies` in this repository can be used to get a subset from BARTOC, including all [terminologies listed in NFDI4Objects](https://bartoc.org/vocabularies?partOf=http://bartoc.org/en/node/18961).
+Metadata of **[collections](#collections)** and **[mapping sources]** must be provided in a custom JSON format. Example:
 
-The location of the data is taken from metadata field `distributions` if existing. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with landing page URL) is used. Subfield `format` can be added to specificy the data format. *[This feature has not fully been implemented yet](https://github.com/nfdi4objects/n4o-graph-importer/issues/59)*
+~~~json
+{
+  "name": "African Red Slip Ware",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "url": "https://doi.org/10.5281/zenodo.5642751",
+  "distributions": [
+    {
+      "url": "https://doi.org/10.5281/zenodo.5642751"
+    }
+  ]
+}
+~~~
 
-The location can be overridden with optional query parameter `from` with an URL or a file name from [local data directory.](#configuration), but this location is not made public. 
+**[Terminology](#terminologies)** metadata is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminology/{id}](#put-terminologyid) or [PUT /terminology/](#put-terminology)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead. Script `update-terminologies` in this repository can be used to get a subset from BARTOC, including all [terminologies listed in NFDI4Objects](https://bartoc.org/vocabularies?partOf=http://bartoc.org/en/node/18961).
+
+The location of data is taken from metadata field `distributions`. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with Zenodo DOI) is used. Subfield `format` can be added to specificy the data format. The following formats are supported:
+
+- RDF/XML: `xml` or `https://format.gbv.de/rdf/xml`)
+- Turtle: `ttl` or `https://format.gbv.de/rdf/turtle`)
+- N-Triples: `nt` or `https://format.gbv.de/rdf/ntriples`)
+- Newline delimited JSON: `ndjson` or `https://format.gbv.de/ndjson`) with JSKOS records (only for terminologies and mappings)
+- ZIP Archive with RDF Files (`*.{nt,ttl,rdf,xml}`): `zip` or `https://format.gbv.de/zip`. The archive is extracted recursively on receive.
+
+Format of Zenodo DOI data is always `zip`.
+
+The location can be overridden on receive with optional query parameter `from` pointing to an URL or a file name from [local data directory.](#configuration). These locations are not made public.
+
 
 ### Graphs
 
@@ -214,17 +252,6 @@ Receiving data generates two additional files in the stage directory (replace `{
 
 - `terminology-{id}.nt`/`collection-{id}.nt`/`mappings-{id}.nt`: validated and filtered RDF triples to be imported
 - `terminology-{id}-removed.nt`/`collection-{id}-removed.nt`/`mappings-{id}-removed.nt`: triples removed on [filtering]
-
-## Configuration
-
-The web service and its Docker image can be configured via environment variables:
-
-- `TITLE`: title of the application. Default: `Knowledge Graph Importer`
-- `BASE`: base URI of named graphs. Default: `http://example.org/`
-- `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. An in-memory Triple store is used as fallback if `SPARQL` is not set.
-- `STAGE`: writeable stage directory. Default: `stage`
-- `DATA`: local data directory for file import
-- `FRONTEND`: URL of [n4o-graph-apis] instance. This is included as field `frontend` in [/status.json](#get-statusjson) and shown in the HTML interface for convenience. Default is the value of `BASE`
 
 ## API
 

@@ -35,7 +35,7 @@
   "publisher": {
     "@id": "dcterms:publisher"
   },
-  "access": {
+  "distributions": {
     "@id": "dcat:distribution",
     "@context": {
       "url": {
