@@ -1,20 +1,19 @@
 # grimpo
 
-[![Docker image](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/docker.yml/badge.svg)](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer)
+[![License](https://img.shields.io/github/license/nfdi4objects/n4o-graph-importer.svg)](https://github.com/nfdi4objects/n4o-graph-importer/blob/master/LICENSE)
 [![Test](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/test.yml/badge.svg)](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/test.yml)
+[![Docker image](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/docker.yml/badge.svg)](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer)
 
 > Import RDF data into a Knowledge Graph
 
-This knowledge graph importer named **grimpo** provides a [web service](#api) for controlled import of RDF data into the triple store of a knowledge graph. The knowledge graph is [split into](#graph) indivual data collections, terminologies, and mappings.
-
-Grimpo is provided [as Docker image](https://github.com/nfdi4objects/n4o-graph-importer) but it can also be run from sources for [development and testing](#development).
+This knowledge graph importer named **grimpo** provides a [web service](#api) for controlled import of RDF data into the triple store of a knowledge graph. The knowledge graph is [split into](#graphs) indivual data collections, terminologies, and mappings.
 
 Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.net/) to build the [NFDI4Objects Knowledge Graph](https://graph.nfdi4objects.net/). 
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Configuration](#configuration)
+- [Overview](#overview)
+- [Installation and configuration](#installation-and-configuration)
 - [Usage](#usage)
   - [Data sources](#data-sources)
   - [Graphs](#graphs)
@@ -73,12 +72,49 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 - [Development](#development)
 - [License](#license)
 
-## Installation
+## Overview
 
-The application does not include any methods of authentification. It is meant to be deployed together with components described in [n4o-graph](https://github.com/nfdi4objects/n4o-graph) repository. In particular:
+grimpo requires access to an RDF triple store with support of named graphs and the default graph configured as union graph. The application wraps write access to the triple store but it does not include any methods of authentification. An additinal interface is required for public read-access to the triple store and metadata.
 
-- [n4o-fuseki](https://github.com/nfdi4objects/n4o-fuseki): RDF triple store
-- [n4o-graph-apis](https://github.com/nfdi4objects/n4o-graph-apis): web interface and public SPARQL endpoint
+```mermaid
+graph TD
+    terminologies(terminologies) --> receive
+    mappings(mappings) --> receive
+    collections(collections) --> receive
+    stage(stage)
+    subgraph importer [grimpo]
+        receive[register & receive]
+        receive -- validate, transform, report --> stage
+        stage --> load
+        load
+    end
+    kg[triple store]
+    stage --> interface[interface]
+    kg -- SPARQL --> interface
+    interface -- SPARQL --> apps(applications)
+    load -- SPARQL update & graph store --> kg
+    interface --UI--> users(users)
+    
+classDef data stroke:#4d8dd1, fill:#D4E6F9, color:#333;
+classDef prime fill: #ECECFF, color:#333, stroke:#9370DB;
+classDef box fill:#ffffde, stroke:#aaaa33, color:#333;
+class terminologies,mappings,collections,stage,apps,users data;
+class receive,load,lido2rdf,web-app prime;
+class importer,kg,interface,lido box;
+linkStyle default color:black;
+```
+
+The main application of grimpo is the [NFDI4Objects Knowledge Graph](https://graph.nfdi4objects.net/) with components described in [n4o-graph](https://github.com/nfdi4objects/n4o-graph) repository:
+
+- [n4o-fuseki](https://github.com/nfdi4objects/n4o-fuseki): the RDF triple store
+- [n4o-graph-apis](https://github.com/nfdi4objects/n4o-graph-apis): the interface (web interface and public SPARQL endpoint)
+
+
+## Installation and configuration
+
+[configuration](#installation-and-configuration)
+
+Grimpo is provided [as Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer) but it can also be run from sources for [development and testing](#development).
 
 ## Configuration
 
@@ -133,7 +169,7 @@ classDef data stroke:#4d8dd1, fill:#D4E6F9;
 
 ### Data sources
 
-Metadata of **[collections](#collections)** and **[mapping sources]** must be provided in a custom JSON format. Example:
+Metadata of **[collections](#collections)** and **[mapping sources](#mappings)** must be provided in a custom JSON format. Example:
 
 ~~~json
 {
@@ -160,14 +196,14 @@ The location of data is taken from metadata field `distributions`. The first arr
 
 Format of Zenodo DOI data is always `zip`.
 
-The location can be overridden on receive with optional query parameter `from` pointing to an URL or a file name from [local data directory.](#configuration). These locations are not made public.
+The location can be overridden on receive with optional query parameter `from` pointing to an URL or a file name from [local data directory.](#installation-and-configuration). These locations are not made public.
 
 
 ### Graphs
 
 [graph]: #graphs
 
-The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix base should be changed by [configuration](#configuration) first.
+The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix base should be changed by [configuration] first.
 
 - metadata about all terminologies is in graph of URI `http://example.org/terminology/`
 
@@ -263,7 +299,7 @@ A HTTP 400 error with response body in [Data Validation Error Format] is returne
 
 #### GET /status.json
 
-Get curent information about the application as JSON object. This includes the [configuration](#configuration) with lowercase field names and field `connected` whether the SPARQL API endpoint can be accessed.
+Get curent information about the application as JSON object. This includes the [configuration] with lowercase field names and field `connected` whether the SPARQL API endpoint can be accessed.
 
 #### GET /data/
 
