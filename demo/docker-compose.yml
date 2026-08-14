@@ -1,0 +1,45 @@
+# Try with:
+#
+# docker compose up --force-recreate --remove-orphans -V
+
+# This runs
+# - A fuseki triple store
+# - grimpo at <http://localhost:5020/>            $IMPORT
+# - grimpo-interface at <http://localhost:8000/>  $PORT
+
+services:
+
+  fuseki:
+    image: ghcr.io/nfdi4objects/n4o-fuseki:main
+    networks:
+      - n4o
+    restart: always
+
+  importer:
+    image: ghcr.io/nfdi4objects/n4o-graph-importer:main
+    environment:
+      - SPARQL=http://fuseki:3030/n4o
+      - FRONTEND=http://localhost:${PORT:-8000}
+    ports:
+      - ${IMPORT:-5020}:5020
+    volumes:
+      - ${DATA:-./data}:/app/data:ro
+      - ${STAGE:-./stage}:/app/stage
+    networks:
+      - n4o
+
+  apis:
+    image: ghcr.io/nfdi4objects/n4o-graph-apis:main
+    environment:
+      - SPARQL=http://fuseki:3030/n4o
+    ports:
+      - ${PORT:-8000}:8000
+    volumes:
+      - ./config-apis.yml:/app/config.yaml:ro
+      - ${STAGE:-./stage}:/app/stage:ro
+    networks:
+      - n4o
+
+networks:
+  n4o:
+    driver: bridge

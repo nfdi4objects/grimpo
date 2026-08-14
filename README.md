@@ -116,6 +116,8 @@ The main application of grimpo is the [NFDI4Objects Knowledge Graph](https://gra
 
 Grimpo is provided [as Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer) but it can also be run from sources for [development and testing](#development).
 
+See directory [demo/](demo) for a sample Docker configuration.
+
 ## Configuration
 
 The web service and its Docker image can be configured via environment variables:
