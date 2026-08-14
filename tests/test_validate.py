@@ -18,7 +18,7 @@ def test_jsonschema():
             schema = {"type": "object", "properties": {}}
             schema["properties"][prop] = check
             validateJSON(data, schema)
-            assert prop == "ValidationError should have been thrown!"
+            assert prop == "ValidationError should have been thrown!"   # pragma: no cover
         except ValidationError as e:
             assert e.position == {"jsonpointer": pos}
 

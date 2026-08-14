@@ -14,7 +14,7 @@ def parse(source, filter=None, unique=False):
 def fail(file, error):
     try:
         parse(file)
-        assert file == f"parsing {file} should have thrown ValidationError!"
+        assert file == f"parsing {file} should have thrown ValidationError!"  # pragma: no cover
     except ValidationError as e:
         assert e.to_dict() == error
 

@@ -39,8 +39,7 @@ def terminology(terminology_id, nested_context=JSKOS_CONTEXT_URL):
 def test_nested_contexts(config, monkeypatch):
     # The conversion must not make HTTP requests.
     def fail_network(*_args, **_kwargs):
-        raise AssertionError(
-            "JSON-LD context unexpectedly fetched over the network")
+        raise AssertionError("Unexpected HTTP request")  # pragma: no cover
 
     monkeypatch.setattr("requests.get", fail_network)
 

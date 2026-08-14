@@ -19,10 +19,7 @@ def guess_format(source, format=None):
         elif format in known_formats.values():
             return format
     elif source:
-        if type(source) is str:
-            ext = source.split(".")[-1]
-        elif isinstance(source, Path):
-            ext = source.suffix[1:]
+        ext = source.split(".")[-1]
         if ext in ["nt", "ttl"]:
             return "ttl"
         elif ext in ["rdf", "xml"]:

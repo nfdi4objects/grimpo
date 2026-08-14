@@ -107,9 +107,6 @@ class InternalTripleStore(AbstractTripleStore):
         self.ds = Dataset(default_union=True)
 
     def query(self, query, format='sparql'):
-        def map_row(row):
-            return {str(k): convert_rdflib_term(v, format) for k, v in row.items()}
-
         query = self.prefixes + query
 
         # RDFLib raises warning, see <https://github.com/RDFLib/rdflib/issues/3361>
