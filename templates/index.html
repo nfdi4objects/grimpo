@@ -10,7 +10,12 @@
 {%- endmacro -%}
 
 <p>
-  Controlled <b>write access</b> to Triple store at <a id="backend" href="{{ sparql }}">{{ sparql }}</a>.
+  Controlled <b>write access</b> to
+  {% if sparql %}
+    a triple store at <a id="backend" href="{{ sparql }}">{{ sparql }}</a>.
+  {% else %}
+    an in-memory triple store.
+  {% endif %}
   This is a backend service <b>without authentication</b>: all data can be modified!
   Please use SPARQL endpoint or <a href="{{ frontend }}">frontend</a> for read access.
 </p>
