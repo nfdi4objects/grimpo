@@ -112,7 +112,7 @@ The main application of grimpo is the [NFDI4Objects Knowledge Graph](https://gra
 
 ## Installation and configuration
 
-[configuration](#installation-and-configuration)
+[configuration]: #installation-and-configuration
 
 Grimpo is provided [as Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer) but it can also be run from sources for [development and testing](#development).
 
@@ -203,19 +203,14 @@ The location can be overridden on receive with optional query parameter `from` p
 
 [graph]: #graphs
 
-The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix base should be changed by [configuration] first.
-
-- metadata about all terminologies is in graph of URI `http://example.org/terminology/`
-
-- metadata about all collections is in graph of URI `http://example.org/collection/`
-
-- metadata about all mapping sources is in graph of URI `http://example.org/mappings/`
-
-- each terminology is imported into a graph by its [BARTOC] URI
+The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix should be changed by [configuration] variable `BASE`.
 
 - each collection is imported into a graph of URI namespace `http://example.org/collection/`, followed by a numeric identifier
-
+- metadata about all collections is in graph of URI `http://example.org/collection/`
+- each terminology is imported into a graph by its [BARTOC] URI, for instance `http://bartoc.org/en/node/725`
+- metadata about all terminologies is in graph of URI `http://example.org/terminology/`
 - mappings are grouped into mapping sources, each imported into a graph of URI namespace `http://example.org/mappings/`, followed by a numeric identifier
+- metadata about all mapping sources is in graph of URI `http://example.org/mappings/`
 
 ```mermaid
 flowchart TD
