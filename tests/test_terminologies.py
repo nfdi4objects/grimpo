@@ -28,7 +28,11 @@ def terminology(terminology_id, nested_context=JSKOS_CONTEXT_URL):
                 "id": "http://example.org/1/thumbnail.jpg",
                 "format": "image/jpeg"
             }]
-        }]
+        }],
+        # these should be ignored:
+        "concepts": [{"uri": "http://example.org/1"}],
+        "creator": [{"uri": "http://example.org/2"}],
+        "contributor": [{"uri": "http://example.org/3"}],
     }
 
 

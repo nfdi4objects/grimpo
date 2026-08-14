@@ -248,7 +248,7 @@ Received data in RDF or JSKOS format must be syntactically valid. Additional con
 
 **JSKOS data** (for terminologies and mappings) is not validated yet (see [open issue](https://github.com/nfdi4objects/n4o-graph-importer/issues/50)).
 
-JSON-LD context SHOULD be <https://gbv.github.io/jskos/context.json>. It is not retrieved from the network but loaded from a local copy where field `concepts` has been removed to limit JSKOS data to terminology metadata. Support of images ([`media`](https://gbv.github.io/jskos/#media))
+JSON-LD context SHOULD be <https://gbv.github.io/jskos/context.json>. It is not retrieved from the network but loaded from a local copy where field `concepts`, `creator` and `contributor` have been removed to limit JSKOS data to terminology metadata. Support of images ([`media`](https://gbv.github.io/jskos/#media))
 is limited to thumbnails with `id` (image URL) and `format`.
 
 Other remote context URLs are rejected. Other embedded context declarations are preserved but this may be removed in a future version.

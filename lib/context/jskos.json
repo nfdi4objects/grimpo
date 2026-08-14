@@ -18,14 +18,6 @@
       "@id": "http://purl.org/dc/terms/modified",
       "@type": "xsd:date"
     },
-    "creator": {
-      "@id": "http://purl.org/dc/terms/creator",
-      "@container": "@set"
-    },
-    "contributor": {
-      "@id": "http://purl.org/dc/terms/contributor",
-      "@container": "@set"
-    },
     "publisher": {
       "@id": "http://purl.org/dc/terms/publisher",
       "@container": "@set"
