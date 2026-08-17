@@ -281,6 +281,16 @@ def test_api(client):
     assert resp.status_code == 200
     assert resp.get_json() == collection_1_full
 
+    # add another collection with auto-id
+    collection_autoid = {"name": "A", "url": "http://example.com/"}
+    resp = client.post('/collection/', json=collection_autoid)
+    assert resp.status_code == 200  # TODO: should be 201 Created
+    assert resp.get_json() == {
+        **collection_autoid, "id": "2",
+        "uri": "http://example.org/collection/2",
+        "partOf": ["http://example.org/collection/"]
+    }
+
     # purge collections
     assert client.put('/collection/', json=[]).status_code == 200
 
