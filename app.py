@@ -22,7 +22,7 @@ def init(**config):
     global terminologies
     global mappings
 
-    title = config.get('title', os.getenv('TITLE', 'Knowledge Graph Importer'))
+    title = config.get('title', os.getenv('TITLE', 'Grimpo Knowledge Graph Importer'))
 
     if config.get("debug", False):
         app.debug = True
@@ -77,7 +77,9 @@ def status():
     return values
 
 
-route('GET', '/icon.png', lambda: send_file("static/nfdi4objects-logo.png"))
+route('GET', '/icon.png', lambda: send_file("static/grimpo-icon.png"))
+
+route('GET', '/grimpo.jpg', lambda: send_file("static/grimpo.jpg"))
 
 api('GET', '/status.json', status)
 

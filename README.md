@@ -1,8 +1,8 @@
 # grimpo
 
-[![License](https://img.shields.io/github/license/nfdi4objects/n4o-graph-importer.svg)](https://github.com/nfdi4objects/n4o-graph-importer/blob/master/LICENSE)
-[![Test](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/test.yml/badge.svg)](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/test.yml)
-[![Docker image](https://github.com/nfdi4objects/n4o-graph-importer/actions/workflows/docker.yml/badge.svg)](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer)
+[![License](https://img.shields.io/github/license/nfdi4objects/grimpo.svg)](https://github.com/nfdi4objects/grimpo/blob/master/LICENSE)
+[![Test](https://github.com/nfdi4objects/grimpo/actions/workflows/test.yml/badge.svg)](https://github.com/nfdi4objects/grimpo/actions/workflows/test.yml)
+[![Docker image](https://github.com/nfdi4objects/grimpo/actions/workflows/docker.yml/badge.svg)](https://github.com/orgs/nfdi4objects/packages/container/package/grimpo)
 
 > Import RDF data into a Knowledge Graph
 
@@ -114,7 +114,7 @@ The main application of grimpo is the [NFDI4Objects Knowledge Graph](https://gra
 
 [configuration]: #installation-and-configuration
 
-Grimpo is provided [as Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/n4o-graph-importer) but it can also be run from sources for [development and testing](#development).
+Grimpo is provided [as Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/grimpo) but it can also be run from sources for [development and testing](#development).
 
 See directory [demo/](demo) for a sample Docker configuration.
 
@@ -122,7 +122,7 @@ See directory [demo/](demo) for a sample Docker configuration.
 
 The web service and its Docker image can be configured via environment variables:
 
-- `TITLE`: title of the application. Default: `Knowledge Graph Importer`
+- `TITLE`: title of the application. Default: `Grimpo Knowledge Graph Importer`
 - `BASE`: base URI of named graphs. Default: `http://example.org/`
 - `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. An in-memory Triple store is used as fallback if `SPARQL` is not set.
 - `STAGE`: writeable stage directory. Default: `stage`
@@ -243,7 +243,7 @@ Received data in RDF or JSKOS format must be syntactically valid. Additional con
 
 **JSON metadata** to describe collections and mapping sources is validated with JSON Schemas [collection-schema.json] and [mappings-schema.json], respectively.
 
-**JSKOS data** (for terminologies and mappings) is not validated yet (see [open issue](https://github.com/nfdi4objects/n4o-graph-importer/issues/50)).
+**JSKOS data** (for terminologies and mappings) is not validated yet (see [open issue](https://github.com/nfdi4objects/grimpo/issues/50)).
 
 JSON-LD context SHOULD be <https://gbv.github.io/jskos/context.json>. It is not retrieved from the network but loaded from a local copy where field `concepts`, `creator` and `contributor` have been removed to limit JSKOS data to terminology metadata. Support of images ([`media`](https://gbv.github.io/jskos/#media))
 is limited to thumbnails with `id` (image URL) and `format`.

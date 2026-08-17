@@ -1,7 +1,7 @@
 services:
   importer:
-    container_name: ${CONTAINER:-n4o-graph-importer}
-    image: ${IMPORTER_IMAGE:-ghcr.io/nfdi4objects/n4o-graph-importer:main}
+    container_name: ${CONTAINER:-grimpo}
+    image: ${IMPORTER_IMAGE:-ghcr.io/nfdi4objects/grimpo:main}
     volumes:
       - ${STAGE:-./stage}:/app/stage
       - ${DATA:-./data}:/app/data:ro

@@ -16,7 +16,7 @@ services:
     restart: always
 
   importer:
-    image: ghcr.io/nfdi4objects/n4o-graph-importer:main
+    image: ghcr.io/nfdi4objects/grimpo:main
     environment:
       - SPARQL=http://fuseki:3030/n4o
       - FRONTEND=http://localhost:${PORT:-8000}

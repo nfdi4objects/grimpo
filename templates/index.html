@@ -3,7 +3,7 @@
 {% macro help(text, id) -%}
   <span class="msg" id="{{id}}"></span>
   <br>{{ text|safe }}
-  ⇒ <a href="https://github.com/nfdi4objects/n4o-graph-importer#{{id}}" target="_blank">help</a>
+  ⇒ <a href="https://github.com/nfdi4objects/grimpo#{{id}}" target="_blank">help</a>
 {%- endmacro -%}
 {% macro input_id(class) -%}
   <input type="number" min="0" step="1" size="6" placeholder=":id" class="{{class}}"/>
@@ -255,7 +255,7 @@ const request = async (e, url, method) => {
   const options = { method }
 
   const submit = async () => {
-    document.getElementById(id).textContent = "..."
+    document.getElementById(id).textContent = "...loading..."
     const res = await fetch(url, options).catch(e => ({ statusText: `${e}` }))
     if (res.ok) {
       document.getElementById(id).textContent = res.statusText

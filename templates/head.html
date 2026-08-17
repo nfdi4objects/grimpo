@@ -11,6 +11,7 @@
     body {
       margin: 20px;
       font-family: sans-serif;
+      color: #340000;
     }
     ul {
       list-style-type: none;
@@ -23,7 +24,11 @@
     }
     a {
       text-decoration: none;
-      color: rgb(96, 143, 219);
+      color: #751e03;
+    }
+    li > b > a {
+      background: #fadda1;
+      cursor: pointer;
     }
     a:hover, a:active {
       text-decoration: underline;
@@ -49,6 +54,7 @@
     </style>
   </head>
   <body>
+    <img src="grimpo.jpg" style="float:right" title="Grimpoteuthis umbellata" />
     {% if root %}
     <h1><a href="{{ root }}">{{ title }}</a></h1>
     {% else %}

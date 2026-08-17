@@ -19,7 +19,7 @@ crm:E1_CRM_Entity a owl:Class .                             # disallowed namespa
 
 ### Keep
 
-# FIXME: https://github.com/nfdi4objects/n4o-graph-importer/issues/44
+# FIXME: https://github.com/nfdi4objects/grimpo/issues/44
 # <http://example.org/x?foo[]=x> <http://purl.org/dc/terms/title> "Hello"@en .
 
 <http://example.org/x?foo=x> <http://purl.org/dc/terms/title> "Hello"@en .
