@@ -1,6 +1,9 @@
 # Unit test
+import pytest
 from lib.triplestores import createTripleStore
 from rdflib import URIRef, Literal, BNode
+from werkzeug import Request
+from werkzeug.test import EnvironBuilder
 
 
 def test_store():
@@ -35,3 +38,24 @@ def test_store():
     store.add_file('http://example.org/2', "tests/ex2.ttl")
     query = "SELECT * { GRAPH <http://example.org/2> { ?s ?b ?o } }"
     assert len(store.query(query)) == 5
+
+    # SPARQL query endpoint
+    def sparql(*args, **kwargs):
+        env = EnvironBuilder('/', None, *args, **kwargs)
+        req = Request(env.get_environ())
+        return store.query_request(req)
+
+    with pytest.raises(Exception):
+        sparql({"query": ""})
+    with pytest.raises(Exception):
+        sparql({"query": "?"})
+
+    res = sparql({"query": query}).json
+    assert res["head"] == {"vars": ["s", "b", "o"]}
+    assert len(res["bindings"]) == 5
+
+    res = sparql(data="DESCRIBE <http://example.org/NULL>",
+                 content_type="application/sparql-query", method="POST").json
+    assert res == {"head": {"vars": []}, "bindings": []}
+
+    # TODO: content-type="application/x-www-form-urlencoded", method="POST")

@@ -29,6 +29,13 @@
     <b>GET <a href="/data/">/data/</a>:file</b>
     {{ help("List and get files from local data directory","get-data") }}
   </li>
+  {% if not sparql %}
+  <li>
+    <b>GET|POST <a onclick="visit(this,'/sparql?query='+encodeURIComponent(document.getElementById('query').value))">/sparql</a>?query=</b>
+    <input type="text" placeholder=":query" id="query" />
+    {{ help("SPARQL Query endpoint to in-memory triple store","get-post-sparql") }}
+  </li>
+  {% endif %}
 </ul>
 <h2>Terminology Endpoints</h2>
 <ul>

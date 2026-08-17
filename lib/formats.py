@@ -1,5 +1,3 @@
-from pathlib import Path
-
 known_formats = {
     "https://format.gbv.de/rdf/xml": "xml",
     "https://format.gbv.de/rdf/turtle": "ttl",

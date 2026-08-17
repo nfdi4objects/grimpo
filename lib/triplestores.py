@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 from rdflib import URIRef, Literal, BNode, Dataset, Graph
 from SPARQLWrapper import SPARQLWrapper
 import requests
-import warnings
-from .errors import ServerError
+import json
+from flask import Response
+from .errors import ServerError, ApiError
 
 
 def createTripleStore(api=None):
@@ -108,12 +109,41 @@ class InternalTripleStore(AbstractTripleStore):
 
     def query(self, query, format='sparql'):
         query = self.prefixes + query
+        result = self.ds.query(query).bindings
+        return convert_query_result(result, convert_rdflib_term, format)
 
-        # RDFLib raises warning, see <https://github.com/RDFLib/rdflib/issues/3361>
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=DeprecationWarning)
-            result = self.ds.query(query).bindings
-            return convert_query_result(result, convert_rdflib_term, format)
+    def query_request(self, request):
+
+        # Implements a subset of <https://www.w3.org/TR/2013/REC-sparql11-protocol-20130321/#query-operation>
+        if request.method == "POST":
+            content = request.headers.get('content-type')
+            if content == "application/sparql-query":
+                query = request.data.decode('utf-8')
+            elif content == "application/x-www-form-urlencoded":
+                query = request.form.get("query", "")
+            else:
+                raise ApiError("Invalid Content-Type!", 400)
+        else:
+            query = request.args.get("query", "")
+
+        if query == "":
+            raise ApiError("Missing or empty query!", 400)
+
+        # TODO: support these parameters
+        # params = {}
+        # for name in ["default-graph-uri", "named-graph-uri"]:
+        #    if name in request.values:
+        #        params[name] = request.values[name]
+
+        try:
+            data = self.ds.query(query).bindings
+            # TODO: support other serialization formats
+            vars = [k for k in data[0].keys()] if data else []
+            bindings = convert_query_result(data or [], convert_sparql_term, "sparql")
+            data = {"head": {"vars": vars}, "bindings": bindings}
+            return Response(json.dumps(data), mimetype="application/sparql-results+json")
+        except Exception as e:
+            raise ApiError(f"SPARQL Query failed: {e}")
 
     def _update(self, query):
         self.ds.update(self.prefixes + query)

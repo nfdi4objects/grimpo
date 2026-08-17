@@ -83,6 +83,10 @@ route('GET', '/grimpo.jpg', lambda: send_file("static/grimpo.jpg"))
 
 api('GET', '/status.json', status)
 
+if not app.config.get('sparql'):
+    route('GET', '/sparql', lambda: app.config['store'].query_request(request))
+    route('POST', '/sparql', lambda: app.config['store'].query_request(request))
+
 api('GET', '/terminology/', lambda: terminologies.list())
 api('GET', '/terminology/namespaces.json', lambda: terminologies.namespaces())
 

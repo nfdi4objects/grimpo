@@ -24,6 +24,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
   - [General endpoints](#general-endpoints)
     - [GET /status.json](#get-statusjson)
     - [GET /data/](#get-data)
+    - [GET|POST /sparql](#get-post-sparql)
   - [Terminologies](#terminologies)
     - [GET /terminology](#get-terminology)
     - [GET /terminology/{id}](#get-terminologyid)
@@ -301,6 +302,10 @@ Get curent information about the application as JSON object. This includes the [
 #### GET /data/
 
 List and get files from local data directory.
+
+#### GET|POST /sparql
+
+SPARQL Query endpoint to the in-memory triple store. This is only supports JSON response format and it is disabled when an external triple store is configured.
 
 ### Terminologies
 
