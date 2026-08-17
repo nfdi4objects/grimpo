@@ -24,7 +24,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
   - [General endpoints](#general-endpoints)
     - [GET /status.json](#get-statusjson)
     - [GET /data/](#get-data)
-    - [GET|POST /sparql](#get-post-sparql)
+    - [GET|POST /sparql](#getpost-sparql)
   - [Terminologies](#terminologies)
     - [GET /terminology](#get-terminology)
     - [GET /terminology/{id}](#get-terminologyid)
