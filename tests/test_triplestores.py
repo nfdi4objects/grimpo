@@ -43,19 +43,28 @@ def test_store():
     def sparql(*args, **kwargs):
         env = EnvironBuilder('/', None, *args, **kwargs)
         req = Request(env.get_environ())
-        return store.query_request(req)
+        return store.query_request(req).json
 
     with pytest.raises(Exception):
         sparql({"query": ""})
     with pytest.raises(Exception):
         sparql({"query": "?"})
 
-    res = sparql({"query": query}).json
+    # GET
+    res = sparql({"query": query})
     assert res["head"] == {"vars": ["s", "b", "o"]}
     assert len(res["bindings"]) == 5
 
+    # POST full body
     res = sparql(data="DESCRIBE <http://example.org/NULL>",
-                 content_type="application/sparql-query", method="POST").json
+                 content_type="application/sparql-query", method="POST")
     assert res == {"head": {"vars": []}, "bindings": []}
 
-    # TODO: content-type="application/x-www-form-urlencoded", method="POST")
+    # POST form
+    query = "SELECT * FROM <http://example.org/NULL> { ?s ?p ?o }"
+    res = sparql(data={"query": query}, method="POST")
+    assert res == {"head": {"vars": []}, "bindings": []}
+
+    query = "SELECT * FROM <http://example.org/1> { ?s ?p ?o }"
+    res = sparql(data={"query": query}, method="POST")
+    assert len(res["bindings"]) == 6

@@ -1,10 +1,14 @@
 from abc import ABC, abstractmethod
+import rdflib.plugins.sparql
 from rdflib import URIRef, Literal, BNode, Dataset, Graph
 from SPARQLWrapper import SPARQLWrapper
 import requests
 import json
 from flask import Response
 from .errors import ServerError, ApiError
+
+# Don't allow loading additional graphs
+rdflib.plugins.sparql.SPARQL_LOAD_GRAPHS = False
 
 
 def createTripleStore(api=None):
