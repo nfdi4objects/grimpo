@@ -11,9 +11,6 @@ test:
 start:
 	@.venv/bin/python3 app.py
 
-api:
-	@FRONTEND=http://127.0.0.1:8000 npm run --silent api
-
 lint:
 	@.venv/bin/flake8 *.py lib/*.py tests/*.py --exit-zero --statistics
 

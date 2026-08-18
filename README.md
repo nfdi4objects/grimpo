@@ -13,7 +13,8 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 ## Table of Contents
 
 - [Overview](#overview)
-- [Installation and configuration](#installation-and-configuration)
+- [Installation](#installation)
+- [Configuration](#configuration)
 - [Usage](#usage)
   - [Data sources](#data-sources)
   - [Graphs](#graphs)
@@ -75,7 +76,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 
 ## Overview
 
-grimpo requires access to an RDF triple store with support of named graphs and the default graph configured as union graph. The application wraps write access to the triple store but it does not include any methods of authentification. An additinal interface is required for public read-access to the triple store and metadata.
+grimpo provides access to an RDF triple store grouped into named graphs and the default graph configured as union graph. The application wraps write access to the triple store but it does not include any methods of authentification nor a user interface (see [n4o-graph-admin]). An additional interface is required for public read-access to the triple store and metadata (see [n4o-graph-apis]).
 
 ```mermaid
 graph TD
@@ -83,12 +84,13 @@ graph TD
     mappings(mappings) --> receive
     collections(collections) --> receive
     stage(stage)
-    subgraph importer [grimpo]
+    subgraph grimpo [grimpo]
         receive[register & receive]
         receive -- validate, transform, report --> stage
         stage --> load
         load
     end
+    admin --> grimpo
     kg[triple store]
     stage --> interface[interface]
     kg -- SPARQL --> interface
@@ -96,28 +98,32 @@ graph TD
     load -- SPARQL update & graph store --> kg
     interface --UI--> users(users)
     
-classDef data stroke:#4d8dd1, fill:#D4E6F9, color:#333;
-classDef prime fill: #ECECFF, color:#333, stroke:#9370DB;
-classDef box fill:#ffffde, stroke:#aaaa33, color:#333;
+classDef data stroke: #4d8dd1, fill: #D4E6F9, color:#333;
+classDef prime fill: #ECECFF, stroke: #9370DB, color:#333;
+classDef box fill: #ffffde, stroke: #aaaa33, color:#333;
 class terminologies,mappings,collections,stage,apps,users data;
-class receive,load,lido2rdf,web-app prime;
-class importer,kg,interface,lido box;
+class receive,load prime;
+class grimpo,kg,interface,admin box;
 linkStyle default color:black;
 ```
 
 The main application of grimpo is the [NFDI4Objects Knowledge Graph](https://graph.nfdi4objects.net/) with components described in [n4o-graph](https://github.com/nfdi4objects/n4o-graph) repository:
 
-- [n4o-fuseki](https://github.com/nfdi4objects/n4o-fuseki): the RDF triple store
-- [n4o-graph-apis](https://github.com/nfdi4objects/n4o-graph-apis): the interface (web interface and public SPARQL endpoint)
+- [n4o-fuseki]: the RDF triple store
+- [n4o-graph-apis]: web interface and public SPARQL endpoint
+- [n4o-graph-admin]: grimp admin interface
 
 
-## Installation and configuration
+## Installation
 
-[configuration]: #installation-and-configuration
+Run from [Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/grimpo), for instance like this:
 
-Grimpo is provided [as Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/grimpo) but it can also be run from sources for [development and testing](#development).
+```sh
+docker run --rm -p 5020:5020 ghcr.io/nfdi4objects/grimpo:main
+```
 
-See directory [demo/](demo) for a sample Docker configuration.
+The [API](#api) is then made available at <http://localhost:5020>. See directory [demo/](demo) for a more comprehensive sample Docker configuration. Alternatively run from sources as [described below](#development).
+
 
 ## Configuration
 
@@ -129,6 +135,7 @@ The web service and its Docker image can be configured via environment variables
 - `STAGE`: writeable stage directory. Default: `stage`
 - `DATA`: local data directory for file import
 - `FRONTEND`: URL of [n4o-graph-apis] instance. This is included as field `frontend` in [/status.json](#get-statusjson) and shown in the HTML interface for convenience. Default is the value of `BASE`
+
 
 ## Usage
 
@@ -161,7 +168,7 @@ flowchart LR
   R -- receive --> S
   S -- load --> T
   T -- remove --> R
-  R -- delete --> END
+R -- delete --> END
   END ~~~ R
   C  ~~~ R
   C <-. append/detach .-> T
@@ -200,7 +207,6 @@ The location of data is taken from metadata field `distributions`. The first arr
 Format of Zenodo DOI data is always `zip`.
 
 The location can be overridden on receive with optional query parameter `from` pointing to an URL or a file name from [local data directory.](#installation-and-configuration). These locations are not made public.
-
 
 ### Graphs
 
@@ -286,6 +292,7 @@ Receiving data generates two additional files in the stage directory (replace `{
 
 - `terminology-{id}.nt`/`collection-{id}.nt`/`mappings-{id}.nt`: validated and filtered RDF triples to be imported
 - `terminology-{id}-removed.nt`/`collection-{id}-removed.nt`/`mappings-{id}-removed.nt`: triples removed on [filtering]
+
 
 ## API
 
@@ -531,26 +538,17 @@ Get latest load [report] of a mapping source.
 
 Remove mappings of a specific mapping source from the triple store and from staging area. The mapping source will still be registered and its metadata is not removed from the triple store.
 
+
 ## Development
 
 Requires basic development toolchain (`sudo apt install build-essential`) and Python 3 with module venv to be installed.
 
 - `make deps` installs Python dependencies in a virtual environment in directory `.venv`
-- `make test` runs a test instance of the service with a temporary triple store
 - `make start` runs the service without restarting
-- `make api` runs the service with automatic restarting (requires install Node module `nodemon` with `npm install`)
-- `make lint` checks coding style
+- `make test` runs the tests against a temporary external triple store
+- `make lint` checks coding style. *Please use regularly!*
 - `make fix` cleans up some coding style violations
-
-Best use the Docker image [n4o-fuseki] to start a triple store configured to be used with the importer:
-
-~~~sh
-docker run --rm -p 3030:3030 ghcr.io/nfdi4objects/n4o-fuseki:main
-~~~
-
-To also inspect the content of the triple store, use [n4o-graph-apis].
-
-*TODO: add description how to run this both*
+- `make loc` counts lines of code (requires `cloc`). *Please avoid feature creep!*
 
 The Docker image of grimpo is automatically build on GitHub. To locally build and run the image for testing:
 
@@ -559,7 +557,6 @@ docker image build -t grimpo .
 IMPORTER_IMAGE=grimpo docker compose run --rm -p 5020:5020 importer
 ~~~
 
-*TODO: add description how to also run triple store and apis*
 
 ## License
 
@@ -567,5 +564,6 @@ Licensed under [Apache License](http://www.apache.org/licenses/) 2.0.
 
 [BARTOC]: https://bartoc.org/
 [n4o-fuseki]: https://github.com/nfdi4objects/n4o-fuseki#readme
+[n4o-graph-admin]: https://github.com/nfdi4objects/n4o-graph-admin#readme
 [n4o-graph-apis]: https://github.com/nfdi4objects/n4o-graph-apis#readme
 [Data Validation Error Format]: https://gbv.github.io/validation-error-format/
