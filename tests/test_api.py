@@ -100,7 +100,7 @@ def test_validation(client):
     fail("POST", "/collection/", {})
 
 
-def test_general(client):
+def test_general(client, monkeypatch):
     client, *_ = client
 
     client.get('/data/').status_code == 200
@@ -109,7 +109,14 @@ def test_general(client):
     status = client.get('/status.json')
     assert status.status_code == 200
     assert status.json["title"] == "Graph Import API TEST"
+    assert status.json["connected"] == True
     assert status.json["collections"] == 0
+
+    # test backend failure
+    monkeypatch.setattr(app.config["store"], "query", None)
+    status = client.get('/status.json').json
+    assert status["connected"] == False
+    assert "collections" not in status
 
 
 def test_terminology(client):
