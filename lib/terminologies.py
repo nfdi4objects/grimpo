@@ -88,7 +88,7 @@ class TerminologyRegistry(Registry):
         voc = self.get(id)
         query = "SELECT * { GRAPH <%s> { ?voc a <%s> } } LIMIT 1" \
             % (voc['uri'], 'http://www.w3.org/2004/02/skos/core#ConceptScheme')
-        if not (voc.get("languages", []) and self.sparql.query(query)):
+        if not (voc.get("languages", []) and self.store.query(query)):
             if skosmos.is_file():
                 skosmos.unlink()
             return

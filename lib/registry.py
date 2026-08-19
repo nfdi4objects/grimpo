@@ -20,7 +20,7 @@ class Registry:
 
     def __init__(self, kind, **config):
         self.base = config["base"]
-        self.sparql = config["store"]
+        self.store = config["store"]
         self.kind = kind
         # named graphs
         self.graph = f"{self.base}{kind}/"
@@ -60,7 +60,10 @@ class Registry:
 
         item["id"] = id
         item["uri"] = self.prefix + id
-        item["partOf"] = [self.graph]
+        if self.kind == "terminology":  # FIXME: this is ugly
+            item["partOf"] = [{"uri": self.graph}]
+        else:
+            item["partOf"] = [self.graph]
         if self.schema:
             validateJSON(item, schema=self.schema)
         return item
@@ -68,6 +71,11 @@ class Registry:
     def list(self):
         files = [f for f in self.stage.iterdir() if f.suffix == ".json" and re.match('^[0-9]+$', f.stem)]
         return [read_json(f) for f in files]
+
+    def count_registered(self):
+        query = (f"SELECT (COUNT(*) AS ?count) FROM <{self.graph}>"
+                 f"{{ ?s <http://purl.org/dc/terms/isPartOf> <{self.graph}> }}")
+        return int(self.store.query(query, "rdflib")[0]["count"])
 
     def get(self, id):
         return read_json(self.stage / f"{int(id)}.json")
@@ -96,7 +104,7 @@ class Registry:
     def update_metadata(self):
         # query issued statements to keep them
         query = f"SELECT * {{ GRAPH <{self.graph}> {{ VALUES (?p) {{(dct:issued)}} ?s ?p ?o }} }}"
-        issued = self.sparql.query(query, "nq")
+        issued = self.store.query(query, "nq")
         # rebuild metadata from JSON-LD
         metadata = jsonld2nt(self.list(), self.context, self.remote_contexts)
         # add issued statements and modified timestamp
@@ -111,7 +119,7 @@ class Registry:
                 f'"{modified}"^^'
                 '<http://www.w3.org/2001/XMLSchema#dateTime> .'
             )
-        self.sparql.store_file(self.graph, file)
+        self.store.store_file(self.graph, file)
 
     def delete(self, id):
         self.remove(id)
@@ -131,9 +139,9 @@ class Registry:
         log = Log(stage / "load.json",
                   f"Loading {self.kind} {uri} from {file}")
         if add:
-            self.sparql.add_file(uri, file)
+            self.store.add_file(uri, file)
         else:
-            self.sparql.store_file(uri, file)
+            self.store.store_file(uri, file)
         self.update_distribution(id, log)
         return log.done()
 
@@ -141,10 +149,10 @@ class Registry:
         uri = self.get(id)["uri"]
         download = f"{self.graph}{id}/stage/{self.kind}-{id}.nt"
 
-        self.sparql.delete(self.graph, f"<{uri}> dct:issued ?issued")
+        self.store.delete(self.graph, f"<{uri}> dct:issued ?issued")
 
         # TODO: this requires further investigation: which graph to query?!
-        self.sparql.delete_where(
+        self.store.delete_where(
             "<%s> dcat:distribution ?s. ?s ?p ?o" % (uri),
             "<%s> dcat:distribution ?s . ?s dcat:downloadURL <%s>" % (uri, download))
 
@@ -163,14 +171,14 @@ class Registry:
                 # TODO: dcat:byteSize
                 "]"
             ])
-            self.sparql.insert(self.graph, triples)
+            self.store.insert(self.graph, triples)
         else:
             log.append("Removed issued timestamp and distribution")
 
     def remove(self, id):
         uri = self.get(id)["uri"]
         rmtree(self.stage / str(id), ignore_errors=True)
-        self.sparql.drop_graph(uri)
+        self.store.drop_graph(uri)
         self.update_distribution(id, Log("/dev/null"), False)
 
     def receive_log(self, id):

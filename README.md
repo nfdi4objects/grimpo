@@ -305,7 +305,11 @@ A HTTP 400 error with response body in [Data Validation Error Format] is returne
 
 #### GET /status.json
 
-Get curent information about the application as JSON object. This includes the [configuration] with lowercase field names and field `connected` whether the SPARQL API endpoint can be accessed.
+Get curent information about the application as JSON object. This includes:
+
+- the [configuration] with lowercase field names
+- field `connected` whether the SPARQL API endpoint can be accessed
+- the number of registered collections, terminologies, and mapping source if connected
 
 #### GET /data/
 

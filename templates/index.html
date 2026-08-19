@@ -14,7 +14,7 @@
   {% if sparql %}
     a triple store at <a id="backend" href="{{ sparql }}">{{ sparql }}</a>.
   {% else %}
-    an in-memory triple store.
+    an <span id="backend">in-memory triple store</span>.
   {% endif %}
   This is a backend service <b>without authentication</b>: all data can be modified!
   Please use SPARQL endpoint or <a href="{{ frontend }}">frontend</a> for read access
@@ -38,7 +38,7 @@
   </li>
   {% endif %}
 </ul>
-<h2>Terminology Endpoints</h2>
+<h2>Terminology Endpoints <span id="terminologies"/></h2>
 <ul>
   <li>
     <b>GET <a href="/terminology/">/terminology/</a></b>
@@ -95,7 +95,7 @@
     {{ help("Return Skosmos vocabulary configuration for imported SKOS and JSKOS terminologies.") }}
   </li>
 </ul>
-<h2>Collection endpoints</h2>
+<h2>Collection endpoints <span id="collections"/></h2>
 <ul>
   <li>
     <b>GET <a href="/collection/">/collection/</a></b>
@@ -154,7 +154,7 @@
     {{ help("Remove collection data from the triple store","post-collectionidremove") }}
   </li>
 </ul>
-<h2>Mapping endoints</h2>
+<h2>Mapping endoints <span id="mappings"/></h2>
 <ul>
   <li>
     <b>GET <a href="/mappings/">/mappings/</a></b>
@@ -271,7 +271,8 @@ const request = async (e, url, method) => {
       var error = res.statusText || "ERROR"
       try { error = (await res.json()).error } catch {}
       errorMessage(id, error)
-    }  
+    }
+    status()
   }
 
   clearMessages()
@@ -323,6 +324,19 @@ const receiveMappings    = e => request(e,`mappings/:id/receive?from=${getValue(
 const loadMappings       = e => request(e,`mappings/:id/load`, "POST")
 const removeMappings     = e => request(e,`mappings/:id/remove`, "POST")
 
+function status() {
+  fetch("status.json").then(res => res.json()).then(s => {
+    if (s.connected) {
+      document.getElementById('backend').className = ''
+      for (let key of ["terminologies", "mappings", "collections"]) {
+        document.getElementById(key).textContent = ` (${s[key]})`
+      }
+    } else {
+      document.getElementById('backend').className = 'error'
+    }
+  })
+}
+
 window.onload = () => {
   for (let cls in idValue) {
     const nodes = document.getElementsByClassName(cls)
@@ -333,10 +347,6 @@ window.onload = () => {
       })
     }
     updateId(cls, nodes[0].value)
-  } 
-  fetch("status.json").then(res => res.json()).then(s => {
-    if (!s.connected) {
-      document.getElementById('backend').className = 'error'
-    }
-  })
+  }
+  status()
 }</script>

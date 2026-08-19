@@ -1,8 +1,6 @@
 from flask import Flask, jsonify, request, render_template, send_from_directory, send_file, Response
-from waitress import serve
 from lib import CollectionRegistry, TerminologyRegistry, MappingRegistry, \
     ApiError, NotFound, ValidationError, createTripleStore
-import argparse
 import os
 from pathlib import Path
 from flask_cors import CORS
@@ -72,7 +70,9 @@ route('GET', '/', lambda: render_template('index.html', **app.config))
 def status():
     values = {key: val for key, val in app.config.items() if key.islower() and type(val) in [str, bool]}
     try:
-        app.config['store'].query("SELECT * { ?s ?p ?o } LIMIT 1")
+        values["collections"] = collections.count_registered()
+        values["terminologies"] = terminologies.count_registered()
+        values["mappings"] = mappings.count_registered()
         values['connected'] = True
     except Exception:
         values['connected'] = False

@@ -68,9 +68,9 @@ class MappingRegistry(Registry):
     def append(self, id, data):
         graph = self.get(id)["uri"]
         triples = "".join(*jskos_mapping_triples(json.loads(data)))
-        self.sparql.insert(graph, triples)
+        self.store.insert(graph, triples)
 
     def detach(self, id, data):
         graph = self.get(id)["uri"]
         triples = "".join(*jskos_mapping_triples(json.loads(data)))
-        self.sparql.delete(graph, triples)
+        self.store.delete(graph, triples)
