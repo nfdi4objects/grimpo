@@ -13,4 +13,5 @@ COPY static/ /app/static
 EXPOSE 5020
 
 ENTRYPOINT []
-CMD ["python", "./app.py"]
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5020", "--access-logfile", "-", "app:app"]

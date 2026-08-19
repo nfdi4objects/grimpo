@@ -9,7 +9,7 @@ test:
 	@. .venv/bin/activate && ./tests/test_api.sh && coverage report -m
 
 start:
-	@.venv/bin/python3 app.py
+	@. .venv/bin/activate && flask run --debug -p 5020
 
 lint:
 	@.venv/bin/flake8 *.py lib/*.py tests/*.py --exit-zero --statistics

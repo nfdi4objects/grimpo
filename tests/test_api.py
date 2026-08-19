@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from lib import read_json
-from app import app, init
+from app import app, configure
 
 cwd = Path().cwd()
 
@@ -62,8 +62,8 @@ def client(tmp_path):
     app.testing = True
 
     data = Path(__file__).parent
-    init(title="Graph Import API TEST",
-         stage=tmp_path, sparql=sparqlApi, data=data)
+    configure(title="Graph Import API TEST",
+              stage=tmp_path, sparql=sparqlApi, data=data)
 
     sparql = app.config["store"]
 

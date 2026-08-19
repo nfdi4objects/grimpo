@@ -17,16 +17,12 @@ terminologies = None
 mappings = None
 
 
-def init(**config):
+def configure(**config):
     global collections
     global terminologies
     global mappings
 
     title = config.get('title', os.getenv('TITLE', 'Grimpo Knowledge Graph Importer'))
-
-    if config.get("debug", False):
-        app.debug = True
-        title = f"{title} (debugging mode)"
 
     app.config['title'] = title
     app.config['base'] = config.get('base', os.getenv('BASE', 'http://example.org/'))
@@ -43,6 +39,10 @@ def init(**config):
     terminologies = TerminologyRegistry(**app.config)
     collections = CollectionRegistry(**app.config, terminologies=terminologies)
     mappings = MappingRegistry(**app.config)
+
+
+with app.app_context():
+    configure()
 
 
 @app.errorhandler(ApiError)
@@ -177,17 +177,3 @@ def mappings_stage(id, filename=None):
 @app.route('/data/<filename>')
 def data_directory(filename=None):
     return serve_dir(Path(app.config["data"]), "data.html", "../", filename)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-w', '--wsgi', action=argparse.BooleanOptionalAction, help="Use WSGI")
-    parser.add_argument('-p', '--port', type=int, default=5020)
-    parser.add_argument('-d', '--debug', action=argparse.BooleanOptionalAction)
-    args = parser.parse_args()
-    init(debug=args.debug)
-    if args.wsgi:
-        print(f"Starting WSGI server at http://localhost:{args.port}/")
-        serve(app, host="0.0.0.0", port=args.port, threads=8)
-    else:
-        app.run(host="0.0.0.0", port=args.port, debug=args.debug)
