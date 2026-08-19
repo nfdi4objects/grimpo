@@ -1,12 +1,10 @@
-Flask==3.1.0
+Flask
 flask_autoindex
-waitress==3.0.2
 requests
 jsonschema
 SPARQLWrapper
-pyoxigraph==0.5.2
-pyparsing==3.2.5    # because >=3.3.0 emits warnings with RDFLib 7.5.0 
+pyoxigraph==0.5.9
 rdflib>=7.6.0
-PyLD==3.1.0
+PyLD>=3.1.0
 flask-cors
 gunicorn
