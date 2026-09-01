@@ -27,18 +27,12 @@ def zipwalk(file, path=None) -> list:
             yield from zipwalk(f, path)
 
 
-def walk(top) -> list:
-    """Iterate over file or directory, including subdirectories and contents of ZIP archives."""
-    if os.path.isdir(top):
-        for path, dirs, files in os.walk(top):
-            for name in files:
-                yield name, [path], None
-                if isZip(name):
-                    yield from zipwalk(os.path.join(path, name))
-    elif os.path.isfile(top):
-        if isZip(top):
-            yield from zipwalk(top)
+def walk(file) -> list:
+    """Iterate over a file, recursing into contents of ZIP archives."""
+    if os.path.isfile(file):
+        if isZip(file):
+            yield from zipwalk(file)
         else:
-            yield str(top), [], None
+            yield str(file), [], None
     else:
-        raise Exception(f"file not found: {top}")
+        raise Exception(f"file not found: {file}")

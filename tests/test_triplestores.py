@@ -27,15 +27,15 @@ def test_store():
     }]
     assert store.query("SELECT * { ?s ?p ?o }", "nq") == '_:b1 <http://purl.org/dc/terms/title> "foo" .'
 
-    store.store_file('http://example.org/1', "tests/filter.ttl")
+    store.store_file('http://example.org/1', "tests/data/filter.ttl")
     query = "SELECT * { GRAPH <http://example.org/1> { ?s ?b ?o } }"
     assert len(store.query(query)) == 6
 
-    store.store_file('http://example.org/2', "tests/ex1.ttl")
+    store.store_file('http://example.org/2', "tests/data/ex1.ttl")
     query = "SELECT * { GRAPH <http://example.org/2> { ?s ?b ?o } }"
     assert len(store.query(query)) == 3
 
-    store.add_file('http://example.org/2', "tests/ex2.ttl")
+    store.add_file('http://example.org/2', "tests/data/ex2.ttl")
     query = "SELECT * { GRAPH <http://example.org/2> { ?s ?b ?o } }"
     assert len(store.query(query)) == 5
 

@@ -12,7 +12,7 @@ requests = {
 
 
 def mock_urlopen(url):
-    return (Path(__file__).parent / requests[url]).open("rb")
+    return (Path(__file__).parent / "data" / requests[url]).open("rb")
 
 
 def test_distributions(config, monkeypatch):

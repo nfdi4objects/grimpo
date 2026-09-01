@@ -133,7 +133,7 @@ The web service and its Docker image can be configured via environment variables
 - `BASE`: base URI of named graphs. Default: `http://example.org/`
 - `SPARQL`: API endpoint of SPARQL Query protocol, SPARQL Update protocol and SPARQL Graph store protocol. An in-memory Triple store is used as fallback if `SPARQL` is not set.
 - `STAGE`: writeable stage directory. Default: `stage`
-- `DATA`: local data directory for file import
+- `DATA`: local data directory for file import (readonly)
 - `FRONTEND`: URL of [n4o-graph-apis] instance. This is included as field `frontend` in [/status.json](#get-statusjson) and shown in the HTML interface for convenience. Default is the value of `BASE`
 - `ADMIN`: URL of [n4o-graph-admin] instance. Default: `https://github.com/nfdi4objects/n4o-graph-admin/`.
 

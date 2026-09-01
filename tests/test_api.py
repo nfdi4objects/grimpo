@@ -10,15 +10,16 @@ from lib import read_json
 from app import app, configure
 
 cwd = Path().cwd()
+data = Path(__file__).parent / "data"
 
 sparqlApi = os.getenv('SPARQL')
 
 base = "http://example.org/collection/"
 terminology_graph = "http://example.org/terminology/"
 
-bartoc = read_json("tests/bartoc-subset.json")
+bartoc = read_json(f"{data}/bartoc-subset.json")
 
-collection_1 = read_json("tests/collection/1.json")
+collection_1 = read_json(f"{data}/collection/1.json")
 collection_1_full = {
     **collection_1,
     "partOf": [base]
@@ -61,7 +62,6 @@ def nonempty_graphs(sparql):
 def client(tmp_path):
     app.testing = True
 
-    data = Path(__file__).parent
     configure(title="Graph Import API TEST",
               stage=tmp_path, sparql=sparqlApi, data=data)
 
@@ -210,7 +210,7 @@ def test_terminology(client):
     assert client.post('/terminology/20533/load').status_code == 200
 
     # check Skosmos configuration
-    skosmos = Path("tests/skosmos-20533.ttl").read_text().rstrip()
+    skosmos = Path(f"{data}/skosmos-20533.ttl").read_text().rstrip()
     assert client.get("/terminology/20533/stage/skosmos.ttl").data.decode("utf-8") == skosmos
     assert client.get("/terminology/skosmos.ttl").data.decode("utf-8") == skosmos
 
@@ -351,10 +351,10 @@ def test_api(client):
 
     # register terminology and receive + load again
     # test local BARTOC cache
-    copy("tests/bartoc-crm.json", "tests/bartoc.json")
+    copy(f"{data}/bartoc-crm.json", f"{data}/bartoc.json")
     fail("PUT", '/terminology/18274', code=404)
     assert client.put('/terminology/1644').status_code == 200  # CIDOC-CRM
-    os.remove("tests/bartoc.json")
+    os.remove(f"{data}/bartoc.json")
 
     client.post('/collection/3/receive?from=data.ttl')
     client.post('/collection/3/load')
@@ -371,7 +371,7 @@ def test_api(client):
         '/terminology/1644/receive?from=crm.ttl').status_code == 200
 
     # TODO: test file upload
-    # with open("tests/data.ttl", "rb") as f:
+    # with open(f"{data}/data.ttl", "rb") as f:
     #    data = {"data.ttl":f}
     #    res = client.post('/collection/1/receive', data=data,
     #                  content_type='multipart/form-data')
@@ -386,8 +386,12 @@ def test_api(client):
     assert client.get('/collection/3').status_code == 200
     # TODO: assert len(sparql.query(query)) == 0
 
+    # cannot receive directory
+    assert client.post('/collection/3/receive?from=collection').status_code == 400
+
     # TODO: metadata should be removed
-    query = f"SELECT * {{ <{base}3> ?p ?o }}"
+    # query = f"SELECT * {{ <{base}3> ?p ?o }}"
+    # assert len(sparql.query(query)) == 0
     # assert len(sparql.query(query)) == 0
 
 
@@ -406,7 +410,7 @@ def test_mappings(client):
     assert client.post('/mappings/1/load').status_code == 200
     assert list(client.get('/mappings/1/receive').get_json().values()) == [
         'Receiving 1 from mappings.ndjson',
-        f'Retrieving source {cwd}/tests/mappings.ndjson from data directory',
+        f'Retrieving source {data}/mappings.ndjson from data directory',
         'Converting JSKOS mappings to RDF mapping triples',
         'Processed 2 lines into 1 mappings',
         f'Extracting RDF from file://{stage}/mappings/1/original.ttl as Turtle',
