@@ -35,6 +35,10 @@
   "publisher": {
     "@id": "dcterms:publisher"
   },
+  "description": {
+    "@id": "dcterms:description",
+    "@container": "@language"
+  },
   "distributions": {
     "@id": "dcat:distribution",
     "@context": {

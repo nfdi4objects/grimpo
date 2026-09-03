@@ -5,6 +5,16 @@
       "format": "uri",
       "pattern": "^https?://"
     },
+    "description": {
+      "type": "object",
+      "patternProperties": {
+        "^([a-z]{1,8}(-[a-z0-9]{1,8})*-?)$": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
     "collection": {
       "type": "object",
       "properties": {
