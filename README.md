@@ -203,6 +203,7 @@ The location of data is taken from metadata field `distributions`. The first arr
 - Turtle: `ttl` or `https://format.gbv.de/rdf/turtle`)
 - N-Triples: `nt` or `https://format.gbv.de/rdf/ntriples`)
 - Newline delimited JSON: `ndjson` or `https://format.gbv.de/ndjson`) with JSKOS records (only for terminologies and mappings)
+- Array of JSKOS mappings or JSON object with field `mappings`: `json` or `https://format.gbv.de/json`
 - ZIP Archive with RDF Files (`*.{nt,ttl,rdf,xml}`): `zip` or `https://format.gbv.de/zip`. The archive is extracted recursively on receive.
 
 Format of Zenodo DOI data is always `zip`.
@@ -365,6 +366,7 @@ File format can be:
 - RDF/Turtle for file extension `.ttl` or `.nt`
 - RDF/XML for file extension `.rdf` or `.xml`
 - JSKOS as newline delimited JSON for file extension `.ndjson`
+- JSKOS as array of mappings or object with field `mappings` for file extension `.json`
 - A ZIP archive containing RDF files for file extension `.zip`
 
 #### GET /terminology/{id}/receive
@@ -505,11 +507,11 @@ Unregister a mapping source and remove it from the triple store and staging area
 
 #### POST /mappings/{id}/append
 
-Directly add mappings to the triple store, bypassing the receive/load workflow. Directly added triples are not stored in the staging area so they will not persist a load operation of the selected mapping source. Expects a JSON array with mappings in JSKOS format.
+Directly add mappings to the triple store, bypassing the receive/load workflow. Directly added triples are not stored in the staging area so they will not persist a load operation of the selected mapping source. Expects a JSON array or JSON object and field `mappings` with mappings in JSKOS format.
 
 #### POST /mappings/{id}/detach
 
-Directly remove mappings from the triple store. This operation is not reflected in the staging area so it will not persist a load operation of the seleceted mapping source. Expects a JSON array with mappings in JSKOS format. Non-existing mappings are ignored.
+Directly remove mappings from the triple store. This operation is not reflected in the staging area so it will not persist a load operation of the seleceted mapping source. Expects a JSON array or JSON object and field `mappings` with mappings in JSKOS format. Non-existing mappings are ignored.
 
 #### GET /mappings/{id}/stage/
 
@@ -524,8 +526,21 @@ Mappings can be given as:
 - plain RDF triples in Turtle syntax (extension `.nt` or `.ttl`)
 - plain RDF triples in RDF/XML syntax (extension `.rdf` or `.xml`)
 - newline delimited JSON with [JSKOS Concept Mappings](https://gbv.github.io/jskos/#concept-mappings) (extension `.ndjson`). Only 1-to-1 mappings are included
+- Array of JSKOS mappings or JSON object with field `mappings` (extension `.json`)
 
-Mapping metadata such as date of creation and annotations are ignored.
+Only 1-to-1 mappings with one of the following mapping types are included and converted into simlple RDF triples, each: 
+
+- [skos:exactMatch](http://www.w3.org/2004/02/skos/core#exactMatch)
+- [skos:closeMatch](http://www.w3.org/2004/02/skos/core#closeMatch)
+- [skos:broadMatch](http://www.w3.org/2004/02/skos/core#broadMatch)
+- [skos:narrowMatch](http://www.w3.org/2004/02/skos/core#narrowMatch)
+- [skos:relatedMatch](http://www.w3.org/2004/02/skos/core#relatedMatch)
+- [skos:mappingRelation](http://www.w3.org/2004/02/skos/core#mappingRelation)
+- [owl:sameAs](http://www.w3.org/2002/07/owl#sameAs)
+- [owl:equivalentClass](http://www.w3.org/2002/07/owl#equivalentClass)
+- [owl:equivalentProperty](http://www.w3.org/2002/07/owl#equivalentProperty)
+- [rdfs:subClassOf](http://www.w3.org/2000/01/rdf-schema#subClassOf)
+- [rdfs:subPropertyOf](http://www.w3.org/2000/01/rdf-schema#subPropertyOf)
 
 #### GET /mappings/{id}/receive
 

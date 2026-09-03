@@ -21,6 +21,8 @@ mappingProperties = [
 
 
 def jskos_mapping_triples(mappings) -> list:
+    if type(mappings) is dict:
+        mappings = mappings.get('mappings')
     try:
         for m in mappings:
             prop = next((p for p in m["type"] if p in mappingProperties), None)
@@ -32,7 +34,7 @@ def jskos_mapping_triples(mappings) -> list:
                 continue
             yield f"<{f[0]['uri']}> <{prop}> <{t[0]['uri']}> .\n"
     except Exception:
-        raise ValidationError("Failed to convert JSKOS mappings!")
+        raise ValidationError("Failed to convert JSKOS mappings")
 
 
 class MappingRegistry(Registry):
@@ -42,21 +44,24 @@ class MappingRegistry(Registry):
     def __init__(self, **config):
         super().__init__("mappings", **config)
 
-    def process_jskos_mappings(self, source, target, log):
+    def process_jskos_mappings(self, source, target, fmt, log):
         log.append("Converting JSKOS mappings to RDF mapping triples")
-        lines = [line for line in open(source)]
-        target = open(target, "w")
         count = 0
-        mappings = [json.loads(line) for line in lines]
+        target = open(target, "w")
+        if fmt == "ndjson":
+            lines = [line for line in open(source)]
+            mappings = [json.loads(line) for line in lines]
+        else:
+            mappings = json.load(open(source))
         for triple in jskos_mapping_triples(mappings):
             target.write(triple)
             count = count + 1
-        log.append(f"Processed {len(lines)} lines into {count} mappings")
+        log.append(f"Processed {count} mappings")
 
     def preprocess_source(self, id, original, fmt, log):
-        if fmt == "ndjson":
+        if fmt in ["ndjson", "json"]:
             result = self.stage / str(id) / "original.ttl"
-            self.process_jskos_mappings(original, result, log)
+            self.process_jskos_mappings(original, result, fmt, log)
             return result
         else:
             return original
@@ -68,6 +73,7 @@ class MappingRegistry(Registry):
     def append(self, id, data):
         graph = self.get(id)["uri"]
         triples = "".join(*jskos_mapping_triples(json.loads(data)))
+        # TODO: this should also update extension of triples!
         self.store.insert(graph, triples)
 
     def detach(self, id, data):

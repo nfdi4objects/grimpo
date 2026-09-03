@@ -1,0 +1,21 @@
+[
+  {
+    "type": [
+      "http://www.w3.org/2004/02/skos/core#exactMatch"
+    ],
+    "from": {
+      "memberSet": [
+        {
+          "uri": "http://example.org/A"
+        }
+      ]
+    },
+    "to": {
+      "memberSet": [
+        {
+          "uri": "http://example.com/foo"
+        }
+      ]
+    }
+  }
+]

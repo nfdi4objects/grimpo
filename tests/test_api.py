@@ -405,14 +405,14 @@ def test_mappings(client):
     assert client.get('/mappings/1').status_code == 200
     assert client.get('/mappings/2').status_code == 200
 
-    # receive and load JSKOS mappings
+    # receive and load JSKOS mappings as NDJSON
     assert client.post('/mappings/1/receive?from=mappings.ndjson').status_code == 200
     assert client.post('/mappings/1/load').status_code == 200
     assert list(client.get('/mappings/1/receive').get_json().values()) == [
         'Receiving 1 from mappings.ndjson',
         f'Retrieving source {data}/mappings.ndjson from data directory',
         'Converting JSKOS mappings to RDF mapping triples',
-        'Processed 2 lines into 1 mappings',
+        'Processed 1 mappings',
         f'Extracting RDF from file://{stage}/mappings/1/original.ttl as Turtle',
         'Removed 0 triples, changed 0 triples, kept 1 triples.',
         'done']
@@ -420,11 +420,27 @@ def test_mappings(client):
     query = "SELECT ?x { <http://example.org/A> ?p ?x }"
     assert sparql.query(query) == [{'x': {'type': 'uri', 'value': 'http://example.com/A'}}]
 
+    # detach mappings
     mappings = [{"type": ["http://www.w3.org/2004/02/skos/core#exactMatch"], "from": {"memberSet": [
         {"uri": "http://example.org/A"}]}, "to": {"memberSet": [{"uri": "http://example.com/A"}]}}]
     assert client.post('/mappings/1/detach', json=mappings).status_code == 200
     assert sparql.query(query) == []
 
+    # TODO: append mappings
+
+    # receive ad load JSKOS mappings as JSON (array)
+    assert client.post('/mappings/1/receive?from=mappings2.json').status_code == 200
+    assert client.post('/mappings/1/load').status_code == 200
+    assert sparql.query(query) == [{'x': {'type': 'uri', 'value': 'http://example.com/foo'}}]
+
+    # receive ad load JSKOS mappings as JSON (object)
+    assert client.post('/mappings/1/receive?from=mappings3.json').status_code == 200
+    assert client.post('/mappings/1/load').status_code == 200
+    assert sparql.query(query) == [{'x': {'type': 'uri', 'value': 'http://example.com/bar'}}]
+
+    assert client.post('/mappings/1/receive?from=invalid-mappings.json').status_code == 400
+
+    # receive and load RDF mappings
     assert client.post('/mappings/2/receive?from=mappings.ttl').status_code == 200
     assert client.post('/mappings/2/load').status_code == 200
 

@@ -4,8 +4,8 @@ known_formats = {
     "https://format.gbv.de/rdf/ntriples": "nt",
     "https://format.gbv.de/zip": "zip",
     "https://format.gbv.de/ndjson": "ndjson",
-    # "https://format.gbv.de/jskos": ??
-    # TODO: BARTOC Format URIs
+    "https://format.gbv.de/json": "json",
+    # TODO: Add BARTOC Format URIs
     # http://bartoc.org/en/Format/RDF
 }
 
@@ -24,5 +24,7 @@ def guess_format(source, format=None):
             return "xml"
         elif ext in ["ndjson", "jsonl"]:
             return "ndjson"
+        elif ext in ["json"]:
+            return "json"
         elif ext in ["zip", "ZIP"]:
             return "zip"
