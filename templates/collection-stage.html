@@ -1,7 +1,15 @@
 {% include 'head.html' %}
 
-<p><a href="../../">collection</a> / <a href="../../{{ id }}">{{ id }}</a> /</p>
+{% with path="mappings" %}
+  {% include 'navbar.html' %}
+{% endwith %}
+
 <h2>Stage directory of <a href="../../{{ id }}">collection {{ id }}</a></h2>
+<p>
+  See also 
+  <a href="../receive">receive log</a>, and
+  <a href="../load">load log</a>.
+</p>
 
 {% include 'files.html' %}
 {% include 'foot.html' %}

@@ -3,99 +3,42 @@
 {% macro help(text, id) -%}
   <span class="msg" id="{{id}}"></span>
   <br>{{ text|safe }}
-  ⇒ <a href="https://github.com/nfdi4objects/grimpo#{{id}}" target="_blank">help</a>
+  <a href="https://github.com/nfdi4objects/grimpo#{{id}}" target="_blank">🛈</a>
 {%- endmacro -%}
 {% macro input_id(class) -%}
   <input type="number" min="0" step="1" size="6" placeholder=":id" class="{{class}}"/>
 {%- endmacro -%}
 
-<p>
-  Controlled <b>write access</b> to
-  {% if sparql %}
-    a triple store at <a id="backend" href="{{ sparql }}">{{ sparql }}</a>.
-  {% else %}
-    an <span id="backend">in-memory triple store</span>.
-  {% endif %}
-  This is a backend service <b>without authentication</b>: all data can be modified!
-  Please use SPARQL endpoint or <a href="{{ frontend }}">frontend</a> for read access
-  and consider <a href="{{ admin }}">admin user interface</a>.
-</p>
-<h2>General Endpoints</h2>
-<ul>
-  <li>
-    <b>GET <a href="/status.json">/status.json</a></b>
-    {{ help("Get curent information about the application","get-statusjson") }}
-  </li>
-  <li>
-    <b>GET <a href="/data/">/data/</a>:file</b>
-    {{ help("List and get files from local data directory","get-data") }}
-  </li>
-  {% if not sparql %}
-  <li>
-    <b>GET|POST <a onclick="visit(this,'/sparql?query='+encodeURIComponent(document.getElementById('query').value))">/sparql</a>?query=</b>
-    <input type="text" placeholder=":query" id="query" />
-    {{ help("SPARQL Query endpoint to in-memory triple store","getpost-sparql") }}
-  </li>
-  {% endif %}
-</ul>
-<h2>Terminology Endpoints <span id="terminologies"/></h2>
-<ul>
-  <li>
-    <b>GET <a href="/terminology/">/terminology/</a></b>
-    {{ help("Return the list of registered terminology metadata", "get-terminology") }}
-  </li>
-  <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter)">/terminology/</a>{{ input_id("ter") }}</b>
-    {{ help("Return metadata of a registered terminology","get-terminologyid") }}
-  </li>
-  <li>
-    <b>PUT <a onclick="registerTerminology(this)">/terminology/</a>{{ input_id("ter") }}</b>
-    {{ help('Register a terminology or update its metadata from <a href="https://bartoc.org/">BARTOC</a>',"put-terminologyid") }}
-  </li>
-  <li>
-    <b>DELETE <a onclick="deleteTerminology(this)">/terminology/</a>{{ input_id("ter") }}</b>
-    {{ help("Unregister a terminology and remove it from stage area and triple store","delete-terminologyid") }}
-  </li>
-  <li>
-    <b>PUT <a onclick="replaceTerminologies(this)">/terminology/</a></b>
-    <input type="file" name="file" id="put-terminology-file">
-    {{ help("Register a list of terminologies, replacing existing ones","put-terminology") }}
-  </li>
-  <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/stage/')">/terminology/</a>{{ input_id("ter") }}/stage/</b>
-    {{ help("List and get files of the stage directory of a terminology","get-terminologyidstage") }}
-  </li>
-  <li>
-    <b>POST <a onclick="receiveTerminology(this)">/terminology/</a>{{ input_id("ter") }}/receive</b>
-    ? from=<input type="text" placeholder="URL or file" id="receiveTerminology" />
-    {{ help("Receive terminology data","post-terminologyidreceive") }}
-  </li>
-  <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/receive')">/terminology/</a>{{ input_id("ter") }}/receive</b>
-    {{ help("Get latest receive log of a terminology","get-terminologyidreceive") }}
-  </li>
-  <li>
-    <b>POST <a onclick="loadTerminology(this)">/terminology/</a>{{ input_id("ter") }}/load</b>
-    {{ help("Load terminology data into the triple store","post-terminologyidload") }}
-  </li>
-  <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/load')">/terminology/</a>{{ input_id("ter") }}/load</b>
-    {{ help("Get latest load log of a terminology","get-terminologyidload") }}
-  </li>
-  <li>
-    <b>POST <a onclick="removeTerminology(this)">/terminology/</a>{{ input_id("ter") }}/remove</b>
-    {{ help("Remove terminology data from the triple store","post-terminologyidremove") }}
-  </li>
-  <li>
-    <b>GET <a href="/terminology/namespaces.json">/terminology/namespaces.json</a></b>
-    {{ help("Return the list of registered URI namespaces forbidden to be used in RDF subjects","get-terminologynamespacesjson") }}
-  </li>
-  <li>
-    <b>GET <a href="/terminology/skosmos.ttl">/terminology/skosmos.ttl</a></b>
-    {{ help("Return Skosmos vocabulary configuration for imported SKOS and JSKOS terminologies.") }}
-  </li>
-</ul>
-<h2>Collection endpoints <span id="collections"/></h2>
+<div class="tabs-wrapper">
+  <nav class="tabs-nav">
+    <label for="tab-collection-toggle" class="tab-item">
+      Collection
+      <span id="collections"></span>
+      <input name="tabs-toggle" id="tab-collection-toggle" type="radio">
+    </label>
+    <label for="tab-terminology-toggle" class="tab-item">
+      Terminology
+      <span id="terminologies"></span>
+      <input name="tabs-toggle" id="tab-terminology-toggle" type="radio">
+    </label>
+    <label for="tab-mapping-toggle" class="tab-item">
+      Mappings
+      <span id="mappings"></span>
+      <input name="tabs-toggle" id="tab-mapping-toggle" type="radio">
+    </label>
+    <a href="{{ root }}data" class="tab-item">
+      Data
+    </a>
+    {% if not sparql %}
+    <label for="tab-sparql-toggle" class="tab-item">
+      SPARQL
+      <input checked name="tabs-toggle" id="tab-sparql-toggle" type="radio">
+    </label>
+    {% endif %}
+    <a href="{{ root }}status.json" class="tab-item">Status</a>
+  </nav>
+
+<div id="collection" class="tab-content">
 <ul>
   <li>
     <b>GET <a href="/collection/">/collection/</a></b>
@@ -154,7 +97,66 @@
     {{ help("Remove collection data from the triple store","post-collectionidremove") }}
   </li>
 </ul>
-<h2>Mapping endoints <span id="mappings"/></h2>
+    </div>
+<div id="terminology" class="tab-content">
+<ul>
+  <li>
+    <b>GET <a href="/terminology/">/terminology/</a></b>
+    {{ help("Return the list of registered terminology metadata", "get-terminology") }}
+  </li>
+  <li>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter)">/terminology/</a>{{ input_id("ter") }}</b>
+    {{ help("Return metadata of a registered terminology","get-terminologyid") }}
+  </li>
+  <li>
+    <b>PUT <a onclick="registerTerminology(this)">/terminology/</a>{{ input_id("ter") }}</b>
+    {{ help('Register a terminology or update its metadata from <a href="https://bartoc.org/">BARTOC</a>',"put-terminologyid") }}
+  </li>
+  <li>
+    <b>DELETE <a onclick="deleteTerminology(this)">/terminology/</a>{{ input_id("ter") }}</b>
+    {{ help("Unregister a terminology and remove it from stage area and triple store","delete-terminologyid") }}
+  </li>
+  <li>
+    <b>PUT <a onclick="replaceTerminologies(this)">/terminology/</a></b>
+    <input type="file" name="file" id="put-terminology-file">
+    {{ help("Register a list of terminologies, replacing existing ones","put-terminology") }}
+  </li>
+  <li>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/stage/')">/terminology/</a>{{ input_id("ter") }}/stage/</b>
+    {{ help("List and get files of the stage directory of a terminology","get-terminologyidstage") }}
+  </li>
+  <li>
+    <b>POST <a onclick="receiveTerminology(this)">/terminology/</a>{{ input_id("ter") }}/receive</b>
+    ? from=<input type="text" placeholder="URL or file" id="receiveTerminology" />
+    {{ help("Receive terminology data","post-terminologyidreceive") }}
+  </li>
+  <li>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/receive')">/terminology/</a>{{ input_id("ter") }}/receive</b>
+    {{ help("Get latest receive log of a terminology","get-terminologyidreceive") }}
+  </li>
+  <li>
+    <b>POST <a onclick="loadTerminology(this)">/terminology/</a>{{ input_id("ter") }}/load</b>
+    {{ help("Load terminology data into the triple store","post-terminologyidload") }}
+  </li>
+  <li>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/load')">/terminology/</a>{{ input_id("ter") }}/load</b>
+    {{ help("Get latest load log of a terminology","get-terminologyidload") }}
+  </li>
+  <li>
+    <b>POST <a onclick="removeTerminology(this)">/terminology/</a>{{ input_id("ter") }}/remove</b>
+    {{ help("Remove terminology data from the triple store","post-terminologyidremove") }}
+  </li>
+  <li>
+    <b>GET <a href="/terminology/namespaces.json">/terminology/namespaces.json</a></b>
+    {{ help("Return the list of registered URI namespaces forbidden to be used in RDF subjects","get-terminologynamespacesjson") }}
+  </li>
+  <li>
+    <b>GET <a href="/terminology/skosmos.ttl">/terminology/skosmos.ttl</a></b>
+    {{ help("Return Skosmos vocabulary configuration for imported SKOS and JSKOS terminologies.") }}
+  </li>
+</ul>
+</div>
+<div id="mapping" class="tab-content">
 <ul>
   <li>
     <b>GET <a href="/mappings/">/mappings/</a></b>
@@ -223,130 +225,19 @@
     {{ help("Remove mappings of a specific mapping source from the triple store and from staging area","post-mappingsidremove") }}
   </li>
 </ul>
+</div>
+
+{% if not sparql %}
+<div id="sparql" class="tab-content">
+  <ul>
+    <li>
+      <b>GET|POST <a onclick="visit(this,'/sparql?query='+encodeURIComponent(document.getElementById('query').value))">/sparql</a>?query=</b>
+      <input type="text" placeholder=":query" id="query" />
+      {{ help("SPARQL Query endpoint to in-memory triple store","getpost-sparql") }}
+    </li>
+  </ul>  
+</div>
+{% endif %}
+</div>
 
 {% include 'foot.html' %}
-
-<script type="text/javascript">
-const idValue = { ter: "", col: "", map: "" }
-
-const updateId = (cls, value) => {
-  idValue[cls] = value
-  for (let e of document.getElementsByClassName(cls)) {
-    e.parentNode.getElementsByTagName("a")[0].className = value ? "enabled" : "disabled"
-    e.value = value
-  }
-}
-
-const clearMessages = () => {
-  for (let e of document.getElementsByClassName("msg")) {
-    e.classList.remove("error")
-    e.textContent = ""
-  }
-}
-
-const errorMessage = (id, error) => {
-  const elem = document.getElementById(id)
-  elem.classList.add("error")
-  elem.textContent = error
-}
-
-const visit = (e, url) => {
-  if (e?.className == "disabled") return true
-  window.location.href = url 
-}
-
-const request = async (e, url, method) => {
-  if (e?.className == "disabled") return true
-
-  const id = method.toLowerCase() + "-" + url.replaceAll(/\?.*|[^a-z]/g,"")
-  url = url.replace(":id", idValue[url.slice(0,3)])
-  const options = { method }
-
-  const submit = async () => {
-    document.getElementById(id).textContent = "...loading..."
-    const res = await fetch(url, options).catch(e => ({ statusText: `${e}` }))
-    if (res.ok) {
-      document.getElementById(id).textContent = res.statusText
-    } else {      
-      var error = res.statusText || "ERROR"
-      try { error = (await res.json()).error } catch {}
-      errorMessage(id, error)
-    }
-    status()
-  }
-
-  clearMessages()
-  
-  const upload = document.getElementById(`${id}-file`)
-  if (upload) {
-    const file = upload.files[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = async e => {
-        options.headers = { 'Content-Type': 'application/json' }
-        options.body = e.target.result
-        await submit()
-      }
-      reader.readAsText(file)
-    } else {
-      errorMessage(id, "Please select a file!")
-      return
-    }
-  } else {
-    await submit()
-  }
-}
-
-const getValue = id => document.getElementById(id).value
-
-const registerTerminology  = e => request(e,`terminology/:id`, "PUT")
-const replaceTerminologies = e => request(e,`terminology/`, "PUT")
-const deleteTerminology    = e => request(e,`terminology/:id`, "DELETE")
-const receiveTerminology   = e => request(e,`terminology/:id/receive?from=${getValue('receiveTerminology')}`, "POST")
-const loadTerminology      = e => request(e,`terminology/:id/load`, "POST")
-const removeTerminology    = e => request(e,`terminology/:id/remove`, "POST")
-
-const registerCollection   = e => request(e,`collection/`, "POST")
-const replaceCollections   = e => request(e,`collection/`, "PUT")
-const updateCollection     = e => request(e,`collection/:id`, "PUT")
-const deleteCollection     = e => request(e,`collection/:id`, "DELETE")
-const receiveCollection    = e => request(e,`collection/:id/receive?from=${getValue('receiveCollection')}`, "POST", "receiveCollection")
-const loadCollection       = e => request(e,`collection/:id/load`, "POST")
-const removeCollection     = e => request(e,`collection/:id/remove`, "POST")
-
-const registerMappings   = e => request(e,`mappings/`, "POST")
-const replaceMappings    = e => request(e,`mappings/`, "PUT")
-const updateMappings     = e => request(e,`mappings/:id`, "PUT")
-const deleteMappings     = e => request(e,`mappings/:id`, "DELETE")
-const appendMappings       = e => request(e,`mappings/:id/append`, "POST")
-const detachMappings     = e => request(e,`mappings/:id/detach`, "POST")
-const receiveMappings    = e => request(e,`mappings/:id/receive?from=${getValue('receiveMappings')}`, "POST", "receiveMappings")
-const loadMappings       = e => request(e,`mappings/:id/load`, "POST")
-const removeMappings     = e => request(e,`mappings/:id/remove`, "POST")
-
-function status() {
-  fetch("status.json").then(res => res.json()).then(s => {
-    if (s.connected) {
-      document.getElementById('backend').className = ''
-      for (let key of ["terminologies", "mappings", "collections"]) {
-        document.getElementById(key).textContent = ` (${s[key]})`
-      }
-    } else {
-      document.getElementById('backend').className = 'error'
-    }
-  })
-}
-
-window.onload = () => {
-  for (let cls in idValue) {
-    const nodes = document.getElementsByClassName(cls)
-    for (let elem of nodes) {
-      elem.addEventListener("input", ({target: {value}}) => {        
-        updateId(cls, value)
-        return true
-      })
-    }
-    updateId(cls, nodes[0].value)
-  }
-  status()
-}</script>

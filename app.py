@@ -79,9 +79,8 @@ def status():
     return values
 
 
-route('GET', '/icon.png', lambda: send_file("static/grimpo-icon.png"))
-
-route('GET', '/grimpo.jpg', lambda: send_file("static/grimpo.jpg"))
+for file in Path('static').glob('*.*'):
+    route('GET', f'/{file.name}', lambda f=file: send_file(str(f)))
 
 api('GET', '/status.json', status)
 

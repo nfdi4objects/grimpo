@@ -1,0 +1,23 @@
+<nav class="tabs-nav">
+  <a href="{{ root }}#collection" class="tab-item {% if path == 'collection' %}checked{% endif %}">
+    Collection
+    <span id="collections"></span>
+  </a>
+  <a href="{{ root }}#terminology" class="tab-item {% if path == 'terminology' %}checked{% endif %}">
+    Terminology
+    <span id="terminologies"></span>
+  </a>
+  <a href="{{ root }}#mappings" class="tab-item {% if path == 'mappings' %}checked{% endif %}">
+    Mappings
+    <span id="mappings"></span>
+  </a>
+  <a href="{{ root }}data" class="tab-item {% if path == 'data' %}checked{% endif %}">
+    Data
+  </a>
+  {% if not sparql %}
+  <a href="{{ root }}#sparql" class="tab-item">
+    SPARQL
+  </a>
+  {% endif %}
+  <a href="{{ root }}status.json" class="tab-item">Status</a>
+</nav>

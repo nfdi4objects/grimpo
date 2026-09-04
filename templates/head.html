@@ -3,60 +3,36 @@
   <head>
     <meta charset="utf-8">
     <title>{{ title }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ root }}icon.png" sizes="32x32" />
-    <link rel="icon" href="{{ root }}icon.png" sizes="192x192" />
-    <link rel="apple-touch-icon" href="{{ root }}icon.png" />
-    <style type="text/css">
-    body {
-      margin: 20px;
-      font-family: sans-serif;
-      color: #340000;
-    }
-    ul {
-      list-style-type: none;
-      padding: 0 1em;
-    }
-    li {
-      text-indent: -2.5em;
-      padding-left: 2.5em;
-      margin-bottom: 0.2em;
-    }
-    a {
-      text-decoration: none;
-      color: #751e03;
-    }
-    li > b > a {
-      background: #fadda1;
-      cursor: pointer;
-    }
-    a:hover, a:active {
-      text-decoration: underline;
-    }
-    a.disabled {
-      color: currentColor;
-      cursor: not-allowed;
-      opacity: 0.5;
-      text-decoration: none;
-    }
-    .ws-endpoint {
-      display: inline-block;
-      background-color:#29517C ;
-      color: white;
-      font-size: 0.75em;
-      padding: 2px 6px;
-      border-radius: 4px;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
-    .msg { color: green; }
-    .error { color: red !important; }
-    </style>
+    <meta name="viewport" content="width=device-width">
+    <link rel="icon" href="{{ root }}grimpo-icon.png" sizes="32x32" />
+    <link rel="icon" href="{{ root }}grimpo-icon.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="{{ root }}grimpo-icon.png" />
+    <link rel="stylesheet" href="{{ root }}style.css" />
+    <script>const root = "{{ root }}"</script>
+    <script src="{{ root }}script.js"></script>
   </head>
   <body>
-    <img src="grimpo.jpg" style="float:right" title="Grimpoteuthis umbellata" />
-    {% if root %}
-    <h1><a href="{{ root }}">{{ title }}</a></h1>
-    {% else %}
-    <h1>{{ title }}</h1>  
-    {% endif %}
+    <header>
+      <a href="https://github.com/nfdi4objects/grimpo#readme">
+        <img src="{{ root }}grimpo.jpg" style="float:right" title="Grimpoteuthis umbellata" />
+      </a>
+      <h1><a href="{{ root }}">{{ title }}</a></h1>
+      <p>
+        Controlled <b>write access</b> to
+        <b>
+        {% if sparql %}
+          a triple store at <a id="backend" href="{{ sparql }}">{{ sparql }}</a>.
+        {% else %}
+          an <span id="backend">in-memory triple store</span>.
+        {% endif %}
+        </b>
+        This backend service provides
+        <a href="https://github.com/nfdi4objects/grimpo#api">API endpoints</a>
+        <b>without authentication</b>!
+
+        Please use SPARQL endpoint or <a href="{{ frontend }}">frontend</a>
+        for read access and consider <a href="{{ admin }}">admin user interface</a>.
+      </p>
+    </header>
+
+

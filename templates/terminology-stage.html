@@ -1,7 +1,14 @@
 {% include 'head.html' %}
+{% with path="terminology" %}
+  {% include 'navbar.html' %}
+{% endwith %}
 
-<p><a href="../../">terminology</a> / <a href="../../{{ id }}">{{ id }}</a> /</p>
-<h2>Stage directory of terminology <a href="https://bartoc.org/en/node/{{ id }}">{{ id }}</a></h2>
+<h2>Stage directory of terminology <a href="../../{{ id }}">{{ id }}</a></h2>
+<p>
+  See also <a href="https://bartoc.org/en/node/{{ id }}">BARTOC</a>,
+  <a href="../receive">receive log</a>, and
+  <a href="../load">load log</a>.
+</p>
 
 {% include 'files.html' %}
 {% include 'foot.html' %}

@@ -1,9 +1,17 @@
 {% include 'head.html' %}
+{% with path="data" %}
+  {% include 'navbar.html' %}
+{% endwith %}
 
-<h2>Data directory</h2>
-<p>
-  Files from this directory (<code>{{ data }}</code>) can be received. Alternatively data can be receiving from an URL or a repository.
-</p>
+<ul>
+  <li>
+    <b>GET <a href="/data/">/data/</a>:file</b>
+    <br>List and get files from local data directory (<code>{{ data }}</code>).
+    Files from this directory can be received.
+    Alternatively data can be received from an URL.
+    <a href="https://github.com/nfdi4objects/grimpo#get-data" target="_blank">🛈</a>
+  </li>
+</ul>
 
 {% include 'files.html' %}
 {% include 'foot.html' %}
