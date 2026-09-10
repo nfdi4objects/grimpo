@@ -1,0 +1,22 @@
+{% if not sparql %}
+  <ul>
+    <li>
+      <b>GET|POST <a onclick="visit(this,'/sparql?query='+encodeURIComponent(document.getElementById('query').value))">/sparql</a>?query=</b>
+      <input type="text" placeholder=":query" id="query" />
+      {{ help("SPARQL Query endpoint to in-memory triple store","getpost-sparql") }}
+    </li>
+  </ul>  
+{% endif %}
+
+<div id="sparql-status">trying to connect...</div>
+
+  <!--
+  <script src="https://unpkg.com/@matdata/yasgui/build/yasgui.min.js"></script>
+<style>
+@import url("https://unpkg.com/@matdata/yasgui/build/yasgui.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css");
+.autocompleteWrapper,
+.endpointButtonsContainer, .queryBrowserToggle {
+  display: none !important;
+}
+</style-->

@@ -29,12 +29,10 @@
     <a href="{{ root }}data" class="tab-item">
       Data
     </a>
-    {% if not sparql %}
     <label for="tab-sparql-toggle" class="tab-item">
       SPARQL
       <input checked name="tabs-toggle" id="tab-sparql-toggle" type="radio">
     </label>
-    {% endif %}
     <a href="{{ root }}status.json" class="tab-item">Status</a>
   </nav>
 
@@ -59,45 +57,45 @@
     {{ help("Register a new collection or update metadata of a registered collection","post-collection") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col)">/collection/</a>{{ input_id("col") }}</b>
+    <b>GET <a onclick="visit(this,'/collection/'+idValue.col)">/collection/</a>{{ input_id("collection") }}</b>
     {{ help("Return metadata of a specific registered collection","get-collectionid") }}
   </li>
   <li>
-    <b>PUT <a onclick="updateCollection(this)">/collection/</a>{{ input_id("col") }}</b>
+    <b>PUT <a onclick="updateCollection(this)">/collection/</a>{{ input_id("collection") }}</b>
     <input type="file" name="file" id="put-collectionid-file">
     {{ help("Update metadata of a specific registered collection or register a new collection","put-collectionid") }}
   </li>
   <li>
-    <b>DELETE <a onclick="deleteCollection(this)">/collection/</a>{{ input_id("col") }}</b>
+    <b>DELETE <a onclick="deleteCollection(this)">/collection/</a>{{ input_id("collection") }}</b>
     {{ help("Unregister a collection and remove it from the triple store and staging area","delete-collectionid") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/stage/')">/collection/</a>{{ input_id("col") }}/stage/</b>
+    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/stage/')">/collection/</a>{{ input_id("collection") }}/stage/</b>
     {{ help("List and get files of the stage directory of a collection","get-collectionidstage") }}
   </li>
   <li>
-    <b>POST <a onclick="receiveCollection(this)">/collection/</a>{{ input_id("col") }}/receive</b>
+    <b>POST <a onclick="receiveCollection(this)">/collection/</a>{{ input_id("collection") }}/receive</b>
     ? from=<input type="text" placeholder="URL or file" id="receiveCollection" />
     {{ help("Receive and process collection data","post-collectionidreceive") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/receive')">/collection/</a>{{ input_id("col") }}/receive</b>
+    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/receive')">/collection/</a>{{ input_id("collection") }}/receive</b>
     {{ help("Get latest receive log of a collection","get-collectionidreceive") }}
   </li>
   <li>
-    <b>POST <a onclick="loadCollection(this)">/collection/</a>{{ input_id("col") }}/load</b>
+    <b>POST <a onclick="loadCollection(this)">/collection/</a>{{ input_id("collection") }}/load</b>
     {{ help("Load received and processed collection data into the triple store","post-collectionidload") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/load')">/collection/</a>{{ input_id("col") }}/load</b>
+    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/load')">/collection/</a>{{ input_id("collection") }}/load</b>
     {{ help("Get latest load log of a collection","get-collectionidload") }}
   </li>
   <li>
-    <b>POST <a onclick="removeCollection(this)">/collection/</a>{{ input_id("col") }}/remove</b>
+    <b>POST <a onclick="removeCollection(this)">/collection/</a>{{ input_id("collection") }}/remove</b>
     {{ help("Remove collection data from the triple store","post-collectionidremove") }}
   </li>
 </ul>
-    </div>
+</div>
 <div id="terminology" class="tab-content">
 <ul>
   <li>
@@ -105,15 +103,15 @@
     {{ help("Return the list of registered terminology metadata", "get-terminology") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter)">/terminology/</a>{{ input_id("ter") }}</b>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter)">/terminology/</a>{{ input_id("terminology") }}</b>
     {{ help("Return metadata of a registered terminology","get-terminologyid") }}
   </li>
   <li>
-    <b>PUT <a onclick="registerTerminology(this)">/terminology/</a>{{ input_id("ter") }}</b>
+    <b>PUT <a onclick="registerTerminology(this)">/terminology/</a>{{ input_id("terminology") }}</b>
     {{ help('Register a terminology or update its metadata from <a href="https://bartoc.org/">BARTOC</a>',"put-terminologyid") }}
   </li>
   <li>
-    <b>DELETE <a onclick="deleteTerminology(this)">/terminology/</a>{{ input_id("ter") }}</b>
+    <b>DELETE <a onclick="deleteTerminology(this)">/terminology/</a>{{ input_id("terminology") }}</b>
     {{ help("Unregister a terminology and remove it from stage area and triple store","delete-terminologyid") }}
   </li>
   <li>
@@ -122,28 +120,28 @@
     {{ help("Register a list of terminologies, replacing existing ones","put-terminology") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/stage/')">/terminology/</a>{{ input_id("ter") }}/stage/</b>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/stage/')">/terminology/</a>{{ input_id("terminology") }}/stage/</b>
     {{ help("List and get files of the stage directory of a terminology","get-terminologyidstage") }}
   </li>
   <li>
-    <b>POST <a onclick="receiveTerminology(this)">/terminology/</a>{{ input_id("ter") }}/receive</b>
+    <b>POST <a onclick="receiveTerminology(this)">/terminology/</a>{{ input_id("terminology") }}/receive</b>
     ? from=<input type="text" placeholder="URL or file" id="receiveTerminology" />
     {{ help("Receive terminology data","post-terminologyidreceive") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/receive')">/terminology/</a>{{ input_id("ter") }}/receive</b>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/receive')">/terminology/</a>{{ input_id("terminology") }}/receive</b>
     {{ help("Get latest receive log of a terminology","get-terminologyidreceive") }}
   </li>
   <li>
-    <b>POST <a onclick="loadTerminology(this)">/terminology/</a>{{ input_id("ter") }}/load</b>
+    <b>POST <a onclick="loadTerminology(this)">/terminology/</a>{{ input_id("terminology") }}/load</b>
     {{ help("Load terminology data into the triple store","post-terminologyidload") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/load')">/terminology/</a>{{ input_id("ter") }}/load</b>
+    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/load')">/terminology/</a>{{ input_id("terminology") }}/load</b>
     {{ help("Get latest load log of a terminology","get-terminologyidload") }}
   </li>
   <li>
-    <b>POST <a onclick="removeTerminology(this)">/terminology/</a>{{ input_id("ter") }}/remove</b>
+    <b>POST <a onclick="removeTerminology(this)">/terminology/</a>{{ input_id("terminology") }}/remove</b>
     {{ help("Remove terminology data from the triple store","post-terminologyidremove") }}
   </li>
   <li>
@@ -177,67 +175,58 @@
     {{ help("Register a new mapping source or update metadata of a mapping source","post-mappings") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map)">/mappings/</a>{{ input_id("map") }}</b>
+    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map)">/mappings/</a>{{ input_id("mappings") }}</b>
     {{ help("Return a specific mapping source","get-mappingsid") }}
   </li>  
   <li>
-    <b>PUT <a onclick="updateMappings(this)">/mappings/</a>{{ input_id("map") }}</b>
+    <b>PUT <a onclick="updateMappings(this)">/mappings/</a>{{ input_id("mappings") }}</b>
     <input type="file" name="file" id="put-mappingsid-file">
     {{ help("Update a specific mapping source", "put-mappingsid") }}
   </li>
   <li>
-    <b>DELETE <a onclick="deleteMappings(this)">/mappings/</a>{{ input_id("map") }}</b>
+    <b>DELETE <a onclick="deleteMappings(this)">/mappings/</a>{{ input_id("mappings") }}</b>
     {{ help("Unregister a mappings source and remove it from the triple store and staging area","delete-mappingsid") }}
   </li>  
   <li>
-    <b>POST <a onclick="appendMappings(this)">/mappings/</a>{{ input_id("map") }}/append</b>
+    <b>POST <a onclick="appendMappings(this)">/mappings/</a>{{ input_id("mappings") }}/append</b>
     <input type="file" name="file" id="post-mappingsidappend-file">
     {{ help("Directly add mappings to the triple store","post-mappingsidappend") }}
   </li>
   <li>
-    <b>POST <a onclick="detachMappings(this)">/mappings/</a>{{ input_id("map") }}/detach</b>
+    <b>POST <a onclick="detachMappings(this)">/mappings/</a>{{ input_id("mappings") }}/detach</b>
     <input type="file" name="file" id="post-mappingsiddetach-file">
     {{ help("Directly remove mappings from the triple store","post-mappingsiddetach") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/stage/')">/mappings/</a>{{ input_id("map") }}/stage/</b>
+    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/stage/')">/mappings/</a>{{ input_id("mappings") }}/stage/</b>
     {{ help("List and get files of the stage directory of a mapping source","get-mappingsidstage") }}
   </li>
   <li>
-    <b>POST <a onclick="receiveMappings(this)">/mappings/</a>{{ input_id("map") }}/receive</b>
+    <b>POST <a onclick="receiveMappings(this)">/mappings/</a>{{ input_id("mappings") }}/receive</b>
     ? from=<input type="text" placeholder="URL or file" id="receiveMappings" />
     {{ help("Receive and process mappings from a mapping source","post-mappingsidreceive") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/receive')">/mappings/</a>{{ input_id("map") }}/receive</b>
+    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/receive')">/mappings/</a>{{ input_id("mappings") }}/receive</b>
     {{ help("Get latest receive log of a mapping source","get-mappingsidreceive") }}
   </li>
   <li>
-    <b>POST <a onclick="loadMappings(this)">/mappings/</a>{{ input_id("map") }}/load</b>
+    <b>POST <a onclick="loadMappings(this)">/mappings/</a>{{ input_id("mappings") }}/load</b>
     {{ help("Load received and processed mappings into the triple store","post-mappingsidload") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/load')">/mappings/</a>{{ input_id("map") }}/load</b>
+    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/load')">/mappings/</a>{{ input_id("mappings") }}/load</b>
     {{ help("Get latest load log of a mapping source","get-mappingsidload") }}
   </li>
   <li>
-    <b>POST <a onclick="removeMappings(this)">/mappings/</a>{{ input_id("map") }}/remove</b>
+    <b>POST <a onclick="removeMappings(this)">/mappings/</a>{{ input_id("mappings") }}/remove</b>
     {{ help("Remove mappings of a specific mapping source from the triple store and from staging area","post-mappingsidremove") }}
   </li>
 </ul>
 </div>
-
-{% if not sparql %}
 <div id="sparql" class="tab-content">
-  <ul>
-    <li>
-      <b>GET|POST <a onclick="visit(this,'/sparql?query='+encodeURIComponent(document.getElementById('query').value))">/sparql</a>?query=</b>
-      <input type="text" placeholder=":query" id="query" />
-      {{ help("SPARQL Query endpoint to in-memory triple store","getpost-sparql") }}
-    </li>
-  </ul>  
+  {% include 'sparql.html' %}
 </div>
-{% endif %}
 </div>
 
 {% include 'foot.html' %}
