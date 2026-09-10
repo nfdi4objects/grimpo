@@ -11,13 +11,12 @@
     Mappings
     <span id="mappings"></span>
   </a>
-  <a href="{{ root }}data" class="tab-item {% if path == 'data' %}checked{% endif %}">
+  <a href="{{ root }}#data" class="tab-item {% if path == 'data' %}checked{% endif %}">
     Data
+    <span id="data"></span>
   </a>
-  {% if not sparql %}
   <a href="{{ root }}#sparql" class="tab-item">
     SPARQL
   </a>
-  {% endif %}
   <a href="{{ root }}status.json" class="tab-item">Status</a>
 </nav>

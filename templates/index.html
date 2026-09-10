@@ -26,9 +26,11 @@
       <span id="mappings"></span>
       <input name="tabs-toggle" id="tab-mapping-toggle" type="radio">
     </label>
-    <a href="{{ root }}data" class="tab-item">
+    <label for="tab-data-toggle" class="tab-item">
       Data
-    </a>
+      <span id="data"></span>
+      <input name="tabs-toggle" id="tab-data-toggle" type="radio">
+    </label>
     <label for="tab-sparql-toggle" class="tab-item">
       SPARQL
       <input checked name="tabs-toggle" id="tab-sparql-toggle" type="radio">
@@ -37,7 +39,7 @@
   </nav>
 
 <div id="collection" class="tab-content">
-<ul>
+<ul class="endpoints">
   <li>
     <b>GET <a href="/collection/">/collection/</a></b>
     {{ help("Return the list of registered collections","get-collection") }}
@@ -57,7 +59,7 @@
     {{ help("Register a new collection or update metadata of a registered collection","post-collection") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col)">/collection/</a>{{ input_id("collection") }}</b>
+    <b>GET <a onclick="visit(this,'collection/:id')">/collection/</a>{{ input_id("collection") }}</b>
     {{ help("Return metadata of a specific registered collection","get-collectionid") }}
   </li>
   <li>
@@ -70,7 +72,7 @@
     {{ help("Unregister a collection and remove it from the triple store and staging area","delete-collectionid") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/stage/')">/collection/</a>{{ input_id("collection") }}/stage/</b>
+    <b>GET <a onclick="visit(this,'collection/:id/stage/')">/collection/</a>{{ input_id("collection") }}/stage/</b>
     {{ help("List and get files of the stage directory of a collection","get-collectionidstage") }}
   </li>
   <li>
@@ -79,7 +81,7 @@
     {{ help("Receive and process collection data","post-collectionidreceive") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/receive')">/collection/</a>{{ input_id("collection") }}/receive</b>
+    <b>GET <a onclick="visit(this,'collection/:id/receive')">/collection/</a>{{ input_id("collection") }}/receive</b>
     {{ help("Get latest receive log of a collection","get-collectionidreceive") }}
   </li>
   <li>
@@ -87,7 +89,7 @@
     {{ help("Load received and processed collection data into the triple store","post-collectionidload") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/collection/'+idValue.col+'/load')">/collection/</a>{{ input_id("collection") }}/load</b>
+    <b>GET <a onclick="visit(this,'collection/:id/load')">/collection/</a>{{ input_id("collection") }}/load</b>
     {{ help("Get latest load log of a collection","get-collectionidload") }}
   </li>
   <li>
@@ -97,13 +99,13 @@
 </ul>
 </div>
 <div id="terminology" class="tab-content">
-<ul>
+<ul class="endpoints">
   <li>
     <b>GET <a href="/terminology/">/terminology/</a></b>
     {{ help("Return the list of registered terminology metadata", "get-terminology") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter)">/terminology/</a>{{ input_id("terminology") }}</b>
+    <b>GET <a onclick="visit(this,'terminology/:id')">/terminology/</a>{{ input_id("terminology") }}</b>
     {{ help("Return metadata of a registered terminology","get-terminologyid") }}
   </li>
   <li>
@@ -120,7 +122,7 @@
     {{ help("Register a list of terminologies, replacing existing ones","put-terminology") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/stage/')">/terminology/</a>{{ input_id("terminology") }}/stage/</b>
+    <b>GET <a onclick="visit(this,'terminology/:id/stage/')">/terminology/</a>{{ input_id("terminology") }}/stage/</b>
     {{ help("List and get files of the stage directory of a terminology","get-terminologyidstage") }}
   </li>
   <li>
@@ -129,7 +131,7 @@
     {{ help("Receive terminology data","post-terminologyidreceive") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/receive')">/terminology/</a>{{ input_id("terminology") }}/receive</b>
+    <b>GET <a onclick="visit(this,'terminology/:id/receive')">/terminology/</a>{{ input_id("terminology") }}/receive</b>
     {{ help("Get latest receive log of a terminology","get-terminologyidreceive") }}
   </li>
   <li>
@@ -137,7 +139,7 @@
     {{ help("Load terminology data into the triple store","post-terminologyidload") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/terminology/'+idValue.ter+'/load')">/terminology/</a>{{ input_id("terminology") }}/load</b>
+    <b>GET <a onclick="visit(this,'terminology/:id/load')">/terminology/</a>{{ input_id("terminology") }}/load</b>
     {{ help("Get latest load log of a terminology","get-terminologyidload") }}
   </li>
   <li>
@@ -155,7 +157,7 @@
 </ul>
 </div>
 <div id="mapping" class="tab-content">
-<ul>
+<ul class="endpoints">
   <li>
     <b>GET <a href="/mappings/">/mappings/</a></b>
     {{ help("Return the list of registered mapping sources","get-mappings") }}
@@ -175,7 +177,7 @@
     {{ help("Register a new mapping source or update metadata of a mapping source","post-mappings") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map)">/mappings/</a>{{ input_id("mappings") }}</b>
+    <b>GET <a onclick="visit(this,'mappings/:id')">/mappings/</a>{{ input_id("mappings") }}</b>
     {{ help("Return a specific mapping source","get-mappingsid") }}
   </li>  
   <li>
@@ -198,7 +200,7 @@
     {{ help("Directly remove mappings from the triple store","post-mappingsiddetach") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/stage/')">/mappings/</a>{{ input_id("mappings") }}/stage/</b>
+    <b>GET <a onclick="visit(this,'mappings/:id/stage/')">/mappings/</a>{{ input_id("mappings") }}/stage/</b>
     {{ help("List and get files of the stage directory of a mapping source","get-mappingsidstage") }}
   </li>
   <li>
@@ -207,7 +209,7 @@
     {{ help("Receive and process mappings from a mapping source","post-mappingsidreceive") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/receive')">/mappings/</a>{{ input_id("mappings") }}/receive</b>
+    <b>GET <a onclick="visit(this,'mappings/:id/receive')">/mappings/</a>{{ input_id("mappings") }}/receive</b>
     {{ help("Get latest receive log of a mapping source","get-mappingsidreceive") }}
   </li>
   <li>
@@ -215,7 +217,7 @@
     {{ help("Load received and processed mappings into the triple store","post-mappingsidload") }}
   </li>
   <li>
-    <b>GET <a onclick="visit(this,'/mappings/'+idValue.map+'/load')">/mappings/</a>{{ input_id("mappings") }}/load</b>
+    <b>GET <a onclick="visit(this,'mappings/:id/load')">/mappings/</a>{{ input_id("mappings") }}/load</b>
     {{ help("Get latest load log of a mapping source","get-mappingsidload") }}
   </li>
   <li>
@@ -223,6 +225,9 @@
     {{ help("Remove mappings of a specific mapping source from the triple store and from staging area","post-mappingsidremove") }}
   </li>
 </ul>
+</div>
+<div id="data" class="tab-content">
+  {% include 'data.html' %}
 </div>
 <div id="sparql" class="tab-content">
   {% include 'sparql.html' %}

@@ -6,11 +6,11 @@ body {
   font-family: sans-serif;
   color: #340000;
 }
-ul {
+ul.endpoints {
   list-style-type: none;
   padding: 0;
 }
-li {
+ul.endpoints > li {
   text-indent: -2.5em;
   padding-left: 2.5em;
   margin-bottom: 0.2em;
@@ -73,6 +73,9 @@ a.disabled {
   display: block;
 }
 .tabs-wrapper:has(#tab-mapping-toggle:checked) #mapping {
+  display: block;
+}
+.tabs-wrapper:has(#tab-data-toggle:checked) #data {
   display: block;
 }
 .tabs-wrapper:has(#tab-sparql-toggle:checked) #sparql {

@@ -25,6 +25,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
   - [General endpoints](#general-endpoints)
     - [GET /status.json](#get-statusjson)
     - [GET /data/](#get-data)
+    - [GET /data/name](#get-dataname)
     - [GET|POST /sparql](#getpost-sparql)
   - [Terminologies](#terminologies)
     - [GET /terminology](#get-terminology)
@@ -33,6 +34,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
     - [DELETE /terminology/{id}](#delete-terminologyid)
     - [PUT /terminology/](#put-terminology)
     - [GET /terminology/{id}/stage/](#get-terminologyidstage)
+    - [GET /terminology/{id}/stage/{name}](#get-terminologyidstagename)
     - [POST /terminology/{id}/receive](#post-terminologyidreceive)
     - [GET /terminology/{id}/receive](#get-terminologyidreceive)
     - [POST /terminology/{id}/load](#post-terminologyidload)
@@ -49,6 +51,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
     - [PUT /collection/{id}](#put-collectionid)
     - [DELETE /collection/{id}](#delete-collectionid)
     - [GET /collection/{id}/stage/](#get-collectionidstage)
+    - [GET /collection/{id}/stage/{name}](#get-collectionidstagename)
     - [POST /collection/{id}/receive](#post-collectionidreceive)
     - [GET /collection/{id}/receive](#get-collectionidreceive)
     - [POST /collection/{id}/load](#post-collectionidload)
@@ -66,6 +69,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
     - [POST /mappings/{id}/append](#post-mappingsidappend)
     - [POST /mappings/{id}/detach](#post-mappingsiddetach)
     - [GET /mappings/{id}/stage/](#get-mappingsidstage)
+    - [GET /mappings/{id}/stage/{name}](#get-mappingsidstagename)
     - [POST /mappings/{id}/receive](#post-mappingsidreceive)
     - [GET /mappings/{id}/receive](#get-mappingsidreceive)
     - [POST /mappings/{id}/load](#post-mappingsidload)
@@ -314,7 +318,11 @@ Get curent information about the application as JSON object. This includes:
 
 #### GET /data/
 
-List and get files from local data directory.
+List files from local data directory as JSON array, each with `name`, `size`, `created`, `modified`.
+
+#### GET /data/{name}
+
+Get a file from the data directory.
 
 #### GET|POST /sparql
 
@@ -355,7 +363,11 @@ Other fields are ignored so the return value of [GET /terminology/](#get-termino
 
 #### GET /terminology/{id}/stage/
 
-List and get files of the stage directory of a terminology.
+List files from stage directory of a terminology, each with `name`, `size`, `created`, `modified`.
+
+#### GET /terminology/{id}/stage/{name}
+
+Get a file from the stage directory.
 
 #### POST /terminology/{id}/receive
 
@@ -439,7 +451,11 @@ Unregister a collection and remove it from the triple store and staging area. Th
 
 #### GET /collection/{id}/stage/
 
-List and get files of the stage directory of a collection.
+List files of the stage directory of a collection, each with `name`, `size`, `created`, `modified`.
+
+#### GET /collection/{id}/stage/{name}
+
+Get a file from the stage directory.
 
 #### POST /collection/{id}/receive
 
@@ -515,7 +531,11 @@ Directly remove mappings from the triple store. This operation is not reflected 
 
 #### GET /mappings/{id}/stage/
 
-List and get files of the stage directory of a mapping source.
+List files of the stage directory of a mapping source, each with `name`, `size`, `created`, `modified`.
+
+#### GET /mappings/{id}/stage/{name}
+
+Get a file from the stage directory.
 
 #### POST /mappings/{id}/receive
 

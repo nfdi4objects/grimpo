@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, render_template, send_from_directory,
 from lib import CollectionRegistry, TerminologyRegistry, MappingRegistry, \
     ApiError, NotFound, ValidationError, createTripleStore
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 from flask_cors import CORS
 
@@ -88,6 +89,8 @@ if not app.config.get('sparql'):
     route('GET', '/sparql', lambda: app.config['store'].query_request(request))
     route('POST', '/sparql', lambda: app.config['store'].query_request(request))
 
+api('GET', '/data/', lambda: list_files(Path(app.config['data'])))
+
 api('GET', '/terminology/', lambda: terminologies.list())
 api('GET', '/terminology/namespaces.json', lambda: terminologies.namespaces())
 
@@ -134,22 +137,34 @@ api('GET', '/mappings/<int:id>/load', lambda id: mappings.load_log(id))
 api('POST', '/mappings/<int:id>/remove', lambda id: mappings.remove(id))
 
 
-def serve_dir(dir, template, root, filename=None, id=None):
+def list_files(dir):
+    files = []
+    if dir.is_dir():
+        for file in [f for f in dir.iterdir() if f.is_file()]:
+            st = file.stat()
+            files.append({
+                "name": file.name,
+                "size": st.st_size,
+                "created": datetime.fromtimestamp(st.st_ctime, tz=timezone.utc).isoformat(),
+                "modified": datetime.fromtimestamp(st.st_mtime, tz=timezone.utc).isoformat(),
+            })
+    return sorted(files, key=lambda f: f["modified"])
+
+
+def serve_dir(dir, root, filename=None, id=None):
     if filename:
         file = dir / filename
         if "/" in filename or not file.is_file():
             raise NotFound("File not found!")
         return send_from_directory(dir, filename)
     else:
-        files = [f.name for f in dir.iterdir() if f.is_file()
-                 ] if dir.is_dir() else []
-        return render_template(template, root=root, files=files, **app.config, id=id)
+        return list_files(dir)
 
 
 def stage(kind, id, filename=None):
     dir = Path(app.config["stage"]) / kind / str(id)
     if dir.is_dir():
-        return serve_dir(dir, f"{kind}-stage.html", "../../../", filename, id)
+        return serve_dir(dir, "../../../", filename, id)
     else:
         raise NotFound(f"{kind} {id} not found!")
 
@@ -172,7 +187,6 @@ def mappings_stage(id, filename=None):
     return stage("mappings", id, filename)
 
 
-@app.route('/data/')
 @app.route('/data/<filename>')
 def data_directory(filename=None):
-    return serve_dir(Path(app.config["data"]), "data.html", "../", filename)
+    return serve_dir(Path(app.config["data"]), "../", filename)

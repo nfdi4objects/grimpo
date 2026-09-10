@@ -103,7 +103,10 @@ def test_validation(client):
 def test_general(client, monkeypatch):
     client, *_ = client
 
-    client.get('/data/').status_code == 200
+    res = client.get('/data/')
+    assert res.status_code == 200
+    assert res.json
+
     client.get('/data/skos.rdf').status_code == 200
 
     status = client.get('/status.json')

@@ -1,5 +1,5 @@
 {% if not sparql %}
-  <ul>
+  <ul class="endpoints">
     <li>
       <b>GET|POST <a onclick="visit(this,'/sparql?query='+encodeURIComponent(document.getElementById('query').value))">/sparql</a>?query=</b>
       <input type="text" placeholder=":query" id="query" />
