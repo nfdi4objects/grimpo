@@ -154,11 +154,13 @@ Each terminology, each collection, and each mapping source is imported into an i
 
 Importing is controlled via [an HTTP API](#api) in three steps:
 
-1. **register**: metadata is retrieved, collected in a **registry** and written to the triple store
+1. **register**: metadata is retrieved, collected in a **registry**, written to the triple store and to a local cache
 2. **receive**: data is retrieved into a **stage** directory where it is [validated](#validation), [filtered](#filtering), and a [report] is generated
 2. **load**: processed data is loaded into the **triple store**
 
 Register can be undone by additional step **delete**. Load and receive can be undone by step **remove**. Mappings can also be injested and withdraw directly into/from the triple store via **append/detach** to support non-durable live-updates. Register and load also log information into [reports](#reports).
+
+Metadata of registered collections, terminologies, and mapping sources are also cached in the stage directory. If the triple store is empty on startup, the cache is used to re-register its content. Otherwise the cache should be synchronized with the triple store (not implemented yet, see <https://github.com/nfdi4objects/grimpo/issues/80>).
 
 ```mermaid
 flowchart LR

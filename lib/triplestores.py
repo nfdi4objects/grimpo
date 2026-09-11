@@ -62,6 +62,14 @@ class AbstractTripleStore(ABC):
     def drop_graph(self, graph):
         return self._update(f"DROP GRAPH <{graph}>")
 
+    def count_graphs(self):
+        query = "SELECT ?g (count(*) as ?t) { GRAPH ?g {?s ?p ?o} } GROUP BY ?g"
+        graphs = {}
+        for row in self.query(query):
+            if "g" in row:  # <https://github.com/RDFLib/rdflib/issues/3382>
+                graphs[row['g']['value']] = int(row['t']['value'])
+        return graphs
+
 
 class ExternalTripleStore(AbstractTripleStore):
     """Triple store accessed via HTTP SPARQL API."""
@@ -77,8 +85,10 @@ class ExternalTripleStore(AbstractTripleStore):
     def query(self, query, format='sparql'):
         client = self.__client(query)
         try:
-            result = client.queryAndConvert()["results"]["bindings"]
-            return convert_query_result(result, convert_sparql_term, format)
+            result = client.queryAndConvert()
+            if "boolean" in result:  # ASK query
+                return result["boolean"]
+            return convert_query_result(result["results"]["bindings"], convert_sparql_term, format)
         except Exception as e:
             raise ServerError(f"SPARQL Query failed: {e}")
 
@@ -113,8 +123,11 @@ class InternalTripleStore(AbstractTripleStore):
 
     def query(self, query, format='sparql'):
         query = self.prefixes + query
-        result = self.ds.query(query).bindings
-        return convert_query_result(result, convert_rdflib_term, format)
+        result = self.ds.query(query)
+        if result.type == "ASK":
+            return result.askAnswer
+        else:
+            return convert_query_result(result.bindings, convert_rdflib_term, format)
 
     def query_request(self, request):
 
@@ -140,11 +153,15 @@ class InternalTripleStore(AbstractTripleStore):
         #        params[name] = request.values[name]
 
         try:
-            data = self.ds.query(query).bindings
-            # TODO: support other serialization formats
-            vars = [k for k in data[0].keys()] if data else []
-            bindings = convert_query_result(data or [], convert_sparql_term, "sparql")
-            data = {"head": {"vars": vars}, "bindings": bindings}
+            data = self.ds.query(query)
+            if data.type == "ASK":
+                data = {"head": {}, "boolean": data.askAnswer}
+            else:
+                bindings = data.bindings or []
+                vars = [k for k in bindings[0].keys()] if bindings else []
+                # TODO: support other serialization formats
+                bindings = convert_query_result(bindings or [], convert_sparql_term, "sparql")
+                data = {"head": {"vars": vars}, "bindings": bindings}
             return Response(json.dumps(data), mimetype="application/sparql-results+json")
         except Exception as e:
             raise ApiError(f"SPARQL Query failed: {e}")

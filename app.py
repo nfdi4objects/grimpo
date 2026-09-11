@@ -71,9 +71,9 @@ route('GET', '/', lambda: render_template('index.html', **app.config))
 def status():
     values = {key: val for key, val in app.config.items() if key.islower() and type(val) in [str, bool]}
     try:
-        values["collections"] = collections.count_registered()
-        values["terminologies"] = terminologies.count_registered()
-        values["mappings"] = mappings.count_registered()
+        values["collections"] = len(collections.registered())
+        values["terminologies"] = len(terminologies.registered())
+        values["mappings"] = len(mappings.registered())
         values['connected'] = True
     except Exception:
         values['connected'] = False

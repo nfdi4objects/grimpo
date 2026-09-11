@@ -48,7 +48,7 @@ def expect_error(client, method, path, json=None, error=None, code=400):
             assert res.get(key, None) == error[key]
 
 
-def nonempty_graphs(sparql):
+def count_graphs(sparql):
     query = "SELECT ?g (count(*) as ?t) { GRAPH ?g {?s ?p ?o} } GROUP BY ?g"
     graphs = {}
 
@@ -65,12 +65,14 @@ def client(tmp_path):
     configure(title="Graph Import API TEST",
               stage=tmp_path, sparql=sparqlApi, data=data)
 
-    sparql = app.config["store"]
+    store = app.config["store"]
 
     with app.test_client() as client:
         def fail(*args, **kwargs):
             return expect_error(client, *args, **kwargs)
-        yield client, fail, tmp_path, sparql
+        yield client, fail, tmp_path, store
+        for g in store.count_graphs():  # flush triple store after each test
+            store.drop_graph(g)
 
 
 def mock_requests_get(url):
@@ -112,13 +114,13 @@ def test_general(client, monkeypatch):
     status = client.get('/status.json')
     assert status.status_code == 200
     assert status.json["title"] == "Graph Import API TEST"
-    assert status.json["connected"] == True
+    assert status.json["connected"] is True
     assert status.json["collections"] == 0
 
     # test backend failure
     monkeypatch.setattr(app.config["store"], "query", None)
     status = client.get('/status.json').json
-    assert status["connected"] == False
+    assert status["connected"] is False
     assert "collections" not in status
 
 
@@ -130,7 +132,6 @@ def test_terminology(client):
     fail("GET", "/terminology/18274/stage/", code=404)
 
     # register terminology from BARTOC
-    assert nonempty_graphs(sparql) == {}
     with patch('requests.get', new=mock_requests_get):
         assert client.put("/terminology/18274").status_code == 200
         assert client.get("/terminology/18274").status_code == 200
@@ -146,7 +147,11 @@ def test_terminology(client):
     status = client.get('/status.json')
     assert status.json["terminologies"] == 1
 
-    assert nonempty_graphs(sparql) == {'http://example.org/terminology/': 13}
+    assert sparql.count_graphs() == {
+        'http://example.org/terminology/': 13,
+        'http://example.org/collection/': 1,
+        'http://example.org/mappings/': 1
+    }
 
     query = ("SELECT ?modified { GRAPH <http://example.org/terminology/> {"
              "<http://example.org/terminology/> <http://purl.org/dc/terms/modified> ?modified "
@@ -188,10 +193,6 @@ def test_terminology(client):
     assert client.get('/terminology/18274/receive').status_code == 200
     assert client.get("/terminology/18274/stage/terminology-18274.nt").status_code == 200
 
-    # FIXME: Here we get too many bnodes in InternalTripleStore
-    # print(sparql.query("SELECT * { GRAPH ?g { ?s ?p ?o } }", "ttl"))
-    # assert nonempty_graphs(sparql) == { 'http://example.org/terminology/': 99 } # 12
-
     # load terminology data and check log
     fail("GET", '/terminology/18274/load', code=404)
     assert client.post('/terminology/18274/load').status_code == 200
@@ -218,35 +219,34 @@ def test_terminology(client):
     assert client.get("/terminology/skosmos.ttl").data.decode("utf-8") == skosmos
 
     # check size of terminology graphs
-    assert nonempty_graphs(sparql) == {
+    assert count_graphs(sparql) == {
         'http://example.org/terminology/': 38,
+        'http://example.org/collection/': 1,
+        'http://example.org/mappings/': 1,
         'http://bartoc.org/en/node/18274': 377,
         'http://bartoc.org/en/node/20533': 679
     }
     assert client.post("/terminology/20533/remove").status_code == 200
-    assert nonempty_graphs(sparql) == {
+    assert count_graphs(sparql) == {
         'http://example.org/terminology/': 37,
+        'http://example.org/collection/': 1,
+        'http://example.org/mappings/': 1,
         'http://bartoc.org/en/node/18274': 377
     }
 
-    # no problem when graph has already been removed
+    # no problem when graph has already been removed (but is registered still)
     assert client.post("/terminology/20533/remove").status_code == 200
 
-    # but graph must be registered
+    # graph must be registered to be removed
     fail("POST", "/terminology/1234/remove", code=404)
 
     # delete terminology
     assert client.delete('/terminology/18274').status_code == 200
-    assert nonempty_graphs(sparql) == {
-        # TODO: this seems wrong if terminology is unregistered
+    assert count_graphs(sparql) == {
         'http://example.org/terminology/': 36,
+        'http://example.org/collection/': 1,
+        'http://example.org/mappings/': 1
     }
-
-    #
-    # client.put("/terminology/", json=[])
-    # TODO: this cleanup should not be required!
-    graph = "http://example.org/terminology/"
-    sparql.drop_graph(graph)
 
 
 def test_api(client):
@@ -262,13 +262,13 @@ def test_api(client):
     assert client.get('/data/').status_code == 200
     assert client.get('/data/data.ttl').status_code == 200
 
+    # collection endpoints
+    assert client.get('/collection/schema.json').status_code == 200
+
     resp = client.get('/collection/')
     assert resp.status_code == 200
     assert resp.get_json() == []
-
     fail("GET", '/collection/1', code=404)
-
-    assert client.get('/collection/schema.json').status_code == 200
 
     # register collection
     assert client.put('/collection/', json=[collection_1]).status_code == 200
@@ -283,7 +283,11 @@ def test_api(client):
 
     assert client.get("/collection/1/stage/").status_code == 200
 
-    assert nonempty_graphs(sparql) == {'http://example.org/collection/': 5}
+    assert count_graphs(sparql) == {
+        'http://example.org/collection/': 5,
+        'http://example.org/terminology/': 1,
+        'http://example.org/mappings/': 1
+    }
 
     # delete collection
     assert client.delete('/collection/1').status_code == 200
@@ -387,15 +391,10 @@ def test_api(client):
     # remove graph, keep registered
     assert client.post('/collection/3/remove').status_code == 200
     assert client.get('/collection/3').status_code == 200
-    # TODO: assert len(sparql.query(query)) == 0
+    assert len(sparql.query(query)) == 0
 
     # cannot receive directory
     assert client.post('/collection/3/receive?from=collection').status_code == 400
-
-    # TODO: metadata should be removed
-    # query = f"SELECT * {{ <{base}3> ?p ?o }}"
-    # assert len(sparql.query(query)) == 0
-    # assert len(sparql.query(query)) == 0
 
 
 def test_mappings(client):

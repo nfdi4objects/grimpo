@@ -31,6 +31,23 @@ class Registry:
         self.data = Path(config.get("data", "data"))
         self.data.mkdir(exist_ok=True, parents=True)
 
+        if self.store.query(f"ASK {{ GRAPH <{self.graph}> {{ ?s ?p ?o }} }}"):
+            self.sync_stage()
+        else:
+            # register in empty triple store from cache
+            self.update_metadata()
+
+    def sync_stage(self):
+        # registered = self.registered()
+        # stage = self.list()
+        # FIXME: Stage cache and store may be out of sync!
+        # <https://github.com/nfdi4objects/grimpo/issues/80>
+        # terminologies can be re-fetched from BARTOC
+        # collections and mappings can use
+        # doc: get all triples
+        # framed = jsonld.frame(doc, frame=self.context)
+        pass
+
     def validate(self, item, id=None):
         if type(item) is not dict:
             raise ValidationError("expected JSON object")
@@ -72,10 +89,10 @@ class Registry:
         files = [f for f in self.stage.iterdir() if f.suffix == ".json" and re.match('^[0-9]+$', f.stem)]
         return [read_json(f) for f in files]
 
-    def count_registered(self):
-        query = (f"SELECT (COUNT(*) AS ?count) FROM <{self.graph}>"
-                 f"{{ ?s <http://purl.org/dc/terms/isPartOf> <{self.graph}> }}")
-        return int(self.store.query(query, "rdflib")[0]["count"])
+    def registered(self):
+        sparql = (f"SELECT ?g FROM <{self.graph}>"
+                  f"{{ ?g <http://purl.org/dc/terms/isPartOf> <{self.graph}> }}")
+        return [row["g"]["value"] for row in self.store.query(sparql)]
 
     def get(self, id):
         return read_json(self.stage / f"{int(id)}.json")

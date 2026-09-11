@@ -65,3 +65,13 @@ def test_collections(config, monkeypatch):
     registry.load(id)
     # TODO: check result log
     # res = registry.sparql.query('SELECT * { ?s ?p ?o }')
+
+    # TODO: Test cache and strore getting out of sync
+    #
+    # remove cached metadata file and start again
+    # (config["stage"] / "collection" / "7.json").unlink()
+    # registry = CollectionRegistry(**config)
+
+    # cache should be synced from triple store
+    # assert len(registry.registered()) == 1
+    # assert len(registry.list()) == 1
