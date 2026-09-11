@@ -2,21 +2,20 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>{{ title }}</title>
+    <title v-text="title">Grimpo Knowledge Graph Importer</title>
     <meta name="viewport" content="width=device-width">
-    <link rel="icon" href="{{ root }}grimpo-icon.png" sizes="32x32" />
-    <link rel="icon" href="{{ root }}grimpo-icon.png" sizes="192x192" />
-    <link rel="apple-touch-icon" href="{{ root }}grimpo-icon.png" />
-    <link rel="stylesheet" href="{{ root }}style.css" />
-    <script>const root = "{{ root }}"</script>
-    <script src="{{ root }}script.js"></script>
+    <link rel="icon" href="grimpo-icon.png" sizes="32x32" />
+    <link rel="icon" href="grimpo-icon.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="grimpo-icon.png" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
   </head>
   <body>
     <header>
       <a href="https://github.com/nfdi4objects/grimpo#readme">
-        <img src="{{ root }}grimpo.jpg" style="float:right; width:15em" title="Grimpoteuthis umbellata" />
+        <img src="grimpo.jpg" style="float:right; width:15em" title="Grimpoteuthis umbellata" />
       </a>
-      <h1><a href="{{ root }}">{{ title }}</a></h1>
+      <h1><a href="./" v-text="title">Grimpo Knowledge Graph Importer</a></h1>
       <p>
         Controlled <b>write access</b> to
         <b>
@@ -29,9 +28,7 @@
         This backend service provides
         <a href="https://github.com/nfdi4objects/grimpo#api">API endpoints</a>
         <b>without authentication</b>!
-
-        Please use SPARQL endpoint or <a href="{{ frontend }}">frontend</a>
-        for read access and consider <a href="{{ admin }}">admin user interface</a>.
+        Please use SPARQL endpoint or <a :href="frontend" v-text="frontend"></a>.
       </p>
     </header>
 

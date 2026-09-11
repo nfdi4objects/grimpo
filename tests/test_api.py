@@ -255,8 +255,6 @@ def test_api(client):
     # start without collections
     resp = client.get('/')
     assert resp.status_code == 200
-    assert b"Graph Import API TEST" in resp.data
-
     assert client.get('/grimpo-icon.png').status_code == 200
 
     assert client.get('/data/').status_code == 200

@@ -23,7 +23,7 @@ const errorMessage = (id, error) => {
 
 const visit = (e, url) => {
   if (e?.className == "disabled") return true
-  window.location.href = root + url.replace(":id", idValue[url.split("/")[0]])
+  window.location.href = url.replace(":id", idValue[url.split("/")[0]])
 }
 
 const request = async (e, url, method) => {
@@ -98,7 +98,12 @@ const removeMappings     = e => request(e,`mappings/:id/remove`, "POST")
 function status() {
   const sparqlStatus = document.getElementById('sparql-status')
 
-  fetch(`${root}status.json`).then(res => res.json()).then(s => {
+  fetch(`status.json`).then(res => res.json()).then(s => {
+
+    // Vue clone in two lines!
+    document.querySelectorAll('[v-text]').forEach(e => e.textContent = s[e.getAttribute("v-text")])
+    document.querySelectorAll('a[\\:href]').forEach(a => a.href = s[a.getAttribute(":href")])
+
     if (s.connected) {
       document.getElementById('backend').className = ''
 
@@ -109,7 +114,7 @@ function status() {
       if (sparqlStatus) {
         sparqlStatus.className = ""
         const yasgui = document.getElementById("yasgui")
-        const endpoint = s.sparql || `${root}/sparql`
+        const endpoint = s.sparql || `sparql`
         fetch(`${endpoint}?query=SELECT%20*%20%7B%20BIND(1%20as%20%3Fx)%20%7D`).then(() => {
           sparqlStatus.innerHTML = "SPARQL backenend is connected and reachable";
           //new Yasgui(yasgui, { requestConfig: { endpoint }});

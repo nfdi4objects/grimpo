@@ -139,7 +139,6 @@ The web service and its Docker image can be configured via environment variables
 - `STAGE`: writeable stage directory. Default: `stage`
 - `DATA`: local data directory for file import (readonly)
 - `FRONTEND`: URL of [n4o-graph-apis] instance. This is included as field `frontend` in [/status.json](#get-statusjson) and shown in the HTML interface for convenience. Default is the value of `BASE`
-- `ADMIN`: URL of [n4o-graph-admin] instance. Default: `https://github.com/nfdi4objects/n4o-graph-admin/`.
 
 
 ## Usage

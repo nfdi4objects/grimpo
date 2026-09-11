@@ -27,12 +27,9 @@ def configure(**config):
     app.config['base'] = config.get('base', os.getenv('BASE', 'http://example.org/'))
     app.config['frontend'] = config.get('frontend', os.getenv(
         'FRONTEND', app.config['base']))
-    app.config['admin'] = config.get('admin', os.getenv(
-        'ADMIN', 'https://github.com/nfdi4objects/n4o-graph-admin/'))
     app.config['sparql'] = config.get('sparql', os.getenv('SPARQL'))
     app.config['stage'] = config.get('stage', os.getenv('STAGE', 'stage'))
     app.config['data'] = config.get('data', os.getenv('DATA', 'data'))
-
     app.config['store'] = createTripleStore(app.config.get("sparql"))
 
     terminologies = TerminologyRegistry(**app.config)
