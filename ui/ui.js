@@ -114,7 +114,7 @@ app.component("endpoint", {
           let error = res.statusText || "ERROR"
           try {
             error = (await res.json()).message 
-          } catch { }
+          } catch { }  // eslint-disable-line
           this.$root["error"] = error
         }
         this.$root.updateStatus()

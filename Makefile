@@ -2,11 +2,12 @@ deps:
 	[ -d .venv ] || python3 -m venv .venv
 	.venv/bin/pip3 install -r requirements.txt
 	.venv/bin/pip3 install -r requirements-dev.txt
+	npm ci --prefix ui
 
 .PHONY: test
 
 test:
-	@. .venv/bin/activate && ./tests/test_api.sh && coverage report -m
+	@. .venv/bin/activate && ./tests/test_api.sh && coverage report -m && npm test --prefix ui
 
 start:
 	@. .venv/bin/activate && flask run --debug -p 5020

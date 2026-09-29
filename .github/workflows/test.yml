@@ -12,7 +12,7 @@ jobs:
         run: sudo apt-get -y install --no-install-recommends raptor2-utils jq
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 26
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -22,7 +22,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt    
           pip install -r requirements-dev.txt   
-      - name: Run tests and coverage report
+      - name: Run server tests and coverage report
         run: |
           ./tests/test_api.sh
           coverage report -m
+
+      - name: Run UI tests
+        run: | 
+          cd ui
+          npm run lint
+          npm run test
+
