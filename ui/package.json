@@ -1,0 +1,13 @@
+{
+  "name": "grimpo-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint ui.js",
+    "fix": "eslint --fix ui.js"
+  },
+  "devDependencies": {
+    "eslint": "^10.10.0",
+    "eslint-config-gbv": "~2.7"
+  }
+}

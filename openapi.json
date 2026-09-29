@@ -1,0 +1,228 @@
+{
+  "paths": {
+    "/status.json": {
+      "get": {
+        "summary": "Get information about the API"
+      }
+    },
+    "/data/": {
+      "get": {
+        "summary": "List files from local data directory"
+      }
+    },
+    "/data/{name}": {
+      "get": {
+        "summary": "Get a file from the data directory"
+      }
+    },
+    "/sparql": {
+      "get": {
+        "summary": "SPARQL Query endpoint to the in-memory triple store, if enabled"
+      },
+      "post": {
+        "summary": "SPARQL Query endpoint to the in-memory triple store, if enabled"
+      }
+    },
+    "/terminology": {
+      "get": {
+        "summary": "Return the list of registered terminologies"
+      },
+      "put": {
+        "summary": "Replace all terminologies by unregistering all and registering a new list"
+      }
+    },
+    "/terminology/{id}": {
+      "get": {
+        "summary": "Return metadata of a registered terminology"
+      },
+      "put": {
+        "summary": "Register a terminology or update its metadata from BARTOC"
+      },
+      "delete": {
+        "summary": "Unregister a terminology and remove it from stage directory and triple store"
+      }
+    },
+    "/terminology/{id}/stage/": {
+      "get": {
+        "summary": "List files in the stage directory of a terminology"
+      }
+    },
+    "/terminology/{id}/stage/{name}": {
+      "get": {
+        "summary": "Get a file from the stage directory of a terminology"
+      }
+    },
+    "/terminology/{id}/receive": {
+      "post": {
+        "summary": "Receive terminology data"
+      },
+      "get": {
+        "summary": "Get latest receive report of a terminology"
+      }
+    },
+    "/terminology/{id}/load": {
+      "post": {
+        "summary": "Load received terminology data into the triple store"
+      },
+      "get": {
+        "summary": "Get latest load report of a terminology."
+      }
+    },
+    "/terminology/{id}/remove": {
+      "post": {
+        "summary": "Remove terminology data from the triple store and from staging area"
+      }
+    },
+    "/terminology/namespaces.json": {
+      "get": {
+        "summary": "Return registered URI namespaces forbidden to be used in RDF subjects"
+      }
+    },
+    "/terminology/skosmos.ttl": {
+      "get": {
+        "summary": "Return Skosmos vocabulary configuration for imported SKOS vocabularies"
+      }
+    },
+    "/collection/": {
+      "get": {
+        "summary": "Return the list of registered collections"
+      },
+      "put": {
+        "summary": "Register a list of collections, replacing existing ones",
+        "requestBody": {}
+      },
+      "post": {
+        "summary": "Register a new collection or update metadata of a registered collection",
+        "requestBody": {}
+      }
+    },
+    "/collection/schema.json": {
+      "get": {
+        "summary": "Return the JSON Schema used to validation collection metadata"
+      }
+    },
+    "/collection/{id}": {
+      "get": {
+        "summary": "Return metadata of a specific registered collection"
+      },
+      "put": {
+        "summary": "Update metadata of a specific registered collection or register a new collection",
+        "requestBody": {}
+      },
+      "delete": {
+        "summary": "Unregister a collection and remove it from the triple store and staging area"
+      }
+    },
+    "/collection/{id}/stage/": {
+      "get": {
+        "summary": "List files in the stage directory of a collection"
+      }
+    },
+    "/collection/{id}/stage/{name}": {
+      "get": {
+        "summary": "Get a file from the stage directory of a collection"
+      }
+    },
+    "/collection/{id}/receive": {
+      "post": {
+        "summary": "Receive and process collection data",
+        "parameters": [
+          {
+            "name": "from",
+            "summary": "URL or file",
+            "in": "query"
+          }
+        ]
+      },
+      "get": {
+        "summary": "Get latest receive log of a collection"
+      }
+    },
+    "/collection/{id}/load": {
+      "post": {
+        "summary": "Load received and processed collection data into the triple store"
+      },
+      "get": {
+        "summary": "Get latest load log of a collection"
+      }
+    },
+    "/collection/{id}/remove": {
+      "post": {
+        "summary": "Remove collection data from the triple store"
+      }
+    },
+    "/mappings/": {
+      "get": {
+        "summary": "Return the list of registered mapping sources"
+      },
+      "put": {
+        "summary": "Update metadata of a specific mapping source"
+      },
+      "post": {
+        "summary": "Register a new mapping source or update metadata of a mapping source"
+      }
+    },
+    "/mappings/schema.json": {
+      "get": {
+        "summary": "Return the JSON Schema of mapping sources"
+      }
+    },
+    "/mappings/properties.json": {
+      "get": {
+        "summary": "Get a list of supported mapping properties"
+      }
+    },
+    "/mappings/{id}": {
+      "get": {
+        "summary": "Return a specific mapping source"
+      },
+      "put": {
+        "summary": "Update metadata of a specific mapping source"
+      },
+      "delete": {
+        "summary": "Unregister a mappings source and remove it from the triple store and staging area"
+      }
+    },
+    "/mappings/{id}/append": {
+      "post": {
+        "summary": "Directly add mappings to the triple store, bypassing the receive/load workflow"
+      }
+    },
+    "/mappings/{id}/detach": {
+      "post": {
+        "summary": "Directly remove mappings from the triple store, bypassing the receive/load workflow"
+      }
+    },
+    "/mappings/{id}/stage/": {
+      "get": {
+        "summary": "List files in the stage directory of a mapping source"
+      }
+    },
+    "/mappings/{id}/stage/{name}": {
+      "get": {
+        "summary": "Get a file from the stage directory of a mapping source"
+      }
+    },
+    "/mappings/{id}/receive": {
+      "post": {
+        "summary": "Receive and process mappings from a mapping source"
+      },
+      "get": {
+        "summary": "Get latest receive report of a mapping source"
+      }
+    },
+    "/mappings/{id}/load": {
+      "post": {
+        "summary": "Load received and processed mapping into the triple store"
+      },
+      "get": {
+        "summary": "Get latest load report of a mapping source"
+      }
+    },
+    "/mappings/{id}/remove": {
+      "post": {
+        "summary": "Remove mappings of a specific mapping source from the triple store and from staging area"
+      }
+    }
+  }
+}

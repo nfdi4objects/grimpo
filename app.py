@@ -1,7 +1,9 @@
-from flask import Flask, jsonify, request, render_template, send_from_directory, send_file, Response
+from flask import Flask, jsonify, request, send_from_directory, send_file, Response
 from lib import CollectionRegistry, TerminologyRegistry, MappingRegistry, \
     ApiError, NotFound, ValidationError, createTripleStore
+from werkzeug.exceptions import HTTPException
 import os
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from flask_cors import CORS
@@ -52,6 +54,13 @@ def handle_validationerror(e):
     e["code"] = 400
     return jsonify(e), 400
 
+@app.errorhandler(HTTPException)
+def handle_exception(e):
+    return jsonify({
+      "code": e.code,
+      "name": e.name,
+      "message": e.description,
+    }), e.code
 
 def route(method, path, fn):
     fn.__name__ = f'{method}-{path}'
@@ -62,11 +71,11 @@ def api(method, path, fn):
     route(method, path, lambda *args, **kws: jsonify(fn(*args, **kws)))
 
 
-route('GET', '/', lambda: render_template('index.html', **app.config))
-
-
 def status():
+    # TODO: adjust to OpenAPI specification
     values = {key: val for key, val in app.config.items() if key.islower() and type(val) in [str, bool]}
+    with open("openapi.json", "r") as file:
+        values.update(json.load(file))
     try:
         values["collections"] = len(collections.registered())
         values["terminologies"] = len(terminologies.registered())
@@ -77,7 +86,9 @@ def status():
     return values
 
 
-for file in Path('static').glob('*.*'):
+route('GET', '/', lambda: send_file("ui/index.html"))
+
+for file in Path('ui').glob('*.*'):
     route('GET', f'/{file.name}', lambda f=file: send_file(str(f)))
 
 api('GET', '/status.json', status)

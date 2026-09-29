@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Grimpo Knowledge Graph Importer</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="icon" href="grimpo-icon.png" sizes="32x32" />
+  <link rel="icon" href="grimpo-icon.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="grimpo-icon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="vue.global.js"></script>
+
+  <!-- Vue component templates -->
+  <script type="text/x-template" id="Endpoints">
+    <div v-if="hasId">
+      id:
+      <input type="number" min="0" step="1" size="6" v-model="id">
+    </div>
+    <ul class="endpoints">
+      <template v-for="(item, path) in selectedPaths">
+        <template v-for="(operation, method) in item">
+          <endpoint :method="method" :path="path" :operation="operation" :id="id"></endpoint>
+        </template>
+      </template>
+    </ul>
+  </script>
+
+  <script type="text/x-template" id="Endpoint">
+    <li :class="{ disabled }">
+      <b>
+        {{method.toUpperCase()}} 
+        <a @click="click">{{disabled ? path : path.replace('{id}',id)}}</a>
+      </b>
+      <span v-if="operation.parameters">
+         ?from=<input type="text" placeholder="URL or file" v-model="from" />
+      </span>
+      {{operation.summary}}
+      <a :href="help" target="_blank">🛈</a>
+      <div v-if="operation.requestBody">
+        <input type="file" @change="selectFile">
+      </div>
+    </li>
+  </script>
+
+  <script type="text/x-template" id="Files">
+    <h3>Files</h3>
+    <ul v-if="files.length">
+      <li v-for="file in files">
+        <a :href="path + file.name">{{ file.name }}</a>
+      </li>
+    </ul>
+    <p v-else>
+      The directory is empty.
+    </p>
+  </script>
+
+  <script src="ui.js" type="module"></script>
+</head>
+
+<body id="app">
+  <header>
+    <a :href="frontend">
+      <img src="grimpo.jpg" style="float:right; width:15em" title="Grimpoteuthis umbellata" />
+    </a>
+    <h1><a href="./">{{title}}</a></h1>
+    <p>
+      Controlled <b>write access without authentication</b> to
+      <b v-if="sparql">
+        a triple store at <a :href="sparql" v-text="sparql"></a>
+      </b>
+      <b v-else>
+        an <span id="backend">in-memory triple store</span>
+      </b>
+      via <a href="https://github.com/nfdi4objects/grimpo#api">API endpoints</a>.
+      <p :class="{ message: true, error: error || sparqlError }">{{error || message || sparqlStatus}}</p>
+    </p>
+  </header>
+
+  <div class="tabs-wrapper">
+    <nav class="tabs-nav">
+      <label for="tab-collection-toggle" class="tab-item">
+        Collection ({{collections}})
+        <input checked name="tabs-toggle" id="tab-collection-toggle" type="radio" value="collection" v-model="tab">
+      </label>
+      <label for="tab-terminology-toggle" class="tab-item">
+        Terminology ({{terminologies}})
+        <input name="tabs-toggle" id="tab-terminology-toggle" type="radio" value="terminology" v-model="tab">
+      </label>
+      <label for="tab-mapping-toggle" class="tab-item">
+        Mappings ({{mappings}})
+        <input name="tabs-toggle" id="tab-mapping-toggle" type="radio" value="mappings" v-model="tab">
+      </label>
+      <label for="tab-data-toggle" class="tab-item">
+        Data
+        <span id="data"></span>
+        <input name="tabs-toggle" id="tab-data-toggle" type="radio" value="data" v-model="tab">
+      </label>
+      <label for="tab-sparql-toggle" class="tab-item">
+        SPARQL
+        <input name="tabs-toggle" id="tab-sparql-toggle" type="radio" value="sparql" v-model="tab">
+      </label>
+      <a href="status.json" class="tab-item">Status</a>
+    </nav>
+
+    <div id="collection" class="tab-content">
+      <endpoints :paths="paths" prefix="collection"></endpoints>
+    </div>
+
+    <div id="terminology" class="tab-content">
+      <endpoints :paths="paths" prefix="terminology"></endpoints>
+    </div>
+
+    <div id="mapping" class="tab-content">
+      <endpoints :paths="paths" prefix="mappings"></endpoints>
+    </div>
+
+    <div id="data" class="tab-content">
+      <endpoints :paths="paths" prefix="data"></endpoints>
+      <files :path="'data/'"></files>
+    </div>
+
+    <div id="sparql" class="tab-content">
+      <endpoints :paths="paths" prefix="sparql"></endpoints>
+      <!--
+  <script src="https://unpkg.com/@matdata/yasgui/build/yasgui.min.js"></script>
+<style>
+@import url("https://unpkg.com/@matdata/yasgui/build/yasgui.min.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css");
+.autocompleteWrapper,
+.endpointButtonsContainer, .queryBrowserToggle {
+  display: none !important;
+}
+</style-->
+    </div>
+  </div>
+</body>
+</html>

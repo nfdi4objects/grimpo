@@ -36,8 +36,8 @@ collection_3_full = {
 }
 
 
-def expect_error(client, method, path, json=None, error=None, code=400):
-    res = client.open(path, method=method, json=json)
+def expect_error(client, method, path, json=None, error=None, code=400, **kwargs):    
+    res = client.open(path, method=method, json=json, **kwargs)
     assert res.status_code == code
     if error:
         if type(error) is str:
@@ -85,6 +85,7 @@ def test_validation(client):
     client, fail, _a, _b = client
 
     # malformed payload
+    fail("PUT", "/collection/1", data="", error="The browser (or proxy) sent a request that this server could not understand.")
     fail("PUT", "/collection/1", [], "expected JSON object")
     fail("PUT", "/collection/1", {"uri": "http://example.org/collection/2"},
          "URI http://example.org/collection/2 and id 1 don't match")

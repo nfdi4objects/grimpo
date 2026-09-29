@@ -1,14 +1,19 @@
 :root {
   --link-color: #751e03;
+  --text-color: #340000;
 }
 body {
-  margin: 20px;
+  margin: 1em;
   font-family: sans-serif;
-  color: #340000;
+  color: var(--text-color);
 }
+header a:hover {
+  text-decoration: underline;
+}
+
 ul.endpoints {
-  list-style-type: none;
-  padding: 0;
+  list-style-type: disc;
+  padding-left: 1em;
 }
 ul.endpoints > li {
   text-indent: -2.5em;
@@ -25,19 +30,16 @@ li > b > a {
   padding: 3px 6px;
   cursor: pointer;
 }
-header a:hover {
-  text-decoration: underline;
-}
-li > b > a:hover:not(.disabled) {
+li:not(.disabled) > b > a:hover {
   background: var(--link-color);
   color: white;
 }
-a.disabled {
+li.disabled > b > a {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.msg { color: green; }
+.message { color: green; }
 .error { color: red !important; }
 
 
