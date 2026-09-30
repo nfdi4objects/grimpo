@@ -48,8 +48,8 @@ def test_collections(config, monkeypatch):
 
     # 1. register
     res = registry.register(col)
-    col['partOf'] = [f'{base}collection/']
-    col['uri'] = f'{base}collection/{id}'
+    col['partOf'] = [f'{base}collections/']
+    col['uri'] = f'{base}collections/{id}'
 
     assert res == col
     assert registry.get(id) == col

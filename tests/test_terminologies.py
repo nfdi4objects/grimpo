@@ -60,7 +60,7 @@ def test_nested_contexts(config, monkeypatch):
     assert [item["id"] for item in registry.list()] == ["1578"]
 
     # The metadata graph proves that "subject" was mapped by the JSKOS context.
-    graph = "http://example.org/terminology/"
+    graph = "http://example.org/terminologies/"
     query = (
         f"SELECT * {{ GRAPH <{graph}> "
         "{ ?s <http://purl.org/dc/terms/subject> ?o } }"

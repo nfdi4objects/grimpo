@@ -28,7 +28,7 @@
         "summary": "SPARQL Query endpoint to the in-memory triple store, if enabled"
       }
     },
-    "/terminology": {
+    "/terminologies": {
       "get": {
         "summary": "Return the list of registered terminologies"
       },
@@ -36,7 +36,7 @@
         "summary": "Replace all terminologies by unregistering all and registering a new list"
       }
     },
-    "/terminology/{id}": {
+    "/terminologies/{id}": {
       "get": {
         "summary": "Return metadata of a registered terminology"
       },
@@ -47,25 +47,32 @@
         "summary": "Unregister a terminology and remove it from stage directory and triple store"
       }
     },
-    "/terminology/{id}/stage/": {
+    "/terminologies/{id}/stage/": {
       "get": {
         "summary": "List files in the stage directory of a terminology"
       }
     },
-    "/terminology/{id}/stage/{file}": {
+    "/terminologies/{id}/stage/{file}": {
       "get": {
         "summary": "Get a file from the stage directory of a terminology"
       }
     },
-    "/terminology/{id}/receive": {
+    "/terminologies/{id}/receive": {
       "post": {
-        "summary": "Receive terminology data"
+        "summary": "Receive terminology data",
+        "parameters": [
+          {
+            "name": "from",
+            "summary": "URL or file",
+            "in": "query"
+          }
+        ]
       },
       "get": {
         "summary": "Get latest receive report of a terminology"
       }
     },
-    "/terminology/{id}/load": {
+    "/terminologies/{id}/load": {
       "post": {
         "summary": "Load received terminology data into the triple store"
       },
@@ -73,22 +80,22 @@
         "summary": "Get latest load report of a terminology."
       }
     },
-    "/terminology/{id}/remove": {
+    "/terminologies/{id}/remove": {
       "post": {
         "summary": "Remove terminology data from the triple store and from staging area"
       }
     },
-    "/terminology/namespaces.json": {
+    "/terminologies/namespaces.json": {
       "get": {
         "summary": "Return registered URI namespaces forbidden to be used in RDF subjects"
       }
     },
-    "/terminology/skosmos.ttl": {
+    "/terminologies/skosmos.ttl": {
       "get": {
         "summary": "Return Skosmos vocabulary configuration for imported SKOS vocabularies"
       }
     },
-    "/collection/": {
+    "/collections": {
       "get": {
         "summary": "Return the list of registered collections"
       },
@@ -101,12 +108,12 @@
         "requestBody": {}
       }
     },
-    "/collection/schema.json": {
+    "/collections/schema.json": {
       "get": {
         "summary": "Return the JSON Schema used to validation collection metadata"
       }
     },
-    "/collection/{id}": {
+    "/collections/{id}": {
       "get": {
         "summary": "Return metadata of a specific registered collection"
       },
@@ -118,17 +125,17 @@
         "summary": "Unregister a collection and remove it from the triple store and staging area"
       }
     },
-    "/collection/{id}/stage/": {
+    "/collections/{id}/stage/": {
       "get": {
         "summary": "List files in the stage directory of a collection"
       }
     },
-    "/collection/{id}/stage/{file}": {
+    "/collections/{id}/stage/{file}": {
       "get": {
         "summary": "Get a file from the stage directory of a collection"
       }
     },
-    "/collection/{id}/receive": {
+    "/collections/{id}/receive": {
       "post": {
         "summary": "Receive and process collection data",
         "parameters": [
@@ -143,7 +150,7 @@
         "summary": "Get latest receive log of a collection"
       }
     },
-    "/collection/{id}/load": {
+    "/collections/{id}/load": {
       "post": {
         "summary": "Load received and processed collection data into the triple store"
       },
@@ -151,12 +158,12 @@
         "summary": "Get latest load log of a collection"
       }
     },
-    "/collection/{id}/remove": {
+    "/collections/{id}/remove": {
       "post": {
         "summary": "Remove collection data from the triple store"
       }
     },
-    "/mappings/": {
+    "/mappings": {
       "get": {
         "summary": "Return the list of registered mapping sources"
       },
@@ -210,7 +217,14 @@
     },
     "/mappings/{id}/receive": {
       "post": {
-        "summary": "Receive and process mappings from a mapping source"
+        "summary": "Receive and process mappings from a mapping source",
+        "parameters": [
+          {
+            "name": "from",
+            "summary": "URL or file",
+            "in": "query"
+          }
+        ]
       },
       "get": {
         "summary": "Get latest receive report of a mapping source"

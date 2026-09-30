@@ -74,7 +74,7 @@ def api(method, path, fn):
 
 
 def status():
-    # TODO: adjust to OpenAPI specification
+    # TODO: Fully adjust to OpenAPI specification and move statistics to summary
     values = {key: val for key, val in app.config.items() if key.islower() and type(val) in [str, bool]}
     with open("openapi.json", "r") as file:
         values.update(json.load(file))
@@ -83,7 +83,7 @@ def status():
         values["terminologies"] = len(terminologies.registered())
         values["mappings"] = len(mappings.registered())
         values['connected'] = True
-    except Exception:
+    except Exception as e:
         values['connected'] = False
     return values
 
@@ -111,34 +111,34 @@ if not app.config.get('sparql'):
 
 api('GET', '/data/', lambda: list_files(Path(app.config['data'])))
 
-api('GET', '/terminology/', lambda: terminologies.list())
-api('GET', '/terminology/namespaces.json', lambda: terminologies.namespaces())
+api('GET', '/terminologies/', lambda: terminologies.list())
+api('GET', '/terminologies/namespaces.json', lambda: terminologies.namespaces())
 
-route('GET', '/terminology/skosmos.ttl', lambda: Response(terminologies.skosmos(), mimetype="text/turtle"))
+route('GET', '/terminologies/skosmos.ttl', lambda: Response(terminologies.skosmos(), mimetype="text/turtle"))
 
-api('PUT', '/terminology/', lambda: terminologies.replace(request.get_json(force=True)))
-api('GET', '/terminology/<int:id>', lambda id: terminologies.get(id))
-api('PUT', '/terminology/<int:id>', lambda id: terminologies.register({"id": str(id)}))
-api('DELETE', '/terminology/<int:id>', lambda id: terminologies.delete(id))
-api('POST', '/terminology/<int:id>/receive', lambda id: terminologies.receive(id, request.args.get('from', None)))
-api('GET', '/terminology/<int:id>/receive', lambda id: terminologies.receive_log(id))
-api('GET', '/terminology/<int:id>/load', lambda id: terminologies.load_log(id))
-api('POST', '/terminology/<int:id>/load', lambda id: terminologies.load(id))
-api('POST', '/terminology/<int:id>/remove', lambda id: terminologies.remove(id))
+api('PUT', '/terminologies/', lambda: terminologies.replace(request.get_json(force=True)))
+api('GET', '/terminologies/<int:id>', lambda id: terminologies.get(id))
+api('PUT', '/terminologies/<int:id>', lambda id: terminologies.register({"id": str(id)}))
+api('DELETE', '/terminologies/<int:id>', lambda id: terminologies.delete(id))
+api('POST', '/terminologies/<int:id>/receive', lambda id: terminologies.receive(id, request.args.get('from', None)))
+api('GET', '/terminologies/<int:id>/receive', lambda id: terminologies.receive_log(id))
+api('GET', '/terminologies/<int:id>/load', lambda id: terminologies.load_log(id))
+api('POST', '/terminologies/<int:id>/load', lambda id: terminologies.load(id))
+api('POST', '/terminologies/<int:id>/remove', lambda id: terminologies.remove(id))
 
-api('GET', '/collection/', lambda: collections.list())
-api('GET', '/collection/schema.json', lambda: collections.schema)
-api('PUT', '/collection/', lambda: collections.replace(request.get_json(force=True)))
-api('POST', '/collection/', lambda: collections.register(request.get_json(force=True)))
-api('GET', '/collection/<int:id>', lambda id: collections.get(id))
-api('PUT', '/collection/<int:id>', lambda id: collections.register(request.get_json(force=True), id))
-api('DELETE', '/collection/<int:id>', lambda id: collections.delete(id))
-api('POST', '/collection/<int:id>/receive', lambda id: collections.receive(id, request.args.get("from", None)))
-api('GET', '/collection/<int:id>/receive', lambda id: collections.receive_log(id))
-api('POST', '/collection/<int:id>/load', lambda id: collections.load(id))
-api('POST', '/collection/<int:id>/add', lambda id: collections.load(id, add=True))
-api('GET', '/collection/<int:id>/load', lambda id: collections.load_log(id))
-api('POST', '/collection/<int:id>/remove', lambda id: collections.remove(id))
+api('GET', '/collections/', lambda: collections.list())
+api('GET', '/collections/schema.json', lambda: collections.schema)
+api('PUT', '/collections/', lambda: collections.replace(request.get_json(force=True)))
+api('POST', '/collections/', lambda: collections.register(request.get_json(force=True)))
+api('GET', '/collections/<int:id>', lambda id: collections.get(id))
+api('PUT', '/collections/<int:id>', lambda id: collections.register(request.get_json(force=True), id))
+api('DELETE', '/collections/<int:id>', lambda id: collections.delete(id))
+api('POST', '/collections/<int:id>/receive', lambda id: collections.receive(id, request.args.get("from", None)))
+api('GET', '/collections/<int:id>/receive', lambda id: collections.receive_log(id))
+api('POST', '/collections/<int:id>/load', lambda id: collections.load(id))
+api('POST', '/collections/<int:id>/add', lambda id: collections.load(id, add=True))
+api('GET', '/collections/<int:id>/load', lambda id: collections.load_log(id))
+api('POST', '/collections/<int:id>/remove', lambda id: collections.remove(id))
 
 api('GET', '/mappings/', lambda: mappings.list())
 api('GET', '/mappings/schema.json', lambda: mappings.schema)
@@ -189,16 +189,16 @@ def stage(kind, id, filename=None):
         raise NotFound(f"{kind} {id} not found!")
 
 
-@app.route('/terminology/<int:id>/stage/')
-@app.route('/terminology/<int:id>/stage/<filename>')
+@app.route('/terminologies/<int:id>/stage/')
+@app.route('/terminologies/<int:id>/stage/<filename>')
 def terminology_stage(id, filename=None):
-    return stage("terminology", id, filename)
+    return stage("terminologies", id, filename)
 
 
-@app.route('/collection/<int:id>/stage/')
-@app.route('/collection/<int:id>/stage/<filename>')
+@app.route('/collections/<int:id>/stage/')
+@app.route('/collections/<int:id>/stage/<filename>')
 def collection_stage(id, filename=None):
-    return stage("collection", id, filename)
+    return stage("collections", id, filename)
 
 
 @app.route('/mappings/<int:id>/stage/')

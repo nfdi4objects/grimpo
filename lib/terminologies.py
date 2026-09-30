@@ -17,7 +17,7 @@ class TerminologyRegistry(Registry):
     auto_ids = False
 
     def __init__(self, **config):
-        super().__init__("terminology", prefix="http://bartoc.org/en/node/", **config)
+        super().__init__("terminologies", prefix="http://bartoc.org/en/node/", **config)
 
     def namespaces(self):
         namespaces = {}

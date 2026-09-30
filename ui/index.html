@@ -101,15 +101,15 @@
         <input name="tabs-toggle" id="tab-sparql-toggle" type="radio" value="sparql" v-model="tab">
       </label>
       <a href="status.json" class="tab-item">Status</a>
-      <a href="summary" class="tab-item">Summary</a>
+      <a href="metadata" class="tab-item">Metadata</a>
     </nav>
 
     <div id="collection" class="tab-content">
-      <endpoints :paths="paths" prefix="collection"></endpoints>
+      <endpoints :paths="paths" prefix="collections"></endpoints>
     </div>
 
     <div id="terminology" class="tab-content">
-      <endpoints :paths="paths" prefix="terminology"></endpoints>
+      <endpoints :paths="paths" prefix="terminologies"></endpoints>
     </div>
 
     <div id="mapping" class="tab-content">

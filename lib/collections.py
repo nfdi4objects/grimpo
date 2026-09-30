@@ -8,7 +8,7 @@ class CollectionRegistry(Registry):
     context = read_context("collection.json")
 
     def __init__(self, **config):
-        super().__init__("collection", **config)
+        super().__init__("collections", **config)
         self.terminologies = config.get("terminologies", None)
 
     def forbidden_namespaces(self, id):

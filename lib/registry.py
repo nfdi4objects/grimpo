@@ -77,7 +77,7 @@ class Registry:
 
         item["id"] = id
         item["uri"] = self.prefix + id
-        if self.kind == "terminology":  # FIXME: this is ugly
+        if self.kind == "terminologies":  # FIXME: this is ugly
             item["partOf"] = [{"uri": self.graph}]
         else:
             item["partOf"] = [self.graph]
