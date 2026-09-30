@@ -204,7 +204,7 @@ Metadata of **[collections](#collections)** and **[mapping sources](#mappings)**
 }
 ~~~
 
-**[Terminology](#terminologies)** metadata is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminology/{id}](#put-terminologyid) or [PUT /terminology/](#put-terminology)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead. Script `update-terminologies` in this repository can be used to get a subset from BARTOC, including all [terminologies listed in NFDI4Objects](https://bartoc.org/vocabularies?partOf=http://bartoc.org/en/node/18961).
+**[Terminology](#terminologies)** metadata is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminology/{id}](#put-terminologyid) or [PUT /terminology/](#put-terminology)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead.
 
 The location of data is taken from metadata field `distributions`. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with Zenodo DOI) is used. Subfield `format` can be added to specificy the data format. The following formats are supported:
 

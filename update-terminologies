@@ -1,5 +1,0 @@
-#!/usr/bin/bash
-set -euo pipefail
-
-curl -s 'https://bartoc.org/api/voc?partOf=http%3A%2F%2Fbartoc.org%2Fen%2Fnode%2F18961&limit=500' \
-    | jq 'map(del(.created,.issued,.modified,.creator,.contributor))' # metadata fields
