@@ -5,12 +5,17 @@
         "summary": "Get information about the API"
       }
     },
+    "/metadata": {
+      "get": {
+        "summary": "Get contents of the knowledge graph summarized"
+      }
+    },
     "/data/": {
       "get": {
         "summary": "List files from local data directory"
       }
     },
-    "/data/{name}": {
+    "/data/{file}": {
       "get": {
         "summary": "Get a file from the data directory"
       }
@@ -47,7 +52,7 @@
         "summary": "List files in the stage directory of a terminology"
       }
     },
-    "/terminology/{id}/stage/{name}": {
+    "/terminology/{id}/stage/{file}": {
       "get": {
         "summary": "Get a file from the stage directory of a terminology"
       }
@@ -118,7 +123,7 @@
         "summary": "List files in the stage directory of a collection"
       }
     },
-    "/collection/{id}/stage/{name}": {
+    "/collection/{id}/stage/{file}": {
       "get": {
         "summary": "Get a file from the stage directory of a collection"
       }
@@ -198,7 +203,7 @@
         "summary": "List files in the stage directory of a mapping source"
       }
     },
-    "/mappings/{id}/stage/{name}": {
+    "/mappings/{id}/stage/{file}": {
       "get": {
         "summary": "Get a file from the stage directory of a mapping source"
       }

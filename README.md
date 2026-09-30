@@ -24,9 +24,11 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 - [API](#api)
   - [General endpoints](#general-endpoints)
     - [GET /status.json](#get-statusjson)
+    - [GET /metadata](#get-metadata)
     - [GET /data/](#get-data)
-    - [GET /data/name](#get-dataname)
-    - [GET|POST /sparql](#getpost-sparql)
+    - [GET /data/{file}](#get-datafile)
+    - [GET /sparql](#get-sparql)
+    - [POST /sparql](#post-sparql)
   - [Terminologies](#terminologies)
     - [GET /terminology](#get-terminology)
     - [GET /terminology/{id}](#get-terminologyid)
@@ -34,7 +36,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
     - [DELETE /terminology/{id}](#delete-terminologyid)
     - [PUT /terminology/](#put-terminology)
     - [GET /terminology/{id}/stage/](#get-terminologyidstage)
-    - [GET /terminology/{id}/stage/{name}](#get-terminologyidstagename)
+    - [GET /terminology/{id}/stage/{file}](#get-terminologyidstagefile)
     - [POST /terminology/{id}/receive](#post-terminologyidreceive)
     - [GET /terminology/{id}/receive](#get-terminologyidreceive)
     - [POST /terminology/{id}/load](#post-terminologyidload)
@@ -51,7 +53,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
     - [PUT /collection/{id}](#put-collectionid)
     - [DELETE /collection/{id}](#delete-collectionid)
     - [GET /collection/{id}/stage/](#get-collectionidstage)
-    - [GET /collection/{id}/stage/{name}](#get-collectionidstagename)
+    - [GET /collection/{id}/stage/{file}](#get-collectionidstagefile)
     - [POST /collection/{id}/receive](#post-collectionidreceive)
     - [GET /collection/{id}/receive](#get-collectionidreceive)
     - [POST /collection/{id}/load](#post-collectionidload)
@@ -69,7 +71,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
     - [POST /mappings/{id}/append](#post-mappingsidappend)
     - [POST /mappings/{id}/detach](#post-mappingsiddetach)
     - [GET /mappings/{id}/stage/](#get-mappingsidstage)
-    - [GET /mappings/{id}/stage/{name}](#get-mappingsidstagename)
+    - [GET /mappings/{id}/stage/{file}](#get-mappingsidstagefile)
     - [POST /mappings/{id}/receive](#post-mappingsidreceive)
     - [GET /mappings/{id}/receive](#get-mappingsidreceive)
     - [POST /mappings/{id}/load](#post-mappingsidload)
@@ -130,6 +132,8 @@ The [API](#api) is then made available at <http://localhost:5020>. See directory
 
 
 ## Configuration
+
+[configuration]: #configuration
 
 The web service and its Docker image can be configured via environment variables:
 
@@ -317,15 +321,25 @@ Get curent information about the application as JSON object. This includes:
 - field `connected` whether the SPARQL API endpoint can be accessed
 - the number of registered collections, terminologies, and mapping source if connected
 
+#### GET /metadata
+
+Get contents of the knowledge graph summarized as JSON object with three arrays:
+
+- `collection` (as also returned by [GET /collection](#get-collection))
+- `terminology`, reduced to their URIs
+- `mappings` (as also returned by [GET /mappings](#get-mappings))
+
 #### GET /data/
 
 List files from local data directory as JSON array, each with `name`, `size`, `created`, `modified`.
 
-#### GET /data/{name}
+#### GET /data/{file}
 
 Get a file from the data directory.
 
-#### GET|POST /sparql
+#### GET /sparql
+
+#### POST /sparql
 
 SPARQL Query endpoint to the in-memory triple store. This is only supports JSON response format and it is disabled when an external triple store is configured.
 
@@ -366,7 +380,7 @@ Other fields are ignored so the return value of [GET /terminology/](#get-termino
 
 List files from stage directory of a terminology, each with `name`, `size`, `created`, `modified`.
 
-#### GET /terminology/{id}/stage/{name}
+#### GET /terminology/{id}/stage/{file}
 
 Get a file from the stage directory.
 
@@ -454,7 +468,7 @@ Unregister a collection and remove it from the triple store and staging area. Th
 
 List files of the stage directory of a collection, each with `name`, `size`, `created`, `modified`.
 
-#### GET /collection/{id}/stage/{name}
+#### GET /collection/{id}/stage/{file}
 
 Get a file from the stage directory.
 
@@ -534,7 +548,7 @@ Directly remove mappings from the triple store. This operation is not reflected 
 
 List files of the stage directory of a mapping source, each with `name`, `size`, `created`, `modified`.
 
-#### GET /mappings/{id}/stage/{name}
+#### GET /mappings/{id}/stage/{file}
 
 Get a file from the stage directory.
 

@@ -36,7 +36,7 @@ collection_3_full = {
 }
 
 
-def expect_error(client, method, path, json=None, error=None, code=400, **kwargs):    
+def expect_error(client, method, path, json=None, error=None, code=400, **kwargs):
     res = client.open(path, method=method, json=json, **kwargs)
     assert res.status_code == code
     if error:
@@ -117,6 +117,13 @@ def test_general(client, monkeypatch):
     assert status.json["title"] == "Graph Import API TEST"
     assert status.json["connected"] is True
     assert status.json["collections"] == 0
+
+    metadata = client.get('/metadata')
+    assert metadata.json == {
+        "terminologies": [],
+        "mappings": [],
+        "collections": []
+    }
 
     # test backend failure
     monkeypatch.setattr(app.config["store"], "query", None)

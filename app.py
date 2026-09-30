@@ -54,13 +54,15 @@ def handle_validationerror(e):
     e["code"] = 400
     return jsonify(e), 400
 
+
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     return jsonify({
-      "code": e.code,
-      "name": e.name,
-      "message": e.description,
+        "code": e.code,
+        "name": e.name,
+        "message": e.description,
     }), e.code
+
 
 def route(method, path, fn):
     fn.__name__ = f'{method}-{path}'
@@ -86,12 +88,22 @@ def status():
     return values
 
 
+def metadata():
+    metadata = {
+        "collections": collections.list(),
+        "mappings": mappings.list(),
+        "terminologies": [{"uri": t["uri"]} for t in terminologies.list()]
+    }
+    return metadata
+
+
 route('GET', '/', lambda: send_file("ui/index.html"))
 
 for file in Path('ui').glob('*.*'):
     route('GET', f'/{file.name}', lambda f=file: send_file(str(f)))
 
 api('GET', '/status.json', status)
+api('GET', '/metadata', metadata)
 
 if not app.config.get('sparql'):
     route('GET', '/sparql', lambda: app.config['store'].query_request(request))
