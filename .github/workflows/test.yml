@@ -30,6 +30,7 @@ jobs:
       - name: Run UI tests
         run: | 
           cd ui
+          npm ci
           npm run lint
           npm run test
 
