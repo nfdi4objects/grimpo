@@ -73,11 +73,10 @@ def api(method, path, fn):
     route(method, path, lambda *args, **kws: jsonify(fn(*args, **kws)))
 
 
+@app.route('/status.json')
 def status():
     # TODO: Fully adjust to OpenAPI specification and move statistics to summary
     values = {key: val for key, val in app.config.items() if key.islower() and type(val) in [str, bool]}
-    with open("openapi.json", "r") as file:
-        values.update(json.load(file))
     try:
         values["collections"] = len(collections.registered())
         values["terminologies"] = len(terminologies.registered())
@@ -87,7 +86,15 @@ def status():
         values['connected'] = False
     return values
 
-
+@app.route('/openapi.json')
+def openapi():
+    openapi = json.load(open("openapi.json", "r"))
+    for kind in ["collection", "mappings"]:
+        with open(f"lib/{kind}-schema.json", "r") as file:
+            openapi["components"]["schemas"][kind] = json.load(file)
+    return openapi
+ 
+@app.route('/metadata')
 def metadata():
     metadata = {
         "collections": collections.list(),
@@ -101,9 +108,6 @@ route('GET', '/', lambda: send_file("ui/index.html"))
 
 for file in Path('ui').glob('*.*'):
     route('GET', f'/{file.name}', lambda f=file: send_file(str(f)))
-
-api('GET', '/status.json', status)
-api('GET', '/metadata', metadata)
 
 if not app.config.get('sparql'):
     route('GET', '/sparql', lambda: app.config['store'].query_request(request))

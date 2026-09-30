@@ -105,24 +105,24 @@
     </nav>
 
     <div id="collection" class="tab-content">
-      <endpoints :paths="paths" prefix="collections"></endpoints>
+      <endpoints :openapi="openapi" prefix="collections"></endpoints>
     </div>
 
     <div id="terminology" class="tab-content">
-      <endpoints :paths="paths" prefix="terminologies"></endpoints>
+      <endpoints :openapi="openapi" prefix="terminologies"></endpoints>
     </div>
 
     <div id="mapping" class="tab-content">
-      <endpoints :paths="paths" prefix="mappings"></endpoints>
+      <endpoints :openapi="openapi" prefix="mappings"></endpoints>
     </div>
 
     <div id="data" class="tab-content">
-      <endpoints :paths="paths" prefix="data"></endpoints>
+      <endpoints :openapi="openapi" prefix="data"></endpoints>
       <files :path="'data/'"></files>
     </div>
 
     <div id="sparql" class="tab-content">
-      <endpoints :paths="paths" prefix="sparql"></endpoints>
+      <endpoints :openapi="openapi" prefix="sparql"></endpoints>
       <!--
   <script src="https://unpkg.com/@matdata/yasgui/build/yasgui.min.js"></script>
 <style>

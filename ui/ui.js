@@ -4,9 +4,9 @@ const fetchJSON = async url => fetch(url).then(res => res.json())
 
 const app = createApp({
   data: () => ({
+    openapi: null,
     // status
     title: "",
-    paths: {},
     connected: false,
     frontend: "",
     base: "",
@@ -33,6 +33,7 @@ const app = createApp({
     },
   },
   created() {
+    fetchJSON("openapi.json").then(openapi => this.openapi = openapi)
     this.updateStatus()  
   },
   methods: {
@@ -62,15 +63,16 @@ const app = createApp({
 // A list of API endpoints
 app.component("endpoints", {
   template: "#Endpoints",
-  props: ["paths", "prefix"],
+  props: ["openapi", "prefix"],
   data: () => ({ id: 0 }),
   computed: {
     hasId() {
       return Object.keys(this.selectedPaths).find(p => p.includes("{id}"))
     },
     selectedPaths() {
-      const selected = Object.keys(this.paths).filter(p => p.startsWith(`/${this.prefix}`))
-      return Object.fromEntries(selected.map(p => [p, this.paths[p]]))
+      const paths = this.openapi?.paths || {}
+      const selected = Object.keys(paths).filter(p => p.startsWith(`/${this.prefix}`))
+      return Object.fromEntries(selected.map(p => [p, paths[p]]))
     },
   },
 })

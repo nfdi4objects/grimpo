@@ -1,8 +1,24 @@
 {
+  "openapi": "3.2.1",
+  "info": {
+    "title": "Grimpo Knowledge Graph Importer API",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {},
+    "responses": {},
+    "parameters": {},
+    "requestBodies": {}
+  },
   "paths": {
     "/status.json": {
       "get": {
         "summary": "Get information about the API"
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "summary": "Get OpenAPI specification of the API"
       }
     },
     "/metadata": {
