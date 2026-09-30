@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "uri": {
+      "type": "string",
+      "pattern": "^http://bartoc\\.org/en/node/[0-9]+$"
+    }
+  },
+  "required": [ "uri" ]
+}

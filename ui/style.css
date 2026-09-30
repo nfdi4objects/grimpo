@@ -83,3 +83,6 @@ li.disabled > b > a {
 .tabs-wrapper:has(#tab-sparql-toggle:checked) #sparql {
   display: block;
 }
+.tabs-wrapper:has(#tab-generic-toggle:checked) #generic {
+  display: block;
+}

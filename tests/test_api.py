@@ -5,11 +5,11 @@ from urllib.parse import urlparse, parse_qs
 from shutil import copy
 from pathlib import Path
 import pytest
+import jsonschema
 
 from lib import read_json
 from app import app, configure
 
-cwd = Path().cwd()
 data = Path(__file__).parent / "data"
 
 sparqlApi = os.getenv('SPARQL')
@@ -124,6 +124,11 @@ def test_general(client, monkeypatch):
         "mappings": [],
         "collections": []
     }
+
+    response = client.get("/openapi.json")
+    schema = read_json(Path(__file__).parent / "openapi-schema.json")
+    jsonschema.validate(response.get_json(), schema)
+
 
     # test backend failure
     monkeypatch.setattr(app.config["store"], "query", None)

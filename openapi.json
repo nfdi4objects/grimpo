@@ -7,8 +7,81 @@
   "components": {
     "schemas": {},
     "responses": {},
-    "parameters": {},
-    "requestBodies": {}
+    "parameters": {
+      "from": {
+        "name": "from",
+        "description": "URL or file",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "requestBodies": {
+      "collection": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "'#/components/schemas/collection"
+            }
+          }
+        }
+      },
+      "collections": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "'#/components/schemas/collection"
+              }
+            }
+          }
+        }
+      },
+      "terminology": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "'#/components/schemas/terminology"
+            }
+          }
+        }
+      },
+      "terminologies": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "'#/components/schemas/terminologies"
+              }
+            }
+          }
+        }
+      },
+      "mappings": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "'#/components/schemas/mappings"
+            }
+          }
+        }
+      },
+      "mappingss": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "'#/components/schemas/mappings"
+              }
+            }
+          }
+        }
+      }
+    }
   },
   "paths": {
     "/status.json": {
@@ -78,9 +151,7 @@
         "summary": "Receive terminology data",
         "parameters": [
           {
-            "name": "from",
-            "summary": "URL or file",
-            "in": "query"
+            "$ref": "'#/components/parameters/from"
           }
         ]
       },
@@ -117,11 +188,15 @@
       },
       "put": {
         "summary": "Register a list of collections, replacing existing ones",
-        "requestBody": {}
+        "requestBody": {
+          "$ref": "'#/components/requestBodies/collections"
+        }
       },
       "post": {
         "summary": "Register a new collection or update metadata of a registered collection",
-        "requestBody": {}
+        "requestBody": {
+          "$ref": "'#/components/requestBodies/collection"
+        }
       }
     },
     "/collections/schema.json": {
@@ -135,7 +210,9 @@
       },
       "put": {
         "summary": "Update metadata of a specific registered collection or register a new collection",
-        "requestBody": {}
+        "requestBody": {
+          "$ref": "'#/components/requestBodies/collection"
+        }
       },
       "delete": {
         "summary": "Unregister a collection and remove it from the triple store and staging area"
@@ -156,9 +233,7 @@
         "summary": "Receive and process collection data",
         "parameters": [
           {
-            "name": "from",
-            "summary": "URL or file",
-            "in": "query"
+            "$ref": "'#/components/parameters/from"
           }
         ]
       },
@@ -184,10 +259,16 @@
         "summary": "Return the list of registered mapping sources"
       },
       "put": {
-        "summary": "Update metadata of a specific mapping source"
+        "summary": "Replace all registered mapping sources",
+        "requestBody": {
+          "$ref": "'#/components/requestBodies/mappingss"
+        }
       },
       "post": {
-        "summary": "Register a new mapping source or update metadata of a mapping source"
+        "summary": "Register a new mapping source or update metadata of a mapping source",
+        "requestBody": {
+          "$ref": "'#/components/requestBodies/mappings"
+        }
       }
     },
     "/mappings/schema.json": {
@@ -205,7 +286,10 @@
         "summary": "Return a specific mapping source"
       },
       "put": {
-        "summary": "Update metadata of a specific mapping source"
+        "summary": "Update metadata of a specific mapping source",
+        "requestBody": {
+          "$ref": "'#/components/requestBodies/mappings"
+        }
       },
       "delete": {
         "summary": "Unregister a mappings source and remove it from the triple store and staging area"
@@ -236,9 +320,7 @@
         "summary": "Receive and process mappings from a mapping source",
         "parameters": [
           {
-            "name": "from",
-            "summary": "URL or file",
-            "in": "query"
+            "$ref": "'#/components/parameters/from"
           }
         ]
       },

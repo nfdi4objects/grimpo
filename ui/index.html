@@ -100,8 +100,10 @@
         SPARQL
         <input name="tabs-toggle" id="tab-sparql-toggle" type="radio" value="sparql" v-model="tab">
       </label>
-      <a href="status.json" class="tab-item">Status</a>
-      <a href="metadata" class="tab-item">Metadata</a>
+      <label for="tab-generic-toggle" class="tab-item">
+        Generic
+        <input name="tabs-toggle" id="tab-generic-toggle" type="radio" value="generic" v-model="tab">
+      </label>
     </nav>
 
     <div id="collection" class="tab-content">
@@ -134,6 +136,13 @@
 }
 </style-->
     </div>
+
+    <div id="generic" class="tab-content">
+      <endpoints :openapi="openapi" prefix="openapi"></endpoints>
+      <endpoints :openapi="openapi" prefix="metadata"></endpoints>
+      <endpoints :openapi="openapi" prefix="status"></endpoints>
+    </div>
+
   </div>
 </body>
 </html>
