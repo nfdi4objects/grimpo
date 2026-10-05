@@ -4,37 +4,51 @@
       "type": "string",
       "format": "uri",
       "pattern": "^https?://"
-    },
-    "mappings": {
-      "type": "object",
-      "properties": {
-        "distributions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "url": { "$ref": "#/$defs/url" },
-              "download": { "$ref": "#/$defs/url" },
-              "format": { "$ref": "#/$defs/url" }
-            }
-          }
-        },
-        "partOf": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/url" },
-          "minItems": 1,
-          "maxItems": 1
-        },
-        "name": { "type": "string", "minLength": 1 },
-        "description": { "type": "string" },
-        "url": { "$ref": "#/$defs/url" },
-        "uri": { "$ref": "#/$defs/url" },
-        "id": { "type": "string", "pattern": "^[1-9][0-9]*$" }
-      }
     }
   },
-  "oneOf": [
-    { "$ref": "#/$defs/mappings" },
-    { "type": "array", "items": { "$ref": "#/$defs/mappings" } }
-  ]
+  "type": "object",
+  "properties": {
+    "distributions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "$ref": "#/$defs/url"
+          },
+          "download": {
+            "$ref": "#/$defs/url"
+          },
+          "format": {
+            "$ref": "#/$defs/url"
+          }
+        }
+      }
+    },
+    "partOf": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/url"
+      },
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "url": {
+      "$ref": "#/$defs/url"
+    },
+    "uri": {
+      "$ref": "#/$defs/url"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    }
+  }
 }

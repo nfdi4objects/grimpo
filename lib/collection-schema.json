@@ -14,49 +14,67 @@
         }
       },
       "additionalProperties": false
-    },
-    "collection": {
-      "type": "object",
-      "properties": {
-        "distributions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "url": { "$ref": "#/$defs/url" },
-              "download": { "$ref": "#/$defs/url" },
-              "format": { "$ref": "#/$defs/url" }
-            }
-          }
-        },
-        "db": {
-          "type": "string",
-          "pattern": "^Q[1-9][0-9]*$" 
-        },
-        "license": { "$ref": "#/$defs/url" },
-        "name": { "type": "string", "minLength": 1 },
-        "partOf": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/url" },
-          "minItems": 1,
-          "maxItems": 1
-        },
-        "url": { "$ref": "#/$defs/url" },
-        "type": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z]+:[a-zA-Z]+$"
-          }
-        },
-        "uri": { "$ref": "#/$defs/url" },
-        "id": { "type": "string", "pattern": "^[1-9][0-9]*$" }
-      },
-      "required": [ "id", "uri", "name" ]
     }
   },
-  "oneOf": [
-    { "$ref": "#/$defs/collection" },
-    { "type": "array", "items": { "$ref": "#/$defs/collection" } }
+  "type": "object",
+  "properties": {
+    "distributions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "$ref": "#/$defs/url"
+          },
+          "download": {
+            "$ref": "#/$defs/url"
+          },
+          "format": {
+            "$ref": "#/$defs/url"
+          }
+        }
+      }
+    },
+    "db": {
+      "type": "string",
+      "pattern": "^Q[1-9][0-9]*$"
+    },
+    "license": {
+      "$ref": "#/$defs/url"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "partOf": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/url"
+      },
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "url": {
+      "$ref": "#/$defs/url"
+    },
+    "type": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+:[a-zA-Z]+$"
+      }
+    },
+    "uri": {
+      "$ref": "#/$defs/url"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    }
+  },
+  "required": [
+    "id",
+    "uri",
+    "name"
   ]
 }

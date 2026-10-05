@@ -87,15 +87,15 @@ def test_validation(client):
     # malformed payload
     fail("PUT", "/collections/1", data="", error="The browser (or proxy) sent a request that this server could not understand.")
     fail("PUT", "/collections/1", [], "expected JSON object")
-    fail("PUT", "/collections/1", {"uri": "http://example.org/collections/2"},
+    fail("PUT", "/collections/1", {"uri": "http://example.org/collections/2", "name": "test"},
          "URI http://example.org/collections/2 and id 1 don't match")
-    fail("PUT", "/collections/1", {"url": "http:/example.org/"}, {
+    fail("PUT", "/collections/1", {"url": "http:/example.org/", "name": "test"}, {
         'message': "'http:/example.org/' does not match '^https?://'",
         'position': {'jsonpointer': '/url'}})
-    fail("PUT", "/collections/1", {"id": "2"}, "ids 1 and 2 don't match")
+    fail("PUT", "/collections/1", {"id": "2", "name": "test"}, "ids 1 and 2 don't match")
 
     fail("PUT", "/collections/", {}, "expected list of collections")
-    fail("PUT", "/collections/", [{"id": "1", "uri": "http://example.org/collections/2"}],
+    fail("PUT", "/collections/", [{"id": "1", "uri": "http://example.org/collections/2", "name": "test"}],
          "URI http://example.org/collections/2 and id 1 don't match")
     fail("POST", "/collections/",
          {"id": "1", "uri": "http://example.org/collections/2", "name": "x"},
@@ -128,7 +128,6 @@ def test_general(client, monkeypatch):
     response = client.get("/openapi.json")
     schema = read_json(Path(__file__).parent / "openapi-schema.json")
     jsonschema.validate(response.get_json(), schema)
-
 
     # test backend failure
     monkeypatch.setattr(app.config["store"], "query", None)

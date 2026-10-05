@@ -8,6 +8,7 @@ from .registry import Registry
 
 
 class TerminologyRegistry(Registry):
+    schema = read_json(Path(__file__).parent / 'terminology-schema.json')
     remote_contexts = {
         "https://gbv.github.io/jskos/context.json": read_context("jskos.json"),
         "http://iiif.io/api/presentation/3/context.json": read_context("iiif.json"),

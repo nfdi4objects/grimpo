@@ -86,6 +86,7 @@ def status():
         values['connected'] = False
     return values
 
+
 @app.route('/openapi.json')
 def openapi():
     openapi = json.load(open("openapi.json", "r"))
@@ -93,7 +94,8 @@ def openapi():
         with open(f"lib/{kind}-schema.json", "r") as file:
             openapi["components"]["schemas"][kind] = json.load(file)
     return openapi
- 
+
+
 @app.route('/metadata')
 def metadata():
     metadata = {
@@ -121,6 +123,7 @@ api('GET', '/terminologies/namespaces.json', lambda: terminologies.namespaces())
 route('GET', '/terminologies/skosmos.ttl', lambda: Response(terminologies.skosmos(), mimetype="text/turtle"))
 
 api('PUT', '/terminologies/', lambda: terminologies.replace(request.get_json(force=True)))
+api('GET', '/terminologies/schema.json', lambda: terminologies.schema)
 api('GET', '/terminologies/<int:id>', lambda id: terminologies.get(id))
 api('PUT', '/terminologies/<int:id>', lambda id: terminologies.register({"id": str(id)}))
 api('DELETE', '/terminologies/<int:id>', lambda id: terminologies.delete(id))
