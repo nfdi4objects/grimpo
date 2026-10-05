@@ -595,16 +595,16 @@ Remove mappings of a specific mapping source from the triple store and from stag
 
 ## Development
 
-Requires basic development toolchain (`sudo apt install build-essential`) and Python 3 with module venv to be installed.
+Requires basic development toolchain (`sudo apt install build-essential`), Python 3 with module venv and NodeJS >= 24 to be installed.
 
-- `make deps` installs Python dependencies in a virtual environment in directory `.venv`
+- `make deps` installs Python dependencies in a virtual environment in directory `.venv` and Node dependencies in `ui/node_modules/`
 - `make start` runs the service without restarting
 - `make test` runs the tests against a temporary external triple store
 - `make lint` checks coding style. *Please use regularly!*
 - `make fix` cleans up some coding style violations
 - `make loc` counts lines of code (requires `cloc`). *Please avoid feature creep!*
 
-The Docker image of grimpo is automatically build on GitHub. To locally build and run the image for testing:
+The [grimpo Docker image](https://github.com/orgs/nfdi4objects/packages/container/package/grimpo) is automatically build on GitHub. To locally build and run the image for testing:
 
 ~~~sh
 docker image build -t grimpo .
