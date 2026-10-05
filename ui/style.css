@@ -86,3 +86,63 @@ li.disabled > b > a {
 .tabs-wrapper:has(#tab-generic-toggle:checked) #generic {
   display: block;
 }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal-dialog {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  min-width: 300px;
+  position: relative;
+}
+.modal-dialog h3 {
+  margin: 0 0 0.25em 0;
+}
+
+.selector-table tr:hover {
+  background: var(--link-color);
+  cursor: pointer;
+}
+.selector-table tr:hover td {
+  background: var(--link-color);
+  color: white;
+}
+
+.required {
+  font-weight: bold;
+}
+
+.editor td {
+  vertical-align: top;
+}
+input[type="text"] {
+  width: 40em;
+}
+
+button {
+  background: #fadda1;
+  border-radius: 3px;
+  padding: 3px 6px;
+  cursor: pointer;
+  color: var(--link-color);
+  font-weight: bold;
+  margin: 3px;
+  border: none;
+  font-size: 1em;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button:hover:not(:disabled) {
+  background: var(--link-color);
+  color: white;
+}

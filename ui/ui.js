@@ -1,6 +1,7 @@
 const { createApp } = Vue
 
-const fetchJSON = async url => fetch(url).then(res => res.json())
+const fetchJSON = async url => fetch(url)
+  .then(res => res.ok ? res.json() : null)
 
 const app = createApp({
   data: () => ({
@@ -57,14 +58,120 @@ const app = createApp({
         }
       })
     },
+    async submit(url, options) {
+      this.error = false
+      this.message = "loading..."
+
+      const res = await fetch(url, options)
+        .catch(e => ({ statusText: `${e}` }))
+      if (res.ok) {
+        this.message = res.statusText
+      } else {      
+        let error = res.statusText || "ERROR"
+        try {
+          error = (await res.json()).message 
+          } catch { }  // eslint-disable-line
+        this.error = error
+      }
+      this.updateStatus()
+    },
   },
+})
+
+// A modal dialog
+app.component("modal", {
+  template: "#Modal",
+  props: ["opened"],
+  emits: ["close"], 
+})
+ 
+// Select from a list of items
+app.component("selector", {
+  template: "#Selector",
+  props: ["prefix"],
+  emits: ["select"], 
+  data: () => ({ list: [] }),
+  created() {
+    fetchJSON(this.prefix).then(data => this.list = data)
+  },
+})
+
+function expandSchema(schema, remove=[]) {
+  const { $defs } = schema
+
+  const expand = properties => {
+    for (let field in properties) {
+      const prop = properties[field]
+      if (properties[field]["x-derived"] || remove.includes(field)) {
+        delete properties[field]
+      } else {
+        if (properties[field].items) {
+          expand(properties[field].items.properties)
+        } else {
+          if (prop.$ref) {
+            Object.assign(prop, $defs[ prop.$ref.split("/").pop() ])
+            delete prop.$ref
+          }
+        }
+      }
+    }
+  }
+
+  expand(schema.properties)
+
+  return schema
+}
+
+
+// Modify item metadata
+app.component("editor", {
+  template: "#Editor",
+  props: ["prefix", "method", "id"],
+  emits: ["close", "saved"],
+  data: () => ({
+    schema: {},
+    item: {},
+    missing: false,
+  }),
+  async created() {
+    fetchJSON(`${this.prefix}/schema.json`)
+      .then(data => this.schema = expandSchema(data))
+    if (this.id) {
+      fetch(`${this.prefix}/${this.id}`).then(async res => {
+        if (res.ok) {
+          this.item = await res.json()
+        } else {
+          this.missing = true
+        }
+      })
+    }
+  },
+  methods: {
+    async save() {
+      this.$emit("close")
+      this.$root.submit(`${this.prefix}/${this.id}`, {
+        method: this.method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.item),
+      })
+    },
+  },
+})
+ 
+app.component("EditorForm", {
+  template: "#EditorForm",
+  props: ["schema", "item"],
 })
 
 // A list of API endpoints
 app.component("endpoints", {
   template: "#Endpoints",
   props: ["openapi", "prefix"],
-  data: () => ({ id: 0 }),
+  data: () => ({
+    id: 0,
+    modal: null,
+    item: null,
+  }),
   computed: {
     hasId() {
       return Object.keys(this.selectedPaths).find(p => p.includes("{id}"))
@@ -73,6 +180,21 @@ app.component("endpoints", {
       const paths = this.openapi?.paths || {}
       const selected = Object.keys(paths).filter(p => p.startsWith(`/${this.prefix}`))
       return Object.fromEntries(selected.map(p => [p, paths[p]]))
+    },
+  },
+  watch: {
+    id: {
+      async handler() {
+        this.item = this.hasId && this.id
+          ? await fetchJSON(`${this.prefix}/${this.id}`) : null
+      },
+      immediate: true,
+    },
+  },
+  methods: {
+    async select(id) {
+      this.id = id 
+      this.modal = null
     },
   },
 })
@@ -104,28 +226,11 @@ app.component("endpoint", {
         window.location.href = url
         return
       }
-      this.$root["error"] = false
-      this.$root["message"] = "loading..."
       
-      const submit = async options => {
-        const res = await fetch(url, { ...options, method: this.method })
-          .catch(e => ({ statusText: `${e}` }))
-        if (res.ok) {
-          this.$root["message"] = res.statusText
-        } else {      
-          let error = res.statusText || "ERROR"
-          try {
-            error = (await res.json()).message 
-          } catch { }  // eslint-disable-line
-          this.$root["error"] = error
-        }
-        this.$root.updateStatus()
-      }
-
       if (this.operation.requestBody) { // file upload        
         if (this.file) {
           const reader = new FileReader()
-          reader.onload = async e => await submit({
+          reader.onload = async e => await this.$root.submit(url, {
             method: this.method,
             headers: { "Content-Type": "application/json" },
             body: e.target.result,
@@ -135,7 +240,7 @@ app.component("endpoint", {
           this.$root["error"] = "Please select a file!"
         }
       } else {
-        return submit({})
+        return this.$root.submit(url, { method: this.method })
       }
     },
   },
@@ -155,5 +260,6 @@ app.component("files", {
     },
   },
 })
+
 
 app.mount("#app")

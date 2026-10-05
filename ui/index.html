@@ -12,10 +12,33 @@
   <script src="vue.global.js"></script>
 
   <!-- Vue component templates -->
+
+  <script type="text/x-template" id="Modal">
+    <Teleport to="body">
+      <div v-if="opened" class="modal-backdrop" @click.self="$emit('close')">
+        <div class="modal-dialog" role="dialog" aria-modal="true">
+          <slot />
+        </div>
+      </div>
+    </Teleport>
+  </script>
+
   <script type="text/x-template" id="Endpoints">
     <div v-if="hasId">
-      id:
+      <button @click="modal = 'select'">id:</button>
       <input type="number" min="0" step="1" size="6" v-model="id">
+      <modal :opened="modal == 'select'" @close="modal = null">
+        <selector :prefix="prefix" @select="select"></selector>
+      </modal>
+      <button v-if="prefix != 'terminologies'" @click="modal = 'edit'" :disabled="!item">edit</button>
+      <modal :opened="modal == 'edit'" @close="modal=null">
+        <editor :method="'PUT'" :prefix="prefix" :id="id" @close="modal=null"></editor>
+      </modal>
+      <button @click="modal = 'add'">add</button>
+      <modal :opened="modal == 'add'" @close="modal=null">
+        <editor :method="'POST'" :prefix="prefix" @close="modal=null"></editor>
+      </modal>
+      <span v-if="item">{{item.name || item.prefLabel?.en || item.uri }}</span>
     </div>
     <ul class="endpoints">
       <template v-for="(item, path) in selectedPaths">
@@ -24,6 +47,57 @@
         </template>
       </template>
     </ul>
+  </script>
+
+
+  <script type="text/x-template" id="EditorForm">
+    <table>
+      <tr v-for="(def, field) in schema.properties">
+        <td :class="{ required: schema.required?.includes[field] }">{{field}}</td>
+        <td v-if="def.type == 'string'">
+          <span v-if="def.type == 'string'">
+            <input type="text" v-model="item[field]">
+          </span>
+          <br><small style="color: grey">{{def}}</small>
+        </td>
+        <td v-else-if="def.items">
+          <table>
+            <tr v-if="item[field]" v-for="(li,i) of item[field]">
+              <td>
+                <EditorForm :schema="def.items" :item="li"></EditorForm>
+              </td>
+              <td>
+                <button @click="item[field].splice(i,1)">-</button>
+              </td>
+            </tr>
+          </table>
+          <button @click="(item[field] ||= []).push({})">+</button>
+        </td>
+      </tr>
+    </table>
+  </script>
+
+  <script type="text/x-template" id="Editor">
+    <div class="editor">
+      <h3>{{method}} /{{prefix}}<span v-if="id">/{{id}}</span></h3>
+      <p v-if="missing">
+        Item not found!
+      </p>
+      <EditorForm v-else :schema="schema" :item="item">
+      </EditorForm>
+      <button @click="save">save</button>
+      <button @click="$emit('close')">cancel</button>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="Selector">
+    <h3>{{prefix}}</h3>
+    <table class="selector-table">
+      <tr v-for="item of list" @click="$emit('select', item.id)">
+        <td>{{item.id}}</td>
+        <td>{{item.name || item.prefLabel.en || item.uri}}</td>
+      </tr>
+    </table>
   </script>
 
   <script type="text/x-template" id="Endpoint">
@@ -45,7 +119,7 @@
 
   <script type="text/x-template" id="Files">
     <h3>Files</h3>
-    <ul v-if="files.length">
+    <ul v-if="files?.length">
       <li v-for="file in files">
         <a :href="path + file.name">{{ file.name }}</a>
       </li>

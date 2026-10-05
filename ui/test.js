@@ -24,8 +24,15 @@ test("Vue application starts and executes", async () => {
         connected: false,
         paths: {},
       }
+    } else if (url == "data/") {
+      data = []
+    } else if (url == "openapi.json") {
+      data = {}
+    } else {
+      console.error(`UNHANDLED FETCH ${url}`)
     }
-    return { json: async () => data }
+
+    return { json: async () => data, ok: 1 }
   }
 
   // Load Vue runtime and UI application

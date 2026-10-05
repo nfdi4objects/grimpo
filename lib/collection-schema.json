@@ -52,7 +52,8 @@
         "$ref": "#/$defs/url"
       },
       "minItems": 1,
-      "maxItems": 1
+      "maxItems": 1,
+      "x-derived": true
     },
     "url": {
       "$ref": "#/$defs/url"
@@ -62,14 +63,17 @@
       "items": {
         "type": "string",
         "pattern": "^[a-z]+:[a-zA-Z]+$"
-      }
+      },
+      "x-derived": true
     },
     "uri": {
-      "$ref": "#/$defs/url"
+      "$ref": "#/$defs/url",
+      "x-derived": true
     },
     "id": {
       "type": "string",
-      "pattern": "^[1-9][0-9]*$"
+      "pattern": "^[1-9][0-9]*$",
+      "x-derived": true
     }
   },
   "required": [

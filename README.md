@@ -82,7 +82,7 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
 
 ## Overview
 
-grimpo provides access to an RDF triple store grouped into named graphs and the default graph configured as union graph. The application wraps write access to the triple store but it does not include any methods of authentification nor a user interface (see [n4o-graph-admin]). An additional interface is required for public read-access to the triple store and metadata (see [n4o-graph-apis]).
+grimpo provides access to an RDF triple store grouped into named graphs and the default graph configured as union graph. The application wraps write access to the triple store but it does not include any methods of authentification. An additional interface is required for public read-access to the triple store and metadata (see [n4o-graph-apis]).
 
 ```mermaid
 graph TD
@@ -117,7 +117,6 @@ The main application of grimpo is the [NFDI4Objects Knowledge Graph](https://gra
 
 - [n4o-fuseki]: the RDF triple store
 - [n4o-graph-apis]: web interface and public SPARQL endpoint
-- [n4o-graph-admin]: grimp admin interface
 
 
 ## Installation
@@ -619,6 +618,5 @@ Licensed under [Apache License](http://www.apache.org/licenses/) 2.0.
 
 [BARTOC]: https://bartoc.org/
 [n4o-fuseki]: https://github.com/nfdi4objects/n4o-fuseki#readme
-[n4o-graph-admin]: https://github.com/nfdi4objects/n4o-graph-admin#readme
 [n4o-graph-apis]: https://github.com/nfdi4objects/n4o-graph-apis#readme
 [Data Validation Error Format]: https://gbv.github.io/validation-error-format/
