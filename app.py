@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request, send_from_directory, send_file, Response
 from lib import CollectionRegistry, TerminologyRegistry, MappingRegistry, \
-    ApiError, NotFound, ValidationError, createTripleStore
+    ApiError, NotFound, ValidationError, createTripleStore, read_json
 from werkzeug.exceptions import HTTPException
 import os
 import json
+import urllib
 from datetime import datetime, timezone
 from pathlib import Path
 from flask_cors import CORS
@@ -122,7 +123,20 @@ api('GET', '/terminologies/namespaces.json', lambda: terminologies.namespaces())
 
 route('GET', '/terminologies/skosmos.ttl', lambda: Response(terminologies.skosmos(), mimetype="text/turtle"))
 
-api('PUT', '/terminologies/', lambda: terminologies.replace(request.get_json(force=True)))
+
+def json_data(request):
+    source = request.args.get('from', False)
+    if bool(source) == bool(request.data):
+        raise ApiError("Expect either request body or query parameter 'from'")
+    if request.data:
+        return request.get_json(force=True)
+    if "/" not in source:   # from file
+        return read_json(app.config["data"] / source)
+    else:                   # from URL (not cached)
+        return json.loads(urllib.request.urlopen(source).read().decode("utf-8"))
+
+
+api('PUT', '/terminologies/', lambda: terminologies.replace(json_data(request)))
 api('GET', '/terminologies/schema.json', lambda: terminologies.schema)
 api('GET', '/terminologies/<int:id>', lambda id: terminologies.get(id))
 api('PUT', '/terminologies/<int:id>', lambda id: terminologies.register({"id": str(id)}))
@@ -135,7 +149,7 @@ api('POST', '/terminologies/<int:id>/remove', lambda id: terminologies.remove(id
 
 api('GET', '/collections/', lambda: collections.list())
 api('GET', '/collections/schema.json', lambda: collections.schema)
-api('PUT', '/collections/', lambda: collections.replace(request.get_json(force=True)))
+api('PUT', '/collections/', lambda: collections.replace(json_data(request)))
 api('POST', '/collections/', lambda: collections.register(request.get_json(force=True)))
 api('GET', '/collections/<int:id>', lambda id: collections.get(id))
 api('PUT', '/collections/<int:id>', lambda id: collections.register(request.get_json(force=True), id))
@@ -150,7 +164,7 @@ api('POST', '/collections/<int:id>/remove', lambda id: collections.remove(id))
 api('GET', '/mappings/', lambda: mappings.list())
 api('GET', '/mappings/schema.json', lambda: mappings.schema)
 api('GET', '/mappings/properties.json', lambda: mappings.properties)
-api('PUT', '/mappings/', lambda: mappings.replace(request.get_json(force=True)))
+api('PUT', '/mappings/', lambda: mappings.replace(json_data(request)))
 api('POST', '/mappings/', lambda: mappings.register(request.get_json(force=True)))
 api('GET', '/mappings/<int:id>', lambda id: mappings.get(id))
 api('PUT', '/mappings/<int:id>', lambda id: mappings.register(request.get_json(force=True), id))

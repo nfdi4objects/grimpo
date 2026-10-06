@@ -95,6 +95,7 @@ def test_validation(client):
     fail("PUT", "/collections/1", {"id": "2", "name": "test"}, "ids 1 and 2 don't match")
 
     fail("PUT", "/collections/", {}, "expected list of collections")
+    fail("PUT", "/collections/?from=xx", {}, "Expect either request body or query parameter 'from'")
     fail("PUT", "/collections/", [{"id": "1", "uri": "http://example.org/collections/2", "name": "test"}],
          "URI http://example.org/collections/2 and id 1 don't match")
     fail("POST", "/collections/",
@@ -187,6 +188,7 @@ def test_terminology(client):
     fail("PUT", "/terminologies/", json=[{"uri": "x"}], code=400)
     assert len(client.get('/terminologies/').get_json()) == 1
     assert client.put("/terminologies/", json=[]).status_code == 200
+    assert client.put("/terminologies/?from=empty-array.json").status_code == 200
     assert client.get('/terminologies/').get_json() == []
     assert client.get("/terminologies/namespaces.json").get_json() == {}
 

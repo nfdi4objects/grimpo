@@ -369,7 +369,9 @@ Unregister a terminology and remove it from stage directory and triple store. Th
 
 #### PUT /terminologies/
 
-Replace the list of terminologies. By unregistering all and registering a new list. The response body is expected to be a JSON array with objects having key `uri` with the BARTOC URI like this:
+Replace the list of terminologies. By unregistering all and registering a new list. The list can be provided either as response body or via query parameter `from` referencing a file or URL.
+
+The list must be a JSON array with objects having key `uri` with the BARTOC URI like this:
 
 ~~~json
 [
@@ -450,7 +452,7 @@ Return the JSON Schema used to validation collection metadata. See file [collect
 
 #### PUT /collections/
 
-Replace the list of collections by unregistering all and registering a new list of collections.
+Replace the list of collections by unregistering all and registering a new list of collections. The list can be provided either as response body or via query parameter `from` referencing a file or URL.
 
 #### POST /collections/
 
@@ -520,7 +522,7 @@ Get a list of supported mapping properties. By default this is the list of [SKOS
 
 #### PUT /mappings/
 
-Register a list of mapping sources. All existing mapping sources and mappings will be deleted.
+Register a list of mapping sources. The list can be provided either as response body or via query parameter `from` referencing a file or URL. All existing mapping sources and mappings are deleted.
 
 #### POST /mappings/
 

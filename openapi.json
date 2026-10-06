@@ -122,7 +122,11 @@
         "summary": "Return the list of registered terminologies"
       },
       "put": {
-        "summary": "Replace all terminologies by unregistering all and registering a new list"
+        "summary": "Replace all terminologies by unregistering all and registering a new list",
+        "parameters": [ { "$ref": "'#/components/parameters/from" } ],
+        "requestBody": {
+          "$ref": "'#/components/requestBodies/terminologies"
+        }
       }
     },
     "/terminologies/{id}": {
@@ -188,6 +192,7 @@
       },
       "put": {
         "summary": "Register a list of collections, replacing existing ones",
+        "parameters": [ { "$ref": "'#/components/parameters/from" } ],
         "requestBody": {
           "$ref": "'#/components/requestBodies/collections"
         }
@@ -260,6 +265,7 @@
       },
       "put": {
         "summary": "Replace all registered mapping sources",
+        "parameters": [ { "$ref": "'#/components/parameters/from" } ],
         "requestBody": {
           "$ref": "'#/components/requestBodies/mappingss"
         }

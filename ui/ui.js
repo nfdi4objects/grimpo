@@ -123,7 +123,7 @@ function expandSchema(schema, remove=[]) {
 }
 
 
-// Modify item metadata
+// Form to modify item metadata with save button
 app.component("editor", {
   template: "#Editor",
   props: ["prefix", "method", "id"],
@@ -158,6 +158,7 @@ app.component("editor", {
   },
 })
  
+// Form to edit an item
 app.component("EditorForm", {
   template: "#EditorForm",
   props: ["schema", "item"],
@@ -219,15 +220,16 @@ app.component("endpoint", {
     },
     async click() {
       let url = this.path.replace("{id}",this.id).replace(/^[/]/,"")
-      if (this.operation.parameters) {  // there is only one possible parameter
-        url += `?from=${encodeURI(this.from)}`
-      }
       if (this.method == "get") {
         window.location.href = url
         return
       }
+
+      if (this.operation.parameters) {  // there is only one possible parameter
+        url += `?from=${encodeURI(this.from)}`
+      }
       
-      if (this.operation.requestBody) { // file upload        
+      if (this.operation.requestBody && !this.from) { // file upload        
         if (this.file) {
           const reader = new FileReader()
           reader.onload = async e => await this.$root.submit(url, {
@@ -239,9 +241,10 @@ app.component("endpoint", {
         } else {
           this.$root["error"] = "Please select a file!"
         }
-      } else {
-        return this.$root.submit(url, { method: this.method })
+        return
       }
+
+      return this.$root.submit(url, { method: this.method })
     },
   },
 })
