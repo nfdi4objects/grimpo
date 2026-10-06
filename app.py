@@ -107,23 +107,6 @@ def metadata():
     return metadata
 
 
-route('GET', '/', lambda: send_file("ui/index.html"))
-
-for file in Path('ui').glob('*.*'):
-    route('GET', f'/{file.name}', lambda f=file: send_file(str(f)))
-
-if not app.config.get('sparql'):
-    route('GET', '/sparql', lambda: app.config['store'].query_request(request))
-    route('POST', '/sparql', lambda: app.config['store'].query_request(request))
-
-api('GET', '/data/', lambda: list_files(Path(app.config['data'])))
-
-api('GET', '/terminologies/', lambda: terminologies.list())
-api('GET', '/terminologies/namespaces.json', lambda: terminologies.namespaces())
-
-route('GET', '/terminologies/skosmos.ttl', lambda: Response(terminologies.skosmos(), mimetype="text/turtle"))
-
-
 def json_data(request):
     source = request.args.get('from', False)
     if bool(source) == bool(request.data):
@@ -136,7 +119,23 @@ def json_data(request):
         return json.loads(urllib.request.urlopen(source).read().decode("utf-8"))
 
 
-api('PUT', '/terminologies/', lambda: terminologies.replace(json_data(request)))
+route('GET', '/', lambda: send_file("ui/index.html"))
+
+for file in Path('ui').glob('*.*'):
+    route('GET', f'/{file.name}', lambda f=file: send_file(str(f)))
+
+if not app.config.get('sparql'):
+    route('GET', '/sparql', lambda: app.config['store'].query_request(request))
+    route('POST', '/sparql', lambda: app.config['store'].query_request(request))
+
+api('GET', '/data/', lambda: list_files(Path(app.config['data'])))
+
+api('GET', '/terminologies', lambda: terminologies.list())
+api('GET', '/terminologies/namespaces.json', lambda: terminologies.namespaces())
+
+route('GET', '/terminologies/skosmos.ttl', lambda: Response(terminologies.skosmos(), mimetype="text/turtle"))
+
+api('PUT', '/terminologies', lambda: terminologies.replace(json_data(request)))
 api('GET', '/terminologies/schema.json', lambda: terminologies.schema)
 api('GET', '/terminologies/<int:id>', lambda id: terminologies.get(id))
 api('PUT', '/terminologies/<int:id>', lambda id: terminologies.register({"id": str(id)}))
@@ -147,10 +146,10 @@ api('GET', '/terminologies/<int:id>/load', lambda id: terminologies.load_log(id)
 api('POST', '/terminologies/<int:id>/load', lambda id: terminologies.load(id))
 api('POST', '/terminologies/<int:id>/remove', lambda id: terminologies.remove(id))
 
-api('GET', '/collections/', lambda: collections.list())
+api('GET', '/collections', lambda: collections.list())
 api('GET', '/collections/schema.json', lambda: collections.schema)
-api('PUT', '/collections/', lambda: collections.replace(json_data(request)))
-api('POST', '/collections/', lambda: collections.register(request.get_json(force=True)))
+api('PUT', '/collections', lambda: collections.replace(json_data(request)))
+api('POST', '/collections', lambda: collections.register(request.get_json(force=True)))
 api('GET', '/collections/<int:id>', lambda id: collections.get(id))
 api('PUT', '/collections/<int:id>', lambda id: collections.register(request.get_json(force=True), id))
 api('DELETE', '/collections/<int:id>', lambda id: collections.delete(id))
@@ -161,11 +160,11 @@ api('POST', '/collections/<int:id>/add', lambda id: collections.load(id, add=Tru
 api('GET', '/collections/<int:id>/load', lambda id: collections.load_log(id))
 api('POST', '/collections/<int:id>/remove', lambda id: collections.remove(id))
 
-api('GET', '/mappings/', lambda: mappings.list())
+api('GET', '/mappings', lambda: mappings.list())
 api('GET', '/mappings/schema.json', lambda: mappings.schema)
 api('GET', '/mappings/properties.json', lambda: mappings.properties)
-api('PUT', '/mappings/', lambda: mappings.replace(json_data(request)))
-api('POST', '/mappings/', lambda: mappings.register(request.get_json(force=True)))
+api('PUT', '/mappings', lambda: mappings.replace(json_data(request)))
+api('POST', '/mappings', lambda: mappings.register(request.get_json(force=True)))
 api('GET', '/mappings/<int:id>', lambda id: mappings.get(id))
 api('PUT', '/mappings/<int:id>', lambda id: mappings.register(request.get_json(force=True), id))
 api('DELETE', '/mappings/<int:id>', lambda id: mappings.delete(id))

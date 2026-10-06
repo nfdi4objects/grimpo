@@ -94,14 +94,14 @@ def test_validation(client):
         'position': {'jsonpointer': '/url'}})
     fail("PUT", "/collections/1", {"id": "2", "name": "test"}, "ids 1 and 2 don't match")
 
-    fail("PUT", "/collections/", {}, "expected list of collections")
-    fail("PUT", "/collections/?from=xx", {}, "Expect either request body or query parameter 'from'")
-    fail("PUT", "/collections/", [{"id": "1", "uri": "http://example.org/collections/2", "name": "test"}],
+    fail("PUT", "/collections", {}, "expected list of collections")
+    fail("PUT", "/collections?from=xx", {}, "Expect either request body or query parameter 'from'")
+    fail("PUT", "/collections", [{"id": "1", "uri": "http://example.org/collections/2", "name": "test"}],
          "URI http://example.org/collections/2 and id 1 don't match")
-    fail("POST", "/collections/",
+    fail("POST", "/collections",
          {"id": "1", "uri": "http://example.org/collections/2", "name": "x"},
          "URI http://example.org/collections/2 and id 1 don't match")
-    fail("POST", "/collections/", {})
+    fail("POST", "/collections", {})
 
 
 def test_general(client, monkeypatch):
@@ -153,7 +153,7 @@ def test_terminology(client):
         fail("PUT", "/terminologies/0", code=404)
 
     # one terminology has been registered
-    resp = client.get('/terminologies/')
+    resp = client.get('/terminologies')
     assert resp.status_code == 200
     assert len(resp.get_json()) == 1
 
@@ -183,19 +183,19 @@ def test_terminology(client):
         "http://bartoc.org/en/node/18274": "http://www.w3.org/2004/02/skos/core#"}
 
     # replace list of terminologies
-    fail("PUT", "/terminologies/", json={})
-    fail("PUT", "/terminologies/", json=[{}], code=400)
-    fail("PUT", "/terminologies/", json=[{"uri": "x"}], code=400)
-    assert len(client.get('/terminologies/').get_json()) == 1
-    assert client.put("/terminologies/", json=[]).status_code == 200
-    assert client.put("/terminologies/?from=empty-array.json").status_code == 200
-    assert client.get('/terminologies/').get_json() == []
+    fail("PUT", "/terminologies", json={})
+    fail("PUT", "/terminologies", json=[{}], code=400)
+    fail("PUT", "/terminologies", json=[{"uri": "x"}], code=400)
+    assert len(client.get('/terminologies').get_json()) == 1
+    assert client.put("/terminologies", json=[]).status_code == 200
+    assert client.put("/terminologies?from=empty-array.json").status_code == 200
+    assert client.get('/terminologies').get_json() == []
     assert client.get("/terminologies/namespaces.json").get_json() == {}
 
     with patch('requests.get', new=mock_requests_get):
         json = [{"uri": "http://bartoc.org/en/node/18274"}]
-        assert client.put("/terminologies/", json=json).status_code == 200
-    assert len(client.get('/terminologies/').get_json()) == 1
+        assert client.put("/terminologies", json=json).status_code == 200
+    assert len(client.get('/terminologies').get_json()) == 1
 
     # receive terminology data and check log
     fail("GET", '/terminologies/18274/receive', code=404)
@@ -277,15 +277,15 @@ def test_api(client):
     # collection endpoints
     assert client.get('/collections/schema.json').status_code == 200
 
-    resp = client.get('/collections/')
+    resp = client.get('/collections')
     assert resp.status_code == 200
     assert resp.get_json() == []
     fail("GET", '/collections/1', code=404)
 
     # register collection
-    assert client.put('/collections/', json=[collection_1]).status_code == 200
+    assert client.put('/collections', json=[collection_1]).status_code == 200
 
-    resp = client.get('/collections/')
+    resp = client.get('/collections')
     assert resp.status_code == 200
     assert resp.get_json() == [collection_1_full]
 
@@ -320,7 +320,7 @@ def test_api(client):
 
     # add another collection with auto-id
     collection_autoid = {"name": "A", "url": "http://example.com/"}
-    resp = client.post('/collections/', json=collection_autoid)
+    resp = client.post('/collections', json=collection_autoid)
     assert resp.status_code == 200  # TODO: should be 201 Created
     assert resp.get_json() == {
         **collection_autoid, "id": "2",
@@ -329,7 +329,7 @@ def test_api(client):
     }
 
     # purge collections
-    assert client.put('/collections/', json=[]).status_code == 200
+    assert client.put('/collections', json=[]).status_code == 200
 
     # add without id in record
     resp = client.put('/collections/3', json=collection_0)
@@ -337,7 +337,7 @@ def test_api(client):
     assert resp.get_json() == collection_3_full
 
     # add without known id
-    resp = client.post('/collections/', json=collection_0)
+    resp = client.post('/collections', json=collection_0)
     assert resp.status_code == 200  # TODO: should be 201 Created
     assert resp.get_json()["id"] == "4"
 
@@ -412,10 +412,10 @@ def test_api(client):
 def test_mappings(client):
     client, fail, stage, sparql = client
 
-    assert client.post('/mappings/', json={}).status_code == 200
+    assert client.post('/mappings', json={}).status_code == 200
     assert client.get('/mappings/1').status_code == 200
 
-    assert client.put('/mappings/', json=[{"name": "A"}, {"name": "B"}]).status_code == 200
+    assert client.put('/mappings', json=[{"name": "A"}, {"name": "B"}]).status_code == 200
     assert client.get('/mappings/1').status_code == 200
     assert client.get('/mappings/2').status_code == 200
 
