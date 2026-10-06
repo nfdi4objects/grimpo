@@ -11,6 +11,10 @@
   <link rel="stylesheet" href="style.css" />
   <script src="vue.global.js"></script>
 
+  <!-- TODO: use local copy instead of CDN? -->
+  <link rel="stylesheet" href="https://unpkg.com/@matdata/yasgui/build/yasgui.min.css" />
+  <script src="https://unpkg.com/@matdata/yasgui/build/yasgui.min.js"></script>
+
   <!-- Vue component templates -->
 
   <script type="text/x-template" id="Modal">
@@ -198,16 +202,7 @@
 
     <div id="sparql" class="tab-content">
       <endpoints :openapi="openapi" prefix="sparql"></endpoints>
-      <!--
-  <script src="https://unpkg.com/@matdata/yasgui/build/yasgui.min.js"></script>
-<style>
-@import url("https://unpkg.com/@matdata/yasgui/build/yasgui.min.css");
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css");
-.autocompleteWrapper,
-.endpointButtonsContainer, .queryBrowserToggle {
-  display: none !important;
-}
-</style-->
+      <sparql-editor></sparql-editor>
     </div>
 
     <div id="generic" class="tab-content">

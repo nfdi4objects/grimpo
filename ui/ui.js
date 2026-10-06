@@ -264,5 +264,15 @@ app.component("files", {
   },
 })
 
+app.component("sparql-editor", {
+  template: "<div ref='editor'></div>",
+  props: ["endpoint"],
+  data: () => ({ yasgui: null }),
+  mounted() {
+    if (window.Yasgui) {
+      this.yasgui = new window.Yasgui(this.$refs.editor, { requestConfig: { endpoint: this.endpoint }})
+    }
+  },
+})
 
 app.mount("#app")
