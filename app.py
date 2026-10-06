@@ -90,9 +90,9 @@ def status():
 @app.route('/openapi.json')
 def openapi():
     openapi = json.load(open("openapi.json", "r"))
-    for kind in ["collection", "terminology", "mappings"]:
-        with open(f"lib/{kind}-schema.json", "r") as file:
-            openapi["components"]["schemas"][kind] = json.load(file)
+    openapi["components"]["schemas"]["collection"] = collections.schema
+    openapi["components"]["schemas"]["terminology"] = terminologies.schema
+    openapi["components"]["schemas"]["mappings"] = mappings.schema
     return openapi
 
 

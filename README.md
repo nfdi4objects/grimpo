@@ -30,41 +30,42 @@ Development is being funded as part of [NFDI4Objects](https://www.nfdi4objects.n
     - [GET /sparql](#get-sparql)
     - [POST /sparql](#post-sparql)
   - [Terminologies](#terminologies)
-    - [GET /terminology](#get-terminology)
-    - [GET /terminology/{id}](#get-terminologyid)
-    - [PUT /terminology/{id}](#put-terminologyid)
-    - [DELETE /terminology/{id}](#delete-terminologyid)
-    - [PUT /terminology/](#put-terminology)
-    - [GET /terminology/{id}/stage/](#get-terminologyidstage)
-    - [GET /terminology/{id}/stage/{file}](#get-terminologyidstagefile)
-    - [POST /terminology/{id}/receive](#post-terminologyidreceive)
-    - [GET /terminology/{id}/receive](#get-terminologyidreceive)
-    - [POST /terminology/{id}/load](#post-terminologyidload)
-    - [GET /terminology/{id}/load](#get-terminologyidload)
-    - [POST /terminology/{id}/remove](#post-terminologyidremove)
-    - [GET /terminology/namespaces.json](#get-terminologynamespacesjson)
-    - [GET /terminology/skosmos.ttl](#get-terminologyskosmosttl)
+    - [GET /terminologies](#get-terminologies)
+    - [GET /terminologies/schema.json](#get-terminologiesschemajson)
+    - [GET /terminologies/{id}](#get-terminologiesid)
+    - [PUT /terminologies/{id}](#put-terminologiesid)
+    - [DELETE /terminologies/{id}](#delete-terminologiesid)
+    - [PUT /terminologies](#put-terminologies)
+    - [GET /terminologies/{id}/stage/](#get-terminologiesidstage)
+    - [GET /terminologies/{id}/stage/{file}](#get-terminologiesidstagefile)
+    - [POST /terminologies/{id}/receive](#post-terminologiesidreceive)
+    - [GET /terminologies/{id}/receive](#get-terminologiesidreceive)
+    - [POST /terminologies/{id}/load](#post-terminologiesidload)
+    - [GET /terminologies/{id}/load](#get-terminologiesidload)
+    - [POST /terminologies/{id}/remove](#post-terminologiesidremove)
+    - [GET /terminologies/namespaces.json](#get-terminologiesnamespacesjson)
+    - [GET /terminologies/skosmos.ttl](#get-terminologiesskosmosttl)
   - [Collections](#collections)
-    - [GET /collection/](#get-collection)
-    - [GET /collection/schema.json](#get-collectionschemajson)
-    - [PUT /collection/](#put-collection)
-    - [POST /collection/](#post-collection)
-    - [GET /collection/{id}](#get-collectionid)
-    - [PUT /collection/{id}](#put-collectionid)
-    - [DELETE /collection/{id}](#delete-collectionid)
-    - [GET /collection/{id}/stage/](#get-collectionidstage)
-    - [GET /collection/{id}/stage/{file}](#get-collectionidstagefile)
-    - [POST /collection/{id}/receive](#post-collectionidreceive)
-    - [GET /collection/{id}/receive](#get-collectionidreceive)
-    - [POST /collection/{id}/load](#post-collectionidload)
-    - [GET /collection/{id}/load](#get-collectionidload)
-    - [POST /collection/{id}/remove](#post-collectionidremove)
+    - [GET /collections](#get-collections)
+    - [GET /collections/schema.json](#get-collectionsschemajson)
+    - [PUT /collections](#put-collections)
+    - [POST /collections](#post-collections)
+    - [GET /collections/{id}](#get-collectionsid)
+    - [PUT /collections/{id}](#put-collectionsid)
+    - [DELETE /collections/{id}](#delete-collectionsid)
+    - [GET /collections/{id}/stage/](#get-collectionsidstage)
+    - [GET /collections/{id}/stage/{file}](#get-collectionsidstagefile)
+    - [POST /collections/{id}/receive](#post-collectionsidreceive)
+    - [GET /collections/{id}/receive](#get-collectionsidreceive)
+    - [POST /collections/{id}/load](#post-collectionsidload)
+    - [GET /collections/{id}/load](#get-collectionsidload)
+    - [POST /collections/{id}/remove](#post-collectionsidremove)
   - [Mappings](#mappings)
-    - [GET /mappings/](#get-mappings)
+    - [GET /mappings](#get-mappings)
     - [GET /mappings/schema.json](#get-mappingsschemajson)
     - [GET /mappings/properties.json](#get-mappingspropertiesjson)
-    - [PUT /mappings/](#put-mappings)
-    - [POST /mappings/](#post-mappings)
+    - [PUT /mappings](#put-mappings)
+    - [POST /mappings](#post-mappings)
     - [GET /mappings/{id}](#get-mappingsid)
     - [PUT /mappings/{id}](#put-mappingsid)
     - [DELETE /mappings/{id}](#delete-mappingsid)
@@ -203,7 +204,7 @@ Metadata of **[collections](#collections)** and **[mapping sources](#mappings)**
 }
 ~~~
 
-**[Terminology](#terminologies)** metadata is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminology/{id}](#put-terminologyid) or [PUT /terminology/](#put-terminology)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead.
+**[Terminology](#terminologies)** metadata is taken from [BARTOC] via its public API when registering a terminology (with [PUT /terminologies/{id}](#put-terminologyid) or [PUT /terminologies](#put-terminologies)). If the data directory contains a file `bartoc.json` with an array of JSKOS records from BARTOC, this file is used as source of terminology metadata instead.
 
 The location of data is taken from metadata field `distributions`. The first array field having either subfield `download` (with direct download URL) or subfield `url` (with Zenodo DOI) is used. Subfield `format` can be added to specificy the data format. The following formats are supported:
 
@@ -224,10 +225,10 @@ The location can be overridden on receive with optional query parameter `from` p
 
 The knowledge graph is organized in individual named graphs. URIs of most of these graphs are based on a namespace prefix, like `http://example.org/`. The prefix should be changed by [configuration] variable `BASE`.
 
-- each collection is imported into a graph of URI namespace `http://example.org/collection/`, followed by a numeric identifier
-- metadata about all collections is in graph of URI `http://example.org/collection/`
+- each collection is imported into a graph of URI namespace `http://example.org/collections/`, followed by a numeric identifier
+- metadata about all collections is in graph of URI `http://example.org/collections/`
 - each terminology is imported into a graph by its [BARTOC] URI, for instance `http://bartoc.org/en/node/725`
-- metadata about all terminologies is in graph of URI `http://example.org/terminology/`
+- metadata about all terminologies is in graph of URI `http://example.org/terminologies/`
 - mappings are grouped into mapping sources, each imported into a graph of URI namespace `http://example.org/mappings/`, followed by a numeric identifier
 - metadata about all mapping sources is in graph of URI `http://example.org/mappings/`
 
@@ -258,7 +259,7 @@ Received data in RDF or JSKOS format must be syntactically valid. Additional con
 }
 ~~~
 
-**JSON metadata** to describe collections and mapping sources is validated with JSON Schemas [collection-schema.json] and [mappings-schema.json], respectively.
+**JSON metadata** to describe collections and mapping sources is validated with [JSON Schemas](schema/).
 
 **JSKOS data** (for terminologies and mappings) is not validated yet (see [open issue](https://github.com/nfdi4objects/grimpo/issues/50)).
 
@@ -291,10 +292,10 @@ Reports are generated on receiving and loading data. The final format of reports
 
 Reports can be accessed with the following API methods:
 
-- [GET /terminology/{id}/receive](#get-terminologyidreceive)
-- [GET /terminology/{id}/load](#get-terminologyidload)
-- [GET /collection/{id}/receive](#get-collectionidreceive)
-- [GET /collection/{id}/load](#get-collectionidload)
+- [GET /terminologies/{id}/receive](#get-terminologyidreceive)
+- [GET /terminologies/{id}/load](#get-terminologyidload)
+- [GET /collections/{id}/receive](#get-collectionidreceive)
+- [GET /collections/{id}/load](#get-collectionidload)
 - [GET /mappings/{id}/receive](#get-mappingsidreceive)
 - [GET /mappings/{id}/load](#get-mappingsidload)
 
@@ -324,7 +325,7 @@ Get curent information about the application as JSON object. This includes:
 
 Get contents of the knowledge graph summarized as JSON object with three arrays:
 
-- `collection` (as also returned by [GET /collection](#get-collection))
+- `collection` (as also returned by [GET /collections](#get-collection))
 - `terminology`, reduced to their URIs
 - `mappings` (as also returned by [GET /mappings](#get-mappings))
 
@@ -346,23 +347,27 @@ SPARQL Query endpoint to the in-memory triple store. This is only supports JSON 
 
 Terminologies are identified by their [BARTOC] identifier. Terminology data should be registered before receiving collection data to detect use of terminologies in collections.
 
-#### GET /terminology
+#### GET /terminologies
 
 Return the list of registered terminologies.
 
-#### GET /terminology/{id}
+#### GET /terminologies/schema.json
+
+Return the terminologies schema [terminology-schema.json](schema/terminology-schema.json) used to validate terminology metadata. The schema is reduced to required property `uri` referencing a BARTOC URI. 
+
+#### GET /terminologies/{id}
 
 Return metadata of a registered terminology.
 
-#### PUT /terminology/{id}
+#### PUT /terminologies/{id}
 
 Register a terminology or update its metadata from BARTOC. The metadata is directly added to the triple store. Updates may lead to errors in description of terminologies because removal of statements is limited to simple triples with terminology URI as subject!
 
-#### DELETE /terminology/{id}
+#### DELETE /terminologies/{id}
 
-Unregister a terminology and remove it from stage directory and triple store. This implies [DELETE /terminology/{id}/remove](#delete-terminologyidremove).
+Unregister a terminology and remove it from stage directory and triple store. This implies [DELETE /terminologies/{id}/remove](#delete-terminologyidremove).
 
-#### PUT /terminology/
+#### PUT /terminologies/
 
 Replace the list of terminologies. By unregistering all and registering a new list. The response body is expected to be a JSON array with objects having key `uri` with the BARTOC URI like this:
 
@@ -373,17 +378,17 @@ Replace the list of terminologies. By unregistering all and registering a new li
 ]
 ~~~
 
-Other fields are ignored so the return value of [GET /terminology/](#get-terminology) can be used as payload.
+Other fields are ignored so the return value of [GET /terminologies](#get-terminologies) can be used as payload.
 
-#### GET /terminology/{id}/stage/
+#### GET /terminologies/{id}/stage/
 
 List files from stage directory of a terminology, each with `name`, `size`, `created`, `modified`.
 
-#### GET /terminology/{id}/stage/{file}
+#### GET /terminologies/{id}/stage/{file}
 
 Get a file from the stage directory.
 
-#### POST /terminology/{id}/receive
+#### POST /terminologies/{id}/receive
 
 Receive terminology data. Data source is given in terminology metadata field `distributions` or via query parameter `from` (see [data sources](#data-sources)).
 
@@ -395,27 +400,27 @@ File format can be:
 - JSKOS as array of mappings or object with field `mappings` for file extension `.json`
 - A ZIP archive containing RDF files for file extension `.zip`
 
-#### GET /terminology/{id}/receive
+#### GET /terminologies/{id}/receive
 
 Get latest receive [report] of a terminology.
 
-#### POST /terminology/{id}/load
+#### POST /terminologies/{id}/load
 
 Load received terminology data into the triple store. If the terminology is SKOS format (possibly converted from JSKOS) and the terminology has title and language information, a configuration file `skosmos.ttl` to be used for [Skosmos](https://skosmos.org/) is also generated in the stage are of the terminology.
 
-#### GET /terminology/{id}/load
+#### GET /terminologies/{id}/load
 
 Get latest load [report] of a terminology.
 
-#### POST /terminology/{id}/remove
+#### POST /terminologies/{id}/remove
 
 Remove terminology data from the triple store and from staging area. The terminology will still be registered and its metadata is not removed from the triple store.
 
-#### GET /terminology/namespaces.json
+#### GET /terminologies/namespaces.json
 
-Return registered URI namespaces forbidden to be used in RDF subjects. The result is a JSON object with terminology URIs as keys and namespaces as values. For instance the SKOS (<http://bartoc.org/en/node/18274>) namespace is <http://www.w3.org/2004/02/skos/core#> so RDF triples with subjects in this namespace can only be added to the knowledge graph via `/terminology/18274`.
+Return registered URI namespaces forbidden to be used in RDF subjects. The result is a JSON object with terminology URIs as keys and namespaces as values. For instance the SKOS (<http://bartoc.org/en/node/18274>) namespace is <http://www.w3.org/2004/02/skos/core#> so RDF triples with subjects in this namespace can only be added to the knowledge graph via `/terminologies/18274`.
 
-#### GET /terminology/skosmos.ttl
+#### GET /terminologies/skosmos.ttl
 
 Return Skosmos vocabulary configuration for imported (J)SKOS vocabularies.
 
@@ -433,45 +438,45 @@ Collections are described in a custom JSON format described by JSON Schema [coll
 
 When registered, the collection is assigned an id, and a corresponding URI.
 
-#### GET /collection/
+#### GET /collections/
 
 Return the list of registered collections (metadata only).
 
-#### GET /collection/schema.json
+#### GET /collections/schema.json
 
-[collection-schema.json]: lib/collection-schema.json
+[collection-schema.json]: schema/collection-schema.json
 
 Return the JSON Schema used to validation collection metadata. See file [collection-schema.json]. Collection field `id` is required by the schema but it gets assigned automatically in most cases.
 
-#### PUT /collection/
+#### PUT /collections/
 
 Replace the list of collections by unregistering all and registering a new list of collections.
 
-#### POST /collection/
+#### POST /collections/
 
 Register a new collection or update metadata of a registered collection.
 
-#### GET /collection/{id}
+#### GET /collections/{id}
 
 Return metadata of a specific registered collection.
 
-#### PUT /collection/{id}
+#### PUT /collections/{id}
 
 Update metadata of a specific registered collection or register a new collection.
 
-#### DELETE /collection/{id}
+#### DELETE /collections/{id}
 
-Unregister a collection and remove it from the triple store and staging area. This implies [DELETE /collection/{id}/remove](#delete-collectionidremove).
+Unregister a collection and remove it from the triple store and staging area. This implies [DELETE /collections/{id}/remove](#delete-collectionidremove).
 
-#### GET /collection/{id}/stage/
+#### GET /collections/{id}/stage/
 
 List files of the stage directory of a collection, each with `name`, `size`, `created`, `modified`.
 
-#### GET /collection/{id}/stage/{file}
+#### GET /collections/{id}/stage/{file}
 
 Get a file from the stage directory.
 
-#### POST /collection/{id}/receive
+#### POST /collections/{id}/receive
 
 Receive and process collection data. Data source is given in collection metadata field `distributions` or via query parameter `from` (see [data sources](#data-sources)).
 
@@ -481,19 +486,19 @@ File format can be:
 - RDF/XML for file extension `.rdf` or `.xml`
 - A ZIP archive containing RDF files for file extension `.zip`
 
-#### GET /collection/{id}/receive
+#### GET /collections/{id}/receive
 
 Get latest receive [report] of a collection.
 
-#### POST /collection/{id}/load
+#### POST /collections/{id}/load
 
 Load received and processed collection data into the triple store.
 
-#### GET /collection/{id}/load
+#### GET /collections/{id}/load
 
 Get latest load [report] of a collection.
 
-#### POST /collection/{id}/remove
+#### POST /collections/{id}/remove
 
 Remove collection data from the triple store and from staging area. The collection will still be registered and its metadata is not removed from the triple store.
 
@@ -507,9 +512,7 @@ Return the list of registered mapping sources.
 
 #### GET /mappings/schema.json
 
-[mappings-schema.json]: lib/mappings-schema.json
-
-Return the mapping sources schema [mappings-schema.json] used to validate mapping sources.
+Return the mapping sources schema [mappings-schema.json](schema/mappings-schema.json) used to validate mapping sources.
 
 #### GET /mappings/properties.json
 

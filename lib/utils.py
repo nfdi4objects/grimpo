@@ -18,3 +18,7 @@ def write_json(file, data):
 
 def read_context(file):
     return read_json(Path(__file__).parent / "context" / file)
+
+
+def read_schema(file):
+    return read_json(Path(__file__).parent / ".." / "schema" / file)

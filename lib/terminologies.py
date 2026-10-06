@@ -1,14 +1,14 @@
 from pathlib import Path
 import requests
 import json
-from .utils import read_json, read_context
+from .utils import read_json, read_schema, read_context
 from .errors import NotFound
 from .rdf import jsonld2nt
 from .registry import Registry
 
 
 class TerminologyRegistry(Registry):
-    schema = read_json(Path(__file__).parent / 'terminology-schema.json')
+    schema = read_schema('terminology-schema.json')
     remote_contexts = {
         "https://gbv.github.io/jskos/context.json": read_context("jskos.json"),
         "http://iiif.io/api/presentation/3/context.json": read_context("iiif.json"),

@@ -8,6 +8,7 @@ RUN pip3 install -r requirements.txt
 COPY app.py /app
 COPY openapi.json /app
 COPY lib/ /app/lib
+COPY schema/ /app/schema
 COPY ui/ /app/ui
 
 EXPOSE 5020
