@@ -15,11 +15,6 @@ def test_store():
         'p': {'type': 'uri', 'value': 'http://purl.org/dc/terms/title'},
         'o': {'type': 'literal', 'value': 'foo'}
     }]
-    assert store.query("SELECT * { ?s ?p ?o }", "rdflib") == [{
-        's': BNode('b1'),
-        'p': URIRef('http://purl.org/dc/terms/title'),
-        'o': Literal("foo")
-    }]
     assert store.query("SELECT * { ?s ?p ?o }", "n3") == [{
         's': '_:b1',
         'p': '<http://purl.org/dc/terms/title>',
@@ -53,18 +48,18 @@ def test_store():
     # GET
     res = sparql({"query": query})
     assert res["head"] == {"vars": ["s", "b", "o"]}
-    assert len(res["bindings"]) == 5
+    assert len(res["results"]["bindings"]) == 5
 
     # POST full body
     res = sparql(data="DESCRIBE <http://example.org/NULL>",
                  content_type="application/sparql-query", method="POST")
-    assert res == {"head": {"vars": []}, "bindings": []}
+    assert res == {"head": {"vars": []}, "results": {"bindings": []}}
 
     # POST form
     query = "SELECT * FROM <http://example.org/NULL> { ?s ?p ?o }"
     res = sparql(data={"query": query}, method="POST")
-    assert res == {"head": {"vars": []}, "bindings": []}
+    assert res == {"head": {"vars": []}, "results": {"bindings": []}}
 
     query = "SELECT * FROM <http://example.org/1> { ?s ?p ?o }"
     res = sparql(data={"query": query}, method="POST")
-    assert len(res["bindings"]) == 6
+    assert len(res["results"]["bindings"]) == 6

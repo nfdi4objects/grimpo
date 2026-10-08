@@ -82,7 +82,7 @@ class ExternalTripleStore(AbstractTripleStore):
         client.setQuery(self.prefixes + query)
         return client
 
-    def query(self, query, format='sparql'):
+    def query(self, query, format="sparql"):
         client = self.__client(query)
         try:
             result = client.queryAndConvert()
@@ -121,7 +121,7 @@ class InternalTripleStore(AbstractTripleStore):
     def __init__(self):
         self.ds = Dataset(default_union=True)
 
-    def query(self, query, format='sparql'):
+    def query(self, query, format="sparql"):
         query = self.prefixes + query
         result = self.ds.query(query)
         if result.type == "ASK":
@@ -153,16 +153,18 @@ class InternalTripleStore(AbstractTripleStore):
         #        params[name] = request.values[name]
 
         try:
-            data = self.ds.query(query)
-            if data.type == "ASK":
-                data = {"head": {}, "boolean": data.askAnswer}
+            result = self.ds.query(query)
+            if result.type == "ASK":
+                data = {"head": {}, "boolean": result.askAnswer}
             else:
-                bindings = data.bindings or []
+                bindings = result.bindings or []
                 vars = [k for k in bindings[0].keys()] if bindings else []
-                # TODO: support other serialization formats
-                bindings = convert_query_result(bindings or [], convert_sparql_term, "sparql")
-                data = {"head": {"vars": vars}, "bindings": bindings}
-            return Response(json.dumps(data), mimetype="application/sparql-results+json")
+                bindings = convert_query_result(bindings, convert_rdflib_term, "sparql")
+                data = {
+                    "head": {"vars": vars},
+                    "results": {"bindings": bindings}
+                }
+            return Response(json.dumps(data, indent=2), mimetype="application/sparql-results+json")
         except Exception as e:
             raise ApiError(f"SPARQL Query failed: {e}")
 
@@ -185,19 +187,19 @@ class InternalTripleStore(AbstractTripleStore):
 
 
 def convert_query_result(result, mapper, target):
-    """Convert a SPARQL Query result to target form (sparql, rdflib, n3, nq, ttl)."""
+    """Convert a SPARQL Query result to target form (sparql, nq)."""
 
-    if target == "nq" or target == "ttl":
+    if target == "nq":
         result = convert_query_result(result, mapper, "n3")
         return "\n".join([
             " ".join([row.get(f) for f in ['g', 's', 'p', 'o'] if f in row]) + " ."
             for row in result])
-
-    return [{str(k): mapper(v, target) for k, v in row.items()} for row in result]
+    else:
+        return [{str(k): mapper(v, target) for k, v in row.items()} for row in result]
 
 
 def convert_sparql_term(term, format):
-    if format == "rdflib" or format == "n3":
+    if format == "n3":
         if term['type'] == 'uri':
             term = URIRef(term['value'])
         elif term['type'] == 'bnode':
@@ -209,14 +211,11 @@ def convert_sparql_term(term, format):
                 term = Literal(term['value'], lang=term['xml:lang'])
             else:
                 term = Literal(term['value'])
-        if format == "n3":
-            return term.n3()
+        return term.n3()
     return term
 
 
 def convert_rdflib_term(term, format):
-    if format == "rdflib":
-        return term
     if format == "n3":
         return term.n3()
     if isinstance(term, URIRef):

@@ -37,6 +37,11 @@ const app = createApp({
     fetchJSON("openapi.json").then(openapi => this.openapi = openapi)
     this.updateStatus()  
   },
+  computed: {
+    sparqlEndpoint() {
+      return this.sparql || "sparql" 
+    },
+  },
   methods: {
     async updateStatus() {
       fetchJSON("status.json").then(status => {
@@ -45,10 +50,8 @@ const app = createApp({
         }
         document.getElementsByTagName("title")[0].textContent = this.title
         if (this.connected) {
-          const endpoint = this.sparql || "sparql"
-          fetch(`${endpoint}?query=SELECT%20*%20%7B%20BIND(1%20as%20%3Fx)%20%7D`).then(() => {
+          fetch(`${this.sparqlEndpoint}?query=SELECT%20*%20%7B%20BIND(1%20as%20%3Fx)%20%7D`).then(() => {
             this.sparqlStatus = "SPARQL backenend is connected and reachable"
-            // TODO: show Yasgui
           }).catch(() => {
             this.sparqlStatus = "SPARQL backend is connected but not accessible from outside!"
           })
@@ -275,8 +278,25 @@ app.component("sparql-editor", {
   props: ["endpoint"],
   data: () => ({ yasgui: null }),
   mounted() {
-    if (window.Yasgui) {
-      this.yasgui = new window.Yasgui(this.$refs.editor, { requestConfig: { endpoint: this.endpoint }})
+    const Yasgui = window.Yasgui
+    if (Yasgui) {
+      const endpoint = /^https?:/.test(this.endpoint) ? this.endpoint
+        : window.location.href.split(/[?#]/)[0] + this.endpoint
+      const pluginsOptions = {
+        Table: {
+          displayConfig: {
+            uriDisplayMode: "abbreviated",
+            showDatatypes: false,
+            ellipsisMode: true,
+          },
+        },
+      }
+      // TODO: prefixes
+      const config = { requestConfig: { endpoint }, pluginsOptions }
+      if (Yasgui.Yasr) {
+        Yasgui.Yasr.defaults.pluginsOptions = pluginsOptions
+      }
+      this.yasgui = new Yasgui(this.$refs.editor, config)
     }
   },
 })
