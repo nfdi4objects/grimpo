@@ -126,7 +126,7 @@ function expandSchema(schema, remove=[]) {
 // Form to modify item metadata with save button
 app.component("editor", {
   template: "#Editor",
-  props: ["prefix", "method", "id"],
+  props: ["prefix", "id"],
   emits: ["close", "saved"],
   data: () => ({
     schema: {},
@@ -146,10 +146,16 @@ app.component("editor", {
       })
     }
   },
+  computed: {
+    method() {
+      return this.id ? "PUT" : "POST"
+    },
+  },
   methods: {
     async save() {
       this.$emit("close")
-      this.$root.submit(`${this.prefix}/${this.id}`, {
+      const url = this.id ? `${this.prefix}/${this.id}` : this.prefix
+      this.$root.submit(url, {
         method: this.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this.item),

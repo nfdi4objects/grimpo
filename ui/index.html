@@ -34,14 +34,19 @@
       <modal :opened="modal == 'select'" @close="modal = null">
         <selector :prefix="prefix" @select="select"></selector>
       </modal>
-      <button v-if="prefix != 'terminologies'" @click="modal = 'edit'" :disabled="!item">edit</button>
-      <modal :opened="modal == 'edit'" @close="modal=null">
-        <editor :method="'PUT'" :prefix="prefix" :id="id" @close="modal=null"></editor>
-      </modal>
-      <button @click="modal = 'add'">add</button>
-      <modal :opened="modal == 'add'" @close="modal=null">
-        <editor :method="'POST'" :prefix="prefix" @close="modal=null"></editor>
-      </modal>
+      <template v-if="prefix == 'terminologies'">
+        <button @click="$root.submit(`terminologies/${id}`, { method: 'PUT' })" :disabled="!id">add</button>
+      </template>
+      <template v-else>
+        <button @click="modal = 'edit'" :disabled="!item">edit</button>
+        <modal :opened="modal == 'edit'" @close="modal=null">
+          <editor :prefix="prefix" :id="id" @close="modal=null"></editor>
+        </modal>
+        <button @click="modal = 'add'">add</button>
+        <modal :opened="modal == 'add'" @close="modal=null">
+          <editor :prefix="prefix" @close="modal=null"></editor>
+        </modal>
+      </template>
       <span v-if="item">{{item.name || item.prefLabel?.en || item.uri }}</span>
     </div>
     <ul class="endpoints">
